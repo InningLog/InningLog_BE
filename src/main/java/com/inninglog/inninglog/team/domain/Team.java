@@ -1,4 +1,4 @@
-package com.inninglog.inninglog.team;
+package com.inninglog.inninglog.team.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

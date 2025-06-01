@@ -1,7 +1,7 @@
-package com.inninglog.inninglog.member;
+package com.inninglog.inninglog.member.domain;
 
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
-import com.inninglog.inninglog.team.Team;
+import com.inninglog.inninglog.team.domain.Team;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,7 +34,7 @@ public class Member extends BaseTimeEntity {
     private String profile_url;
 
     @Enumerated(EnumType.STRING) // <= 중요! enum을 문자열로 저장
-    private UserType user_type;
+    private MemberType user_type;
 
     //응원하는 팀
     @ManyToOne(fetch = FetchType.LAZY) //지연 로딩

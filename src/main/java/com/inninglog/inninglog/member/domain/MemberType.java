@@ -1,15 +1,15 @@
-package com.inninglog.inninglog.member;
+package com.inninglog.inninglog.member.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum UserType {
+public enum MemberType {
     NEWBIE("뉴비"),
     VETERAN("고인물");
 
     private final String description;
 
-    UserType(String description) {
+    MemberType(String description) {
         this.description = description;
     }
 
@@ -19,8 +19,8 @@ public enum UserType {
     }
 
     @JsonCreator
-    public static UserType from(String input) {
-        for (UserType type : UserType.values()) {
+    public static MemberType from(String input) {
+        for (MemberType type : MemberType.values()) {
             if (type.description.equals(input)) {
                 return type;
             }

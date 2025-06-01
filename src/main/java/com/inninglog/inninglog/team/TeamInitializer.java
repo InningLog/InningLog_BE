@@ -1,5 +1,7 @@
 package com.inninglog.inninglog.team;
 
+import com.inninglog.inninglog.team.domain.Team;
+import com.inninglog.inninglog.team.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
