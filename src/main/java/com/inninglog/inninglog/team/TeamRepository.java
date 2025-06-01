@@ -1,4 +1,6 @@
 package com.inninglog.inninglog.team;
 
-public class TeamRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface TeamRepository extends JpaRepository<Team, Long> {
 }

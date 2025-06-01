@@ -1,6 +1,7 @@
 package com.inninglog.inninglog.member;
 
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
+import com.inninglog.inninglog.team.Team;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,5 +37,8 @@ public class Member extends BaseTimeEntity {
     private UserType user_type;
 
     //응원하는 팀
+    @ManyToOne(fetch = FetchType.LAZY) //지연 로딩
+    @JoinColumn(name = "team_id")
+    private Team team;
 
 }
