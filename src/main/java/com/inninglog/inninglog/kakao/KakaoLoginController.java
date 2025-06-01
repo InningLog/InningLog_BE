@@ -1,9 +1,9 @@
 package com.inninglog.inninglog.kakao;
 
 
-import com.inninglog.inninglog.common.auth.JwtProvider;
-import com.inninglog.inninglog.member.Member;
-import com.inninglog.inninglog.member.MemberService;
+import com.inninglog.inninglog.global.auth.JwtProvider;
+import com.inninglog.inninglog.member.domain.Member;
+import com.inninglog.inninglog.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;

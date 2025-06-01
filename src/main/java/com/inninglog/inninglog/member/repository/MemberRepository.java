@@ -1,6 +1,6 @@
-package com.inninglog.inninglog.member;
+package com.inninglog.inninglog.member.repository;
 
-import org.springframework.stereotype.Repository;
+import com.inninglog.inninglog.member.domain.Member;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
