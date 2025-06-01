@@ -1,4 +1,4 @@
-package com.inninglog.inninglog.global.config;
+package com.inninglog.inninglog.global.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -19,17 +19,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
-                .httpBasic().disable()
-                .formLogin().disable()
+                .securityMatcher("/**")
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll() // 예외
-                        .anyRequest().authenticated() // 나머지는 인증 필요
-                )
+                        .requestMatchers(
+                                "/login/page",     // 카카오 로그인 페이지
+                                "/callback",       // 카카오 콜백
+                                "/test",           // 토큰 확인용
+                                "/auth/**",        // 일반 인증 관련 경로
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**"
+                ).permitAll()
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .csrf(csrf -> csrf.disable())
+                .httpBasic(httpBasic -> httpBasic.disable())
+                .formLogin(form -> form.disable());
 
         return http.build();
     }
