@@ -32,4 +32,7 @@ public class MemberService {
 
         member.setNickname(nickname);
     }
+
+    @Transactional
+    public void updateMemberType(Long memberId, String memberType) {}
 }
