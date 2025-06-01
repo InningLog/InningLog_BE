@@ -48,12 +48,12 @@ public class MemberService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        if(member.getTeam() != null || member.getUser_type() != null) {
+        if(member.getTeam() != null || member.getMemberType() != null) {
             throw new CustomException(ErrorCode.ALREADY_SET);
         }
 
         //유저 타입 설정
-        member.setUser_type(MemberType.valueOf(userType));
+        member.setMemberType(MemberType.valueOf(userType));
 
         //응원 팀 설정
         Team team = teamRepository.findById(teamId)
