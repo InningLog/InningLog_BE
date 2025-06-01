@@ -1,7 +1,7 @@
 package com.inninglog.inninglog.kakao;
 
 
-import com.inninglog.inninglog.common.auth.JwtProvider;
+import com.inninglog.inninglog.global.auth.JwtProvider;
 import com.inninglog.inninglog.member.Member;
 import com.inninglog.inninglog.member.MemberService;
 import lombok.RequiredArgsConstructor;

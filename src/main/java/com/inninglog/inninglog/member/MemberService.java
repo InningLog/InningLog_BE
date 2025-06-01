@@ -1,5 +1,7 @@
 package com.inninglog.inninglog.member;
 
+import com.inninglog.inninglog.global.exception.CustomException;
+import com.inninglog.inninglog.global.exception.ErrorCode;
 import com.inninglog.inninglog.kakao.KakaoUserInfoResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,9 +19,17 @@ public class MemberService {
                 .orElseGet(() -> {
                     Member newMember = new Member();
                     newMember.setKakaoId(kakaoId);
-                    newMember.setNickname(kakaoUserInfo.getKakaoAccount().getProfile().getNickName());
-                    newMember.setProfileImageUrl(kakaoUserInfo.getKakaoAccount().getProfile().getProfileImageUrl());
+                    newMember.setKakao_nickname(kakaoUserInfo.getKakaoAccount().getProfile().getNickName());
+                    newMember.setKakao_profile_url(kakaoUserInfo.getKakaoAccount().getProfile().getProfileImageUrl());
                     return memberRepository.save(newMember); // join 대신 save
                 });
+    }
+
+    @Transactional
+    public void updateNickname(Long memberId, String nickname) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        member.setNickname(nickname);
     }
 }

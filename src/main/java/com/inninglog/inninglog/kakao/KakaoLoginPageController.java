@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.kakao;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/login")
+@Tag(name = "Kakao", description = "카카오 관련 API")
 public class KakaoLoginPageController {
 
     @Value("${kakao.client_id}")
