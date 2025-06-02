@@ -8,6 +8,8 @@ import com.inninglog.inninglog.team.domain.Team;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Builder
 @AllArgsConstructor //모든 필드를 매개변수로 받는 생성자 생성
@@ -25,7 +27,7 @@ public class Journal extends BaseTimeEntity {
     private Member member;
 
     //경기 날짜
-    private String date;
+    private LocalDate date;
 
     //상대팀
     @ManyToOne(fetch = FetchType.LAZY)
@@ -62,8 +64,8 @@ public class Journal extends BaseTimeEntity {
 
     //시야 정보
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "setView_id")
-    private SeatView setView;
+    @JoinColumn(name = "seatView_id")
+    private SeatView seatView;
 
 
 }
