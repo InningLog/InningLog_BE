@@ -43,17 +43,17 @@ public class MemberService {
 
     //유저 타입 & 응원 팀 설정
     @Transactional
-    public void updateMemberType(Long memberId, String userType, Long teamId) {
+    public void updateMemberType(Long memberId, MemberType userType, Long teamId) {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        if(member.getTeam() != null || member.getMemberType() != null) {
+        if(member.getTeam() != null) {
             throw new CustomException(ErrorCode.ALREADY_SET);
         }
 
         //유저 타입 설정
-        member.setMemberType(MemberType.valueOf(userType));
+        member.setMemberType(userType);
 
         //응원 팀 설정
         Team team = teamRepository.findById(teamId)

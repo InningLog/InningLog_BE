@@ -33,8 +33,10 @@ public class Member extends BaseTimeEntity {
     //서비스 내 프로필 링크
     private String profile_url;
 
-    @Enumerated(EnumType.STRING) // <= 중요! enum을 문자열로 저장
-    private MemberType memberType;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private MemberType memberType = MemberType.NEWBIE;
 
     //응원하는 팀
     @ManyToOne(fetch = FetchType.LAZY) //지연 로딩

@@ -19,5 +19,5 @@ public class Team {
 
     private String name;
 
-    private String short_code;
+    private String shortCode;
 }

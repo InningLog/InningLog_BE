@@ -18,7 +18,7 @@ public class Stadium {
 
     private String name;
 
-    private String short_code;
+    private String shortCode;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
