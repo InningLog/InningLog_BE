@@ -38,6 +38,10 @@ public class Journal extends BaseTimeEntity {
     //상대팀 점수
     private int theirScore;
 
+    //경기 결과
+    @Enumerated(EnumType.STRING)
+    private ResultScore resultScore;
+
     //감정 태그
     @Enumerated(EnumType.STRING)
     private EmotionTag emotion;
