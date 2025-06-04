@@ -8,16 +8,24 @@ import com.inninglog.inninglog.stadium.domain.Stadium;
 import com.inninglog.inninglog.team.domain.Team;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class JourCreateReqDto {
 
     //경기 날짜
 
-    private LocalDate date;
+    private LocalDateTime date;
 
     //상대팀
     @Schema(description = "상대팀 숏코드 작성", example = "KIA")
@@ -31,9 +39,9 @@ public class JourCreateReqDto {
     @Schema(description = "상대팀 점수", example = "1")
     private int theirScore;
 
-    //경기 결과
-    @Schema(description = "경기 결과 승/무승부/패", example = "무승부")
-    private ResultScore resultScore;
+//    //경기 결과
+//    @Schema(description = "경기 결과 승/무승부/패", example = "무승부")
+//    private ResultScore resultScore;
 
     //감정 태그
     @Schema(description = "감정 태그 기쁨/슬픔/짜증 중 한개 작성", example = "기쁨")

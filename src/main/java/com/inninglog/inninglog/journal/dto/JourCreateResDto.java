@@ -1,10 +1,12 @@
 package com.inninglog.inninglog.journal.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.*;
 
-@Getter
+
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class JourCreateResDto {
     private Long journalId;
 }

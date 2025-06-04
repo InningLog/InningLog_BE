@@ -8,9 +8,12 @@ import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.dto.JourCreateReqDto;
 import com.inninglog.inninglog.journal.dto.JourCreateResDto;
+import com.inninglog.inninglog.journal.dto.JournalListResDto;
 import com.inninglog.inninglog.journal.service.JournalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,6 +25,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,22 +57,27 @@ public class JournalController {
             @Parameter(description = "업로드할 이미지 파일 (선택사항)")
             @RequestPart(value = "file", required = false) MultipartFile file,
 
-            @Parameter(description = "일지 생성 요청 데이터",
+            @Parameter(
+                    description = """
+        일지 생성 요청 JSON 예시입니다. 이 값을 복사해 'request' 필드에 붙여넣으세요.
+
+        ```json
+        {
+          "ourScore": 1,
+          "stadiumShortCode": "JAM",
+          "date": "2025-06-03",
+          "opponentTeamShortCode": "KIA",
+          "review_text": "오늘 경기는 완벽했어!",
+          "resultScore": "승",
+          "theirScore": 0,
+          "emotion": "기쁨",
+          "is_public": true
+        }
+        ```
+        """,
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = JourCreateReqDto.class)),
-                    example = """
-                    {
-                      "ourScore": 0,
-                      "stadiumShortCode": "JAM",
-                      "date": "2025-06-03",
-                      "opponentTeamShortCode": "KIA",
-                      "review_text": "오늘 경기 정말 재밌었다!",
-                      "resultScore": "승",
-                      "theirScore": 0,
-                      "emotion": "기쁨",
-                      "is_public": true
-                    }
-                    """)
+                            schema = @Schema(implementation = JourCreateReqDto.class))
+            )
             @RequestPart("request") String requestJson
     ) {
         try {
@@ -93,5 +103,25 @@ public class JournalController {
             return ResponseEntity.internalServerError()
                     .body("Server error: " + e.getMessage());
         }
+
+
+    }
+
+
+    //본인 직관일지 목록 조회
+    @Operation(
+            summary = "본인 직관 일지 목록 조회",
+            description = "JWT 토큰에서 유저 정보를 추출하여 본인의 직관 일지를 조회합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "직관 일지 목록 조회 성공",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = JournalListResDto.class)))),
+            @ApiResponse(responseCode = "404", description = "회원 정보 없음",
+                    content = @Content)
+    })
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyJournals(@AuthenticationPrincipal CustomUserDetails user) {
+        List<JournalListResDto> result = journalService.getJournalsByMember(user.getMember().getId());
+        return ResponseEntity.ok(result);
     }
 }

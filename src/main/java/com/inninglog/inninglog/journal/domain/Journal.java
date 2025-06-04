@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Builder
@@ -27,7 +28,7 @@ public class Journal extends BaseTimeEntity {
     private Member member;
 
     //경기 날짜
-    private LocalDate date;
+    private LocalDateTime date;
 
     //상대팀
     @ManyToOne(fetch = FetchType.LAZY)

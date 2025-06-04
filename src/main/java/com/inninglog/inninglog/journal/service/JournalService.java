@@ -4,8 +4,9 @@ import com.inninglog.inninglog.global.exception.CustomException;
 import com.inninglog.inninglog.global.exception.ErrorCode;
 import com.inninglog.inninglog.global.s3.S3Uploader;
 import com.inninglog.inninglog.journal.domain.Journal;
+import com.inninglog.inninglog.journal.domain.ResultScore;
 import com.inninglog.inninglog.journal.dto.JourCreateReqDto;
-import com.inninglog.inninglog.journal.dto.JourCreateResDto;
+import com.inninglog.inninglog.journal.dto.JournalListResDto;
 import com.inninglog.inninglog.journal.repository.JournalRepository;
 import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.member.repository.MemberRepository;
@@ -19,12 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class JournalService {
 
-    private final JournalRepository repository;
+    private final JournalRepository journalRepository;
     private final MemberRepository memberRepository;
     private final StadiumRepository stadiumRepository;
     private final TeamRepository teamRepository;
@@ -51,13 +54,24 @@ public class JournalService {
             }
         }
 
+        //경기 결과 계산 (백엔드 자동 처리)
+        ResultScore resultScore;
+
+        if (dto.getOurScore() > dto.getTheirScore()) {
+            resultScore = ResultScore.WIN;
+        } else if (dto.getOurScore() < dto.getTheirScore()) {
+            resultScore = ResultScore.LOSE;
+        } else {
+            resultScore = ResultScore.DRAW;
+        }
+
         Journal journal = Journal.builder()
                 .member(member)
                 .date(dto.getDate())
                 .opponentTeam(opponentTeam)
                 .ourScore(dto.getOurScore())
                 .theirScore(dto.getTheirScore())
-                .resultScore(dto.getResultScore())
+                .resultScore(resultScore)
                 .emotion(dto.getEmotion())
                 .review_text(dto.getReview_text())
                 .media_url(mediaUrl)
@@ -66,8 +80,30 @@ public class JournalService {
                 .build();
 
 
-        repository.save(journal);
+        journalRepository.save(journal);
 
         return journal;
+    }
+
+
+    //직관 일지 목록 조회
+    @Transactional(readOnly = true)
+    public List<JournalListResDto> getJournalsByMember(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        List<Journal> journals = journalRepository.findAllByMember(member);
+
+        return journals.stream()
+                .map(journal -> new JournalListResDto(
+                        journal.getId(),
+                        journal.getOurScore(),
+                        journal.getTheirScore(),
+                        journal.getResultScore(),
+                        journal.getDate(),
+                        journal.getOpponentTeam().getName(),
+                        journal.getStadium().getName()
+                ))
+                .collect(Collectors.toList());
     }
 }
