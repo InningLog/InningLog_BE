@@ -46,6 +46,11 @@ dependencies {
 	//시큐리티
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
+	//S3
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'software.amazon.awssdk:s3:2.25.17'
+	implementation 'software.amazon.awssdk:auth:2.25.17'
+
 }
 
 tasks.named('test') {

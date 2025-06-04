@@ -2,6 +2,7 @@ package com.inninglog.inninglog.journal.service;
 
 import com.inninglog.inninglog.global.exception.CustomException;
 import com.inninglog.inninglog.global.exception.ErrorCode;
+import com.inninglog.inninglog.global.s3.S3Uploader;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.dto.JourCreateReqDto;
 import com.inninglog.inninglog.journal.dto.JourCreateResDto;
@@ -15,6 +16,9 @@ import com.inninglog.inninglog.team.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -24,10 +28,11 @@ public class JournalService {
     private final MemberRepository memberRepository;
     private final StadiumRepository stadiumRepository;
     private final TeamRepository teamRepository;
+    private final S3Uploader s3Uploader;
 
     //직관 일지 생성
     @Transactional
-    public Journal createJournal(Long memberId, JourCreateReqDto dto){
+    public Journal createJournal(Long memberId, JourCreateReqDto dto, MultipartFile file){
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -36,6 +41,15 @@ public class JournalService {
 
         Stadium stadium = stadiumRepository.findByShortCode(dto.getStadiumShortCode())
                 .orElseThrow(() -> new CustomException(ErrorCode.STADIUM_NOT_FOUND));
+
+        String mediaUrl = null;
+        if (file != null && !file.isEmpty()) {
+            try {
+                mediaUrl = s3Uploader.uploadFile(file, "journal");
+            } catch (IOException e) {
+                throw new RuntimeException("S3 업로드 실패", e);
+            }
+        }
 
         Journal journal = Journal.builder()
                 .member(member)
@@ -46,9 +60,10 @@ public class JournalService {
                 .resultScore(dto.getResultScore())
                 .emotion(dto.getEmotion())
                 .review_text(dto.getReview_text())
-                .media_url(dto.getReview_text())
+                .media_url(mediaUrl)
                 .is_public(dto.getIs_public())
-                .stadium(stadium).build();
+                .stadium(stadium)
+                .build();
 
 
         repository.save(journal);
