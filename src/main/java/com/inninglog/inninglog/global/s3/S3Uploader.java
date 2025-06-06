@@ -9,6 +9,7 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.core.sync.RequestBody;
 
 import java.io.IOException;
@@ -42,7 +43,6 @@ public class S3Uploader {
                 .bucket(bucket)
                 .key(fileName)
                 .contentType(file.getContentType())
-//                .acl("public-read")
                 .build();
 
         s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
