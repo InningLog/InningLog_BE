@@ -3,7 +3,8 @@ package com.inninglog.inninglog.team;
 import com.inninglog.inninglog.team.domain.Team;
 import com.inninglog.inninglog.team.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -12,13 +13,13 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Order(1)
-public class TeamInitializer implements CommandLineRunner {
+public class TeamInitializer implements ApplicationRunner {
 
     private final TeamRepository teamRepository;
 
     @Override
-    public void run(String... args) {
-        if (teamRepository.count() == 0) { // 중복 삽입 방지
+    public void run(ApplicationArguments args) {
+        if (teamRepository.count() == 0) {
             teamRepository.saveAll(List.of(
                     Team.builder().name("기아 타이거즈").shortCode("KIA").build(),
                     Team.builder().name("삼성 라이온즈").shortCode("SAMSUNG").build(),

@@ -65,10 +65,9 @@ public class JournalController {
         {
           "ourScore": 1,
           "stadiumShortCode": "JAM",
-          "date": "2025-06-03",
+          "date": "2025-06-03T18:30:00",
           "opponentTeamShortCode": "KIA",
           "review_text": "오늘 경기는 완벽했어!",
-          "resultScore": "승",
           "theirScore": 0,
           "emotion": "기쁨",
           "is_public": true

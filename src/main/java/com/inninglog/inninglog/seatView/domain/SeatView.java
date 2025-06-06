@@ -2,6 +2,7 @@ package com.inninglog.inninglog.seatView.domain;
 
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
 import com.inninglog.inninglog.journal.domain.Journal;
+import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.stadium.domain.Stadium;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,6 +20,10 @@ public class SeatView extends BaseTimeEntity { //직관 일지
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "memebr_id")
+    private Member member;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "journal_id")

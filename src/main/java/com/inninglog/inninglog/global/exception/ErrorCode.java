@@ -12,7 +12,9 @@ public enum ErrorCode {
     TYPE_MISMATCH("TYPE_MISMATCH", "요청 파라미터 타입이 올바르지 않습니다."),
     TEAM_NOT_FOUND("TEAM_NOT_FOUND", "등록되지 않은 팀입니다."),
     ALREADY_SET("ALREADY_SET", "이미 유저 타입 혹은 팀이 설정되었습니다."),
-    STADIUM_NOT_FOUND("STADIUM_NOT_FOUND", "등록되지 않은 경기장입니다.");
+    STADIUM_NOT_FOUND("STADIUM_NOT_FOUND", "등록되지 않은 경기장입니다."),
+    JOURNAL_NOT_FOUND("JOURNAL_NOT_FOUND", "작성하지 않은 일지 입니다."),
+    EMOTION_TAG_NOT_FOUND("EMOTION_TAG_NOT_FOUND", "감정 태그가 없습니다.");
 
     private final String code;
     private final String message;
