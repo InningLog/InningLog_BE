@@ -6,18 +6,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class JournalListResDto {
-
+public class JournalSumListResDto {
     private Long journalId;
-    private int ourScore;
-    private int theirScore;
+    private String media_url;
     private ResultScore resultScore;
     private LocalDateTime date;
     private String opponentTeamName;
