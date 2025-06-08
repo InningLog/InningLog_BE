@@ -38,7 +38,7 @@ public class JournalService {
 
     //직관 일지 이미지 업로드
     @Transactional
-    public String uploadImage(Long memberId, MultipartFile file) {
+    public String uploadImage(MultipartFile file) {
 
         String media_url = null;
         if (file != null && !file.isEmpty()) {

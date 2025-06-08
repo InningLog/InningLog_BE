@@ -55,8 +55,6 @@ public class JournalController {
     })
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadImage(
-            @Parameter(hidden = true)
-            @AuthenticationPrincipal CustomUserDetails user,
 
             @Parameter(description = "업로드할 이미지 파일 (선택사항)")
             @RequestPart(value = "file", required = false) MultipartFile file
@@ -66,7 +64,7 @@ public class JournalController {
         }
 
         try {
-           String media_url = journalService.uploadImage(user.getMember().getId(), file);
+           String media_url = journalService.uploadImage(file);
             return ResponseEntity.ok(media_url);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("이미지 업로드 실패: " + e.getMessage());
@@ -125,8 +123,8 @@ public class JournalController {
             )
             @RequestBody JourCreateReqDto request)
     {
-        journalService.createJournal(user.getMember().getId(), request);
-        return ResponseEntity.ok().build();
+        Journal journal = journalService.createJournal(user.getMember().getId(), request);
+        return ResponseEntity.ok(journal.getId());
     }
 
 

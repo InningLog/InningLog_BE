@@ -2,6 +2,7 @@ package com.inninglog.inninglog.seatView.dto;
 
 
 import com.inninglog.inninglog.seatView.domain.SeatViewEmotionTag;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +17,7 @@ import java.util.List;
 public class SeatCreateReqDto {
 
     //직관 일지 id
+    @Schema(description = "매핑 되는 직관 일지의 id")
     private Long journalId;
 
     //좌석 정보 원본
@@ -26,5 +28,8 @@ public class SeatCreateReqDto {
 
     // 감정 태그 코드 리스트만 받음
     private List<String> emotionTagCodes;
+
+    //이미지 업로드 URl
+    private String media_url;
 
 }
