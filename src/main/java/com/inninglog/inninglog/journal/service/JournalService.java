@@ -56,7 +56,7 @@ public class JournalService {
 
     //직관 일지 내용 업로드
     @Transactional
-    public Journal createJournal(Long memberId, String media_url, JourCreateReqDto dto) {
+    public Journal createJournal(Long memberId, JourCreateReqDto dto) {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -90,7 +90,7 @@ public class JournalService {
                 .emotion(dto.getEmotion())
                 .review_text(dto.getReview_text())
                 .is_public(dto.getIs_public())
-                .media_url(media_url)
+                .media_url(dto.getMedia_url())
                 .build();
 
         journalRepository.save(journal);

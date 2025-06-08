@@ -10,6 +10,7 @@ import com.inninglog.inninglog.journal.dto.JourCreateResDto;
 import com.inninglog.inninglog.journal.dto.JournalCalListResDto;
 import com.inninglog.inninglog.journal.dto.JournalSumListResDto;
 import com.inninglog.inninglog.journal.service.JournalService;
+import com.inninglog.inninglog.member.dto.TypeRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -73,11 +74,63 @@ public class JournalController {
     }
 
 
-    //직관 일지 내용 업로드
+    //직관 일지 콘텐츠 업로드
+    @Operation(
+            summary = "직관 일지 콘텐츠 업로드",
+            description = """
+            직관 일지 본문 데이터를 업로드하는 API입니다. 
+            
+            사용자는 사전에 이미지 파일을 S3 업로드 API를 통해 업로드하고, 
+            응답받은 media URL을 포함한 JSON 데이터를 본 API에 전달합니다.
+            
+            이 API는 전달받은 정보로 새로운 Journal 객체를 생성합니다.
+
+            ✅ 필수 필드:
+            - `media_url`: 이미지 S3 URL
+            - `ourScore`, `theirScore`: 점수 정보
+            - `opponentTeamShortCode`, `stadiumShortCode`
+            - `date`, `emotion`, `review_text`, `is_public`
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "일지 콘텐츠 업로드 및 Journal 생성 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 필드 누락"),
+            @ApiResponse(responseCode = "404", description = "회원 또는 팀/경기장 정보 없음")
+    })
     @PostMapping("/contents")
     public ResponseEntity<?> createContents(
-            @RequestBody
-    )
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal CustomUserDetails user,
+
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = """
+                직관 일지 생성 요청 JSON 예시입니다.
+
+                ```json
+                {
+                  "media_url": "https://your-s3-bucket-url/image.jpg",
+                  "ourScore": 4,
+                  "theirScore": 2,
+                  "opponentTeamShortCode": "KIA",
+                  "stadiumShortCode": "JAM",
+                  "date": "2025-06-06T18:30:00",
+                  "emotion": "기쁨",
+                  "review_text": "역전승에 울었다...",
+                  "is_public": true
+                }
+                ```
+                """,
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = JourCreateReqDto.class))
+            )
+            @RequestBody JourCreateReqDto request)
+    {
+        journalService.createJournal(user.getMember().getId(), request);
+        return ResponseEntity.ok().build();
+    }
+
+
+
 
     //본인 직관일지 목록 조회(캘린더)
     @Operation(

@@ -16,44 +16,36 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class JourCreateReqDto {
 
-    //경기 날짜
-
+    @Schema(description = "경기 날짜 (LocalDateTime 형식)", example = "2025-06-03T18:30:00")
     private LocalDateTime date;
 
-    //상대팀
-    @Schema(description = "상대팀 숏코드 작성", example = "KIA")
-    private String opponentTeamShortCode;
-
-    //우리 팀 점수
-    @Schema(description = "우리팀 점수", example = "0")
-    private int ourScore;
-
-    //상대팀 점수
-    @Schema(description = "상대팀 점수", example = "1")
-    private int theirScore;
-
-
-    //감정 태그
-    @Schema(description = "감정 태그 기쁨/슬픔/짜증 중 한개 작성", example = "기쁨")
-    private EmotionTag emotion;
-
-    //후기 글
-    @Schema(description = "후기글 작성", example = "오늘 너무 재미있었다.")
-    private String review_text;
-
-    //공개, 비공개 여부
-    @Schema(description = "일지 비공개/공개 여부", example = "0")
-    private Boolean is_public;
-
-    //경기장 정보
     @Schema(description = "경기장 숏코드", example = "JAM")
     private String stadiumShortCode;
 
+    @Schema(description = "상대팀 숏코드", example = "KIA")
+    private String opponentTeamShortCode;
+
+    @Schema(description = "우리팀 점수", example = "3")
+    private int ourScore;
+
+    @Schema(description = "상대팀 점수", example = "1")
+    private int theirScore;
+
+    @Schema(description = "경기 결과 이미지 URL (S3 업로드 후 응답받은 링크)", example = "https://s3.amazonaws.com/.../image.jpg")
+    private String media_url;
+
+    @Schema(description = "감정 태그 (기쁨/슬픔/짜증 중 하나)", example = "기쁨")
+    private EmotionTag emotion;
+
+    @Schema(description = "후기글 작성", example = "오늘 경기는 정말 재미있었다!")
+    private String review_text;
+
+    @Schema(description = "일지 공개 여부 (true: 공개 / false: 비공개)", example = "true")
+    private Boolean is_public;
 }
