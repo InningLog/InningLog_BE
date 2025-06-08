@@ -39,6 +39,7 @@ public class JournalController {
 
     private final JournalService journalService;
 
+    //직관 일지 이미지 업로드
     @Operation(
             summary = "직관 일지 이미지 업로드",
             description = "JWT 토큰에서 유저 정보를 추출하고, S3에 이미지를 업로드합니다. 이후 URL을 반환하며, 이후 JSON 생성 API에서 이 URL을 사용합니다."
@@ -64,13 +65,19 @@ public class JournalController {
         }
 
         try {
-           Journal journal = journalService.uploadImage(user.getMember().getId(), file);
-            return ResponseEntity.ok(journal.getId());
+           String media_url = journalService.uploadImage(user.getMember().getId(), file);
+            return ResponseEntity.ok(media_url);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("이미지 업로드 실패: " + e.getMessage());
         }
     }
 
+
+    //직관 일지 내용 업로드
+    @PostMapping("/contents")
+    public ResponseEntity<?> createContents(
+            @RequestBody
+    )
 
     //본인 직관일지 목록 조회(캘린더)
     @Operation(

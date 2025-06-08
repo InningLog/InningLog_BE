@@ -38,30 +38,26 @@ public class JournalService {
 
     //직관 일지 이미지 업로드
     @Transactional
-    public Journal uploadImage(Long memberId, MultipartFile file) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    public String uploadImage(Long memberId, MultipartFile file) {
 
-        String mediaUrl = null;
+        String media_url = null;
         if (file != null && !file.isEmpty()) {
             try {
-                mediaUrl = s3Uploader.uploadFile(file, "journal");
+                media_url = s3Uploader.uploadFile(file, "journal");
             } catch (IOException e) {
                 throw new RuntimeException("S3 업로드 실패", e);
             }
         }
 
-        Journal journal = Journal.builder()
-                .media_url(mediaUrl)
-                .build();
-
-        return journalRepository.save(journal);
+        //S3에 업로드한 url 반환
+        return media_url;
 
     }
 
-    //직관 일지 생성
+    //직관 일지 내용 업로드
     @Transactional
-    public Journal createJournal(Long memberId, JourCreateReqDto dto, MultipartFile file){
+    public Journal createJournal(Long memberId, String media_url, JourCreateReqDto dto) {
+
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -71,14 +67,6 @@ public class JournalService {
         Stadium stadium = stadiumRepository.findByShortCode(dto.getStadiumShortCode())
                 .orElseThrow(() -> new CustomException(ErrorCode.STADIUM_NOT_FOUND));
 
-        String mediaUrl = null;
-        if (file != null && !file.isEmpty()) {
-            try {
-                mediaUrl = s3Uploader.uploadFile(file, "journal");
-            } catch (IOException e) {
-                throw new RuntimeException("S3 업로드 실패", e);
-            }
-        }
 
         //경기 결과 계산 (백엔드 자동 처리)
         ResultScore resultScore;
@@ -95,16 +83,15 @@ public class JournalService {
                 .member(member)
                 .date(dto.getDate())
                 .opponentTeam(opponentTeam)
+                .stadium(stadium)
+                .resultScore(resultScore)
                 .ourScore(dto.getOurScore())
                 .theirScore(dto.getTheirScore())
-                .resultScore(resultScore)
                 .emotion(dto.getEmotion())
                 .review_text(dto.getReview_text())
-                .media_url(mediaUrl)
                 .is_public(dto.getIs_public())
-                .stadium(stadium)
+                .media_url(media_url)
                 .build();
-
 
         journalRepository.save(journal);
 

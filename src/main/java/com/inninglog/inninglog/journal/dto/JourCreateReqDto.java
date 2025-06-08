@@ -39,9 +39,6 @@ public class JourCreateReqDto {
     @Schema(description = "상대팀 점수", example = "1")
     private int theirScore;
 
-//    //경기 결과
-//    @Schema(description = "경기 결과 승/무승부/패", example = "무승부")
-//    private ResultScore resultScore;
 
     //감정 태그
     @Schema(description = "감정 태그 기쁨/슬픔/짜증 중 한개 작성", example = "기쁨")
