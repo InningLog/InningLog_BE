@@ -38,10 +38,28 @@ public class SeatViewService {
 
     private final S3Uploader s3Uploader;
 
+    //좌석 시야 사진 업로드
+    @Transactional
+    public String UploadImage(MultipartFile file) {
+
+        String media_url = null;
+        if (file != null && !file.isEmpty()) {
+            try {
+                media_url = s3Uploader.uploadFile(file, "seatView");
+            } catch (IOException e) {
+                throw new RuntimeException("S3 업로드 실패", e);
+            }
+        }
+
+        //S3에 업로드한 url 반환
+        return media_url;
+    }
+
+
 
     //좌석 시야 정보 작성
     @Transactional
-    public SeatView createSeatView(Long memberId, SeatCreateReqDto dto, MultipartFile file) {
+    public SeatView createSeatView(Long memberId, SeatCreateReqDto dto) {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -53,21 +71,12 @@ public class SeatViewService {
                 .orElseThrow(() -> new CustomException(ErrorCode.STADIUM_NOT_FOUND));
 
 
-        String mediaUrl = null;
-        if (file != null && !file.isEmpty()) {
-            try {
-                mediaUrl = s3Uploader.uploadFile(file, "seatView");
-            } catch (IOException e) {
-                throw new RuntimeException("S3 업로드 실패", e);
-            }
-        }
-
         // SeatView 먼저 저장 (view_media_url은 일단 null 처리 또는 dto 필드에서 받아도 OK)
         SeatView seatView = SeatView.builder()
                 .member(member)
                 .journal(journal)
                 .stadium(stadium)
-                .view_media_url(mediaUrl)
+                .view_media_url(dto.getMedia_url())
                 .seat_description(dto.getSeatInfo())
                 .build();
 
