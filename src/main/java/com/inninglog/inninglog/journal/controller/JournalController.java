@@ -39,74 +39,36 @@ public class JournalController {
 
     private final JournalService journalService;
 
-    //직관 일지 생성
     @Operation(
-            summary = "직관 일지 생성",
-            description = "JWT 토큰에서 유저 정보를 추출하고, S3에 이미지 업로드 후 직관 일지를 생성합니다."
+            summary = "직관 일지 이미지 업로드",
+            description = "JWT 토큰에서 유저 정보를 추출하고, S3에 이미지를 업로드합니다. 이후 URL을 반환하며, 이후 JSON 생성 API에서 이 URL을 사용합니다."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "직관 일지 생성 성공",
-                    content = @Content(schema = @Schema(implementation = JourCreateResDto.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 (JSON 형식 오류)",
+            @ApiResponse(responseCode = "200", description = "이미지 업로드 성공",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (파일 없음)",
                     content = @Content),
-            @ApiResponse(responseCode = "404", description = "회원 또는 팀/경기장 정보 없음",
+            @ApiResponse(responseCode = "500", description = "서버 에러 (S3 업로드 실패)",
                     content = @Content)
     })
-    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createJournal(
+    @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadImage(
             @Parameter(hidden = true)
             @AuthenticationPrincipal CustomUserDetails user,
 
             @Parameter(description = "업로드할 이미지 파일 (선택사항)")
-            @RequestPart(value = "file", required = false) MultipartFile file,
-
-            @Parameter(
-                    description = """
-        일지 생성 요청 JSON 예시입니다. 이 값을 복사해 'request' 필드에 붙여넣으세요.
-
-        ```json
-        {
-          "ourScore": 1,
-          "stadiumShortCode": "JAM",
-          "date": "2025-06-03T18:30:00",
-          "opponentTeamShortCode": "KIA",
-          "review_text": "오늘 경기는 완벽했어!",
-          "theirScore": 0,
-          "emotion": "기쁨",
-          "is_public": true
-        }
-        ```
-        """,
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = JourCreateReqDto.class))
-            )
-            @RequestPart("request") String requestJson
+            @RequestPart(value = "file", required = false) MultipartFile file
     ) {
-        try {
-            // 받은 JSON 문자열 로그 출력 (디버깅용)
-            System.out.println("Received JSON: " + requestJson);
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-            objectMapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
-            JourCreateReqDto request = objectMapper.readValue(requestJson, JourCreateReqDto.class);
-
-            // 서비스 로직 호출
-            Journal journal = journalService.createJournal(user.getMember().getId(), request, file);
-            return ResponseEntity.status(201).body(new JourCreateResDto(journal.getId()));
-
-        } catch (JsonProcessingException e) {
-            // JSON 파싱 에러 처리
-            return ResponseEntity.badRequest()
-                    .body("Invalid JSON format: " + e.getMessage());
-        } catch (Exception e) {
-            // 기타 예외 처리
-            return ResponseEntity.internalServerError()
-                    .body("Server error: " + e.getMessage());
+        if (file == null || file.isEmpty()) {
+            return ResponseEntity.badRequest().body("파일이 없습니다.");
         }
 
-
+        try {
+           Journal journal = journalService.uploadImage(user.getMember().getId(), file);
+            return ResponseEntity.ok(journal.getId());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("이미지 업로드 실패: " + e.getMessage());
+        }
     }
 
 

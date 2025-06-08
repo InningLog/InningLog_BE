@@ -36,6 +36,29 @@ public class JournalService {
     private final TeamRepository teamRepository;
     private final S3Uploader s3Uploader;
 
+    //직관 일지 이미지 업로드
+    @Transactional
+    public Journal uploadImage(Long memberId, MultipartFile file) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        String mediaUrl = null;
+        if (file != null && !file.isEmpty()) {
+            try {
+                mediaUrl = s3Uploader.uploadFile(file, "journal");
+            } catch (IOException e) {
+                throw new RuntimeException("S3 업로드 실패", e);
+            }
+        }
+
+        Journal journal = Journal.builder()
+                .media_url(mediaUrl)
+                .build();
+
+        return journalRepository.save(journal);
+
+    }
+
     //직관 일지 생성
     @Transactional
     public Journal createJournal(Long memberId, JourCreateReqDto dto, MultipartFile file){
