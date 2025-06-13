@@ -58,35 +58,56 @@ public class AmplitudeService {
             payload.put("api_key", this.apiKey);
             payload.put("events", events);
 
-            //위에 만든 제이슨 데이터를 실제로 HTTP 요청으로 보내는 함수
-            sendHttpPost(payload);
+            //위에 만든 제이슨 데이터를 실제로 HTTP 요청으로 보내는 함수(재시도 로직 포함)
+            boolean success = trySendWithRetries(payload);
+
         } catch (Exception e) {
-            e.printStackTrace(); // 운영 시에는 logger로 교체 추천
+            //에러 로깅
+            log.error("Amplitude 전송 중 예외 발생", e);
         }
     }
 
     // 엠플리튜드 서버에 데이터를 실제로 보내는 함수
-    private void sendHttpPost(JSONObject payload) throws Exception {
-        URL url = new URL(ENDPOINT);
+    private boolean trySendWithRetries(JSONObject payload) {
+        int attempt = 0;
 
-        //위에서 정의한 https://api2.amplitude.com/2/httpapi 주소에 연결을 시작
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        while (attempt < MAX_RETRIES) {
+            try{
+                URL url = new URL(ENDPOINT);
 
-        //Post요청이란걸 설정, 보내는 데이터 형식이 Json이라고 알림
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "application/json");
-        conn.setDoOutput(true);
+                //위에서 정의한 https://api2.amplitude.com/2/httpapi 주소에 연결을 시작
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-        //만든 제이슨을 엠플리튜드 서버에 전송하는 부분
-        try (OutputStream os = conn.getOutputStream()) {
-            os.write(payload.toString().getBytes());
-            os.flush();
+                //Post요청이란걸 설정, 보내는 데이터 형식이 Json이라고 알림
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setDoOutput(true);
+
+                //서버에 보내는 코드
+                try (OutputStream os = conn.getOutputStream()) {
+                    os.write(payload.toString().getBytes());
+                    os.flush();
+                }
+
+                int responseCode = conn.getResponseCode();
+
+                //응답코드가 200일 때
+                if (responseCode == 200) {
+                    return true; // 🎉 전송 성공
+                } else { //응답 코드가 200이 아닐 때
+                    log.warn("⚠️ Amplitude 응답 코드: {} (재시도 {})", responseCode, attempt + 1);
+                }
+
+            } catch (Exception e) {
+                log.warn("Amplitude 전송 중 네트워크 예외 발생 (재시도 {}): {}", attempt + 1, e.getMessage());
+            }
+
+            attempt++;
+            try {
+                Thread.sleep(500); // 잠깐 기다렸다 재시도
+            } catch (InterruptedException ignored) {}
         }
 
-        // 엠플리튜드가 응답을 보내면 그 상태 코드를 확인함.
-        int responseCode = conn.getResponseCode();
-        if (responseCode != 200) {
-            System.err.println("⚠️ Amplitude 응답 코드: " + responseCode);
-        }
+        return false;
     }
 }
