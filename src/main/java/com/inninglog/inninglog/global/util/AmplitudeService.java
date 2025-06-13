@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.global.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class AmplitudeService {
 
@@ -20,9 +22,24 @@ public class AmplitudeService {
     //엠플리튜드 이벤트를 보내는 서버 주소, 여기에 JSON을 post요청으로 보내면됨
     private static final String ENDPOINT = "https://api2.amplitude.com/2/httpapi";
 
+    //최대 재시도 횟수
+    private static final int MAX_RETRIES = 3;
+
     //이벤트를 전송하는 메서드
     // ex. amplitudeService.log("user_login", "user-123", Map.of("method", "kakao"))
     public void log(String eventType, String userId, Map<String, Object> eventProperties) {
+
+        // Null 체크
+        if (eventType == null || eventType.isBlank()) {
+            log.warn("Amplitude 이벤트 타입이 비어 있습니다. 전송 취소됨.");
+            return;
+        }
+
+        if (userId == null || userId.isBlank()) {
+            log.warn("Amplitude userId가 비어 있습니다. 전송 취소됨.");
+            return;
+        }
+
         try {
             //이멘트 정보를 담을 JSON 객체 만듬
             JSONObject event = new JSONObject();
