@@ -22,7 +22,7 @@ public enum ResultScore {
     @JsonCreator
     public static ResultScore from(String input) {
         for (ResultScore rs : ResultScore.values()) {
-            if (rs.label.equals(input)) {
+            if (rs.label.equals(input) || rs.name().equalsIgnoreCase(input)) {
                 return rs;
             }
         }

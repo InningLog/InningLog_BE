@@ -51,6 +51,8 @@ dependencies {
 	implementation 'software.amazon.awssdk:s3:2.25.17'
 	implementation 'software.amazon.awssdk:auth:2.25.17'
 
+	//엠플리튜드
+	implementation 'org.json:json:20250517'
 }
 
 tasks.named('test') {

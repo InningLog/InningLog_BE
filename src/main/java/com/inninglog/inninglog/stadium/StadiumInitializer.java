@@ -32,7 +32,7 @@ public class StadiumInitializer implements ApplicationRunner {
                                     .orElseThrow(() -> new RuntimeException(code + " 팀이 존재하지 않습니다."))));
 
             stadiumRepository.saveAll(List.of(
-                    Stadium.builder().name("잠실종합운동장 야구장").shortCode("JAM").team(teams.get("DOOSAN")).build(),
+                    Stadium.builder().name("잠실종합운동장 야구장").shortCode("JAM").team(teams.get("DOOSAN")).build(), //엘지랑 매핑
                     Stadium.builder().name("고척 스카이돔").shortCode("GOC").team(teams.get("KIWOOM")).build(),
                     Stadium.builder().name("인천 SSG 랜더스필드").shortCode("ICN").team(teams.get("SSG")).build(),
                     Stadium.builder().name("수원 KT 위즈파크").shortCode("SUW").team(teams.get("KT")).build(),

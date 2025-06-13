@@ -2,6 +2,7 @@ package com.inninglog.inninglog.kakao;
 
 
 import com.inninglog.inninglog.global.auth.JwtProvider;
+import com.inninglog.inninglog.global.util.AmplitudeService;
 import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -20,7 +23,7 @@ public class KakaoLoginController {
     private final KakaoService kakaoService;
     private final MemberService memberService;
     private final JwtProvider jwtProvider;
-
+    private final AmplitudeService amplitudeService;
 
     @GetMapping("/callback")
     public ResponseEntity<?> callback(@RequestParam("code") String code) {
@@ -33,6 +36,16 @@ public class KakaoLoginController {
 
             // 사용자 저장 및 업데이트
             Member member = memberService.saveOrUpdateMember(userInfo);
+
+            // JWT 토큰 생성 후, 응답 헤더 만들기 전에 추가
+            amplitudeService.log(
+                    "user_login",
+                    "test-user-123", // 고정된 값으로 테스트
+                    Map.of(
+                            "login_method", "kakao",
+                            "timestamp", String.valueOf(System.currentTimeMillis())
+                    )
+            );
 
             // JWT 토큰 생성
             String jwtAccessToken = jwtProvider.createToken(member.getId()); // ← 수정
