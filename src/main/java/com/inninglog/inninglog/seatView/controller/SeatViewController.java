@@ -89,23 +89,21 @@ public class SeatViewController {
 
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = """
-                좌석 시야 작성 요청 JSON 예시입니다. 이 값을 복사해 'request' 필드에 붙여넣으세요.
-
-                ```json
-                {
-                  "journalId": 1,
-                  "stadiumShortCode": "JAM",
-                  "zoneShortCode": "JAM_BLUE",
-                  "section": "13구역",
-                  "seatRow": "3열",
-                  "emotionTagCodes": [
-                    "VIEW_OPEN",
-                    "SUN_STRONG"
-                  ],
-                  "media_url": "https://your-s3-bucket-url/image.jpg"
-                }
-                ```
-                """,
+                            좌석 시야 작성 요청 JSON 예시입니다. 이 값을 복사해 'request' 필드에 붙여넣으세요.
+                            
+                            ```json
+                            {
+                              "journalId": 1,
+                              "seatInfo": "13구역 3열",
+                              "stadiumShortCode": "JAM",
+                              "emotionTagCodes": [
+                                "VIBE_GOOD",
+                                "QUIET"
+                              ],
+                              "media_url": "https://your-s3-bucket-url/image.jpg",
+                            }
+                            ```
+                            """,
                     required = true,
                     content = @Content(schema = @Schema(implementation = SeatCreateReqDto.class))
             )

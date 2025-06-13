@@ -33,15 +33,9 @@ public class SeatView extends BaseTimeEntity { //직관 일지
     @JoinColumn(name = "stadium_id")
     private Stadium stadium;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "zone_id")
-    private Zone zone;
-
-    private String section;
-
-    private String seatRow;
-
     //시야 사진 url
     private String view_media_url;
 
+    //좌석 정보 태그 원본
+    private String seat_description;
 }
