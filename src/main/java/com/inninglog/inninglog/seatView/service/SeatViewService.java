@@ -27,9 +27,7 @@ public class SeatViewService {
     private final MemberRepository memberRepository;
     private final JournalRepository journalRepository;
     private final StadiumRepository stadiumRepository;
-
-    private final SeatInfoTagRepository seatInfoTagRepository;
-    private final SeatInfoTagMapRepository seatInfoTagMapRepository;
+    private final ZoneRepository zoneRepository;
 
     private final SeatViewRepository seatViewRepository;
 
@@ -70,6 +68,8 @@ public class SeatViewService {
         Stadium stadium = stadiumRepository.findByShortCode(dto.getStadiumShortCode())
                 .orElseThrow(() -> new CustomException(ErrorCode.STADIUM_NOT_FOUND));
 
+        Zone zone = zoneRepository.findByShortCode(dto.getZoneShortCode())
+                .orElseThrow(()-> new CustomException(ErrorCode.ZONE_NOT_FOUND));
 
         // SeatView 먼저 저장 (view_media_url은 일단 null 처리 또는 dto 필드에서 받아도 OK)
         SeatView seatView = SeatView.builder()
@@ -77,32 +77,12 @@ public class SeatViewService {
                 .journal(journal)
                 .stadium(stadium)
                 .view_media_url(dto.getMedia_url())
-                .seat_description(dto.getSeatInfo())
+                .zone(zone)
+                .section(dto.getSection())
+                .seatRow(dto.getSeatRow())
                 .build();
 
         seatViewRepository.save(seatView);
-
-
-        //좌석 정보 원본을 공백으로 나누어 저장
-        String[] infoSplit = dto.getSeatInfo().split(" ");
-
-        for (String info : infoSplit) {
-            // 동일한 태그가 이미 있으면 재사용
-            SeatInfoTag tag = seatInfoTagRepository.findByTag(info)
-                    .orElseGet(() -> seatInfoTagRepository.save(
-                            SeatInfoTag.builder().tag(info).build()
-                    ));
-
-            // 중간 매핑 테이블 저장
-            SeatInfoTagMap map = SeatInfoTagMap.builder()
-                    .seatView(seatView)
-                    .seatInfoTag(tag)
-                    .build();
-
-            seatInfoTagMapRepository.save(map);
-
-//            seatView.getTagMappings().add(map); // 양방향 매핑 시 필요
-        }
 
 
         //좌석 관련 감정 태그 생성

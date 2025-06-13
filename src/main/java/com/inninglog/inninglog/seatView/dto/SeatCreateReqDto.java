@@ -20,11 +20,18 @@ public class SeatCreateReqDto {
     @Schema(description = "매핑 되는 직관 일지의 id")
     private Long journalId;
 
-    //좌석 정보 원본
-    private String seatInfo;
 
     //경기장 숏코드
     private String stadiumShortCode;
+
+    //존 숏코드
+    private String zoneShortCode;
+
+    //구역
+    private String Section;
+
+    //열
+    private String seatRow;
 
     // 감정 태그 코드 리스트만 받음
     private List<String> emotionTagCodes;
