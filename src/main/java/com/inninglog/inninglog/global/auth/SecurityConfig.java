@@ -27,7 +27,8 @@ public class SecurityConfig {
                                 "/test",           // 토큰 확인용
                                 "/auth/**",        // 일반 인증 관련 경로
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                        "/api/kbo/html/**"
                 ).permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
