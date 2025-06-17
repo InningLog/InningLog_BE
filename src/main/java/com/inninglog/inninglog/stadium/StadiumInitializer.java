@@ -32,15 +32,15 @@ public class StadiumInitializer implements ApplicationRunner {
                                     .orElseThrow(() -> new RuntimeException(code + " 팀이 존재하지 않습니다."))));
 
             stadiumRepository.saveAll(List.of(
-                    Stadium.builder().name("잠실종합운동장 야구장").shortCode("JAM").team(teams.get("LG")).build(),       // LG
-                    Stadium.builder().name("고척 스카이돔").shortCode("GOC").team(teams.get("WO")).build(),       // 키움
-                    Stadium.builder().name("인천 SSG 랜더스필드").shortCode("ICN").team(teams.get("SK")).build(),  // SSG
-                    Stadium.builder().name("수원 KT 위즈파크").shortCode("SUW").team(teams.get("KT")).build(),    // KT
-                    Stadium.builder().name("대전 한화생명 이글스파크").shortCode("DJN").team(teams.get("HH")).build(), // 한화
-                    Stadium.builder().name("대구 삼성 라이온즈 파크").shortCode("DAE").team(teams.get("SS")).build(), // 삼성
-                    Stadium.builder().name("부산 사직야구장").shortCode("BUS").team(teams.get("LT")).build(),       // 롯데
-                    Stadium.builder().name("창원 NC파크").shortCode("CHW").team(teams.get("NC")).build(),         // NC
-                    Stadium.builder().name("광주-기아 챔피언스 필드").shortCode("GWJ").team(teams.get("HT")).build() // 기아
+                    Stadium.builder().name("잠실").shortCode("JAM").team(teams.get("LG")).build(),       // LG
+                    Stadium.builder().name("고척").shortCode("GOC").team(teams.get("WO")).build(),       // 키움
+                    Stadium.builder().name("문학").shortCode("ICN").team(teams.get("SK")).build(),  // SSG
+                    Stadium.builder().name("수원").shortCode("SUW").team(teams.get("KT")).build(),    // KT
+                    Stadium.builder().name("대전").shortCode("DJN").team(teams.get("HH")).build(), // 한화
+                    Stadium.builder().name("대구").shortCode("DAE").team(teams.get("SS")).build(), // 삼성
+                    Stadium.builder().name("사직").shortCode("BUS").team(teams.get("LT")).build(),       // 롯데
+                    Stadium.builder().name("창원").shortCode("CHW").team(teams.get("NC")).build(),         // NC
+                    Stadium.builder().name("광주").shortCode("GWJ").team(teams.get("HT")).build() // 기아
             ));
         }
     }

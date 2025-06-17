@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface StadiumRepository extends JpaRepository<Stadium, Long> {
     Optional<Stadium> findByShortCode(String shortCode);
+
+    Optional<Stadium> findByName(String name);
 }
