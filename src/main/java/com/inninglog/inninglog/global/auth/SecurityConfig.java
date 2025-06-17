@@ -28,7 +28,7 @@ public class SecurityConfig {
                                 "/auth/**",        // 일반 인증 관련 경로
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                        "/api/kbo/html/**"
+                        "/api/kbo/**"
                 ).permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
