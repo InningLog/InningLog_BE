@@ -49,6 +49,7 @@ public class KboSchedulePersistenceService {
                         .localDateTime(localDateTime)
                         .awayScore(dto.getAwayScore())
                         .homeScore(dto.getHomeScore())
+                        .boxscore_url(dto.getBoxscore_url())
                         .build();
 
                 gameRepository.save(game);

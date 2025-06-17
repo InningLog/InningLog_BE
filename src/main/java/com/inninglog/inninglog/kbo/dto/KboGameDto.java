@@ -14,4 +14,5 @@ public class KboGameDto {
     private int homeScore;
     private String stadium;       // 경기장
     private String gameDateTime;  // 경기 시작 시간 (예: "18:30")
+    private String boxscore_url;
 }
