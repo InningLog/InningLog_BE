@@ -35,6 +35,10 @@ public class Game {
     @JoinColumn(name = "away_team_id")
     private Team awayTeam;
 
+    private Integer homeScore;
+
+    private Integer awayScore;
+
     //리뷰 박스 url
     private String boxscore_url;
 }

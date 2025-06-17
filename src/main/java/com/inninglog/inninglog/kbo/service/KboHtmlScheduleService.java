@@ -163,11 +163,10 @@ public class KboHtmlScheduleService {
                 }
             }
 
-            String score = awayScore + " vs " + homeScore;
+            int awayScoreInt = Integer.parseInt(awayScore);
+            int homeScoreInt = Integer.parseInt(homeScore);
 
-            System.out.println(">> 파싱 결과: " + date + " " + time + " | " + awayTeam + " vs " + homeTeam + " (" + score + ") @ " + stadium);
-
-            return new KboGameDto(awayTeam, homeTeam, score, stadium, time);
+            return new KboGameDto(awayTeam, homeTeam, awayScoreInt, homeScoreInt, stadium, time);
 
         } catch (Exception e) {
             System.out.println(">> 경기 정보 파싱 실패: " + matchInfo + " → " + e.getMessage());
