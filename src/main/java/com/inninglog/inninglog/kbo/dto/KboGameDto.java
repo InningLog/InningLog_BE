@@ -1,4 +1,4 @@
-package com.inninglog.inninglog.global.KBO;
+package com.inninglog.inninglog.kbo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

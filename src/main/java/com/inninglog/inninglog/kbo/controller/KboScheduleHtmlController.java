@@ -1,5 +1,7 @@
-package com.inninglog.inninglog.global.KBO;
+package com.inninglog.inninglog.kbo.controller;
 
+import com.inninglog.inninglog.kbo.dto.KboGameDto;
+import com.inninglog.inninglog.kbo.service.KboHtmlScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;

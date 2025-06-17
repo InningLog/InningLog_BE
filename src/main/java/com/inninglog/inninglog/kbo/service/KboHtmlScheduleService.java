@@ -1,5 +1,6 @@
-package com.inninglog.inninglog.global.KBO;
+package com.inninglog.inninglog.kbo.service;
 
+import com.inninglog.inninglog.kbo.dto.KboGameDto;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
@@ -53,7 +54,6 @@ public class KboHtmlScheduleService {
 
             driver.get(url);
 
-            // wait until table is loaded (up to 15s)
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
             wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("table.tbl")));
 
