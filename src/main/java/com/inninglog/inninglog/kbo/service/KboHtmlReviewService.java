@@ -12,7 +12,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,7 +30,9 @@ public class KboHtmlReviewService {
 
     @PreDestroy
     public void closeDriver() {
-        if (driver != null) driver.quit();
+        if (driver != null) {
+            driver.quit();
+        }
     }
 
     /**
@@ -42,55 +44,84 @@ public class KboHtmlReviewService {
         ReviewStatsDto stats = new ReviewStatsDto();
 
         driver.get(reviewUrl);
-        // 테이블이 최소 하나 로드될 때까지 대기
+        // Ajax로 로드된 테이블이 뜰 때까지 충분히 대기
         wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("table.tbl")));
 
         // 모든 ".tbl" 테이블 순회
         List<WebElement> tables = driver.findElements(By.cssSelector("table.tbl"));
         for (WebElement table : tables) {
-            // 테이블 헤더 텍스트 목록
+            // 1) 테이블의 헤더 텍스트 목록
             List<String> headers = table.findElements(By.cssSelector("thead th"))
-                    .stream().map(WebElement::getText).collect(Collectors.toList());
+                    .stream()
+                    .map(WebElement::getText)
+                    .collect(Collectors.toList());
 
             boolean isPitcher = headers.contains("이닝") && headers.contains("자책");
             boolean isHitter  = headers.contains("타수") && headers.contains("안타");
             if (!isPitcher && !isHitter) {
-                // 해당 테이블이 투·타자 기록 테이블이 아니면 건너뛰기
+                // 투수·타자 기록 테이블이 아니면 건너뜀
                 continue;
             }
 
+            // 2) 헤더명 → 열 인덱스 맵
+            Map<String, Integer> colIndex = new HashMap<>();
+            for (int i = 0; i < headers.size(); i++) {
+                colIndex.put(headers.get(i), i);
+            }
+
+            // 3) 선수명 컬럼 헤더 찾기 ("선수명", "타자명", "투수명" 등)
+            String nameKey = headers.stream()
+                    .filter(h -> h.contains("선수명") || h.contains("타자명") || h.contains("투수명"))
+                    .findFirst()
+                    .orElse(headers.get(0));  // 못 찾으면 첫 컬럼
+
             String currentTeam = "";
             List<WebElement> rows = table.findElements(By.cssSelector("tbody tr"));
+
             for (WebElement row : rows) {
-                // 팀 소속 헤더 (th) 로만 이루어진 행이면 팀 이름 갱신
-                if (!row.findElements(By.tagName("th")).isEmpty()) {
-                    currentTeam = row.findElement(By.tagName("th")).getText().trim();
+                // 4) 팀 헤더 감지: th[colspan] 또는 td[colspan]
+                if (!row.findElements(By.cssSelector("th[colspan], td[colspan]")).isEmpty()) {
+                    currentTeam = row.findElement(By.cssSelector("th[colspan], td[colspan]"))
+                            .getText().trim();
                     continue;
                 }
 
-                // 일반 데이터 행
-                List<WebElement> cells = row.findElements(By.tagName("td"));
-                String playerName = cells.get(0).getText().trim();
+                // 5) 선수명(th[scope=row]) + 나머지 td 합치기
+                List<WebElement> dataCells = new ArrayList<>();
+                dataCells.addAll(row.findElements(By.cssSelector("th[scope=row]")));
+                dataCells.addAll(row.findElements(By.tagName("td")));
+
+                // 6) 선수명: 헤더 기반 인덱스로 꺼내기
+                String playerName = dataCells
+                        .get(colIndex.get(nameKey))
+                        .getText().trim();
 
                 if (isPitcher) {
-                    int idxInnings = headers.indexOf("이닝");
-                    int idxEarned  = headers.indexOf("자책");
-                    String innings = cells.get(idxInnings).getText().trim();
-                    int earned    = Integer.parseInt(cells.get(idxEarned).getText().trim());
-                    stats.getPitchers().add(new PitcherStatDto(currentTeam, playerName, innings, earned));
+                    // 투수: 이닝, 자책
+                    String innings = dataCells.get(colIndex.get("이닝")).getText().trim();
+                    int earned    = Integer.parseInt(
+                            dataCells.get(colIndex.get("자책")).getText().trim()
+                    );
+                    stats.getPitchers()
+                            .add(new PitcherStatDto(currentTeam, playerName, innings, earned));
 
                 } else {
-                    int idxAB   = headers.indexOf("타수");
-                    int idxHits = headers.indexOf("안타");
-                    int atBats  = Integer.parseInt(cells.get(idxAB).getText().trim());
-                    int hits    = Integer.parseInt(cells.get(idxHits).getText().trim());
-                    stats.getBatters().add(new HitterStatDto(currentTeam, playerName, atBats, hits));
+                    // 타자: 타수, 안타
+                    int atBats = Integer.parseInt(
+                            dataCells.get(colIndex.get("타수")).getText().trim()
+                    );
+                    int hits   = Integer.parseInt(
+                            dataCells.get(colIndex.get("안타")).getText().trim()
+                    );
+                    stats.getBatters()
+                            .add(new HitterStatDto(currentTeam, playerName, atBats, hits));
                 }
             }
         }
 
         log.info("파싱 완료: 투수 {}명, 타자 {}명",
-                stats.getPitchers().size(), stats.getBatters().size());
+                stats.getPitchers().size(),
+                stats.getBatters().size());
         return stats;
     }
 }
