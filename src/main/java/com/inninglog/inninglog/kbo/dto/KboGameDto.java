@@ -1,13 +1,16 @@
 package com.inninglog.inninglog.kbo.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class KboGameDto {
+    private String gameId;
     private String awayTeam;      // 원정팀
     private String homeTeam;      // 홈팀
     private int awayScore;
