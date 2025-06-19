@@ -18,6 +18,11 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // KBO에서 사용하는 게임 ID (예: "20250601HHNC0")
+    @Column(unique = true, nullable = false)
+    private String gameId;
+
+
     private LocalDateTime localDateTime;
 
     //경기장

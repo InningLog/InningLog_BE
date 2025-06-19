@@ -59,6 +59,9 @@ dependencies {
 	implementation 'org.jsoup:jsoup:1.16.1'
 	implementation 'org.seleniumhq.selenium:selenium-java:4.21.0'
 
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
 }
 
 tasks.named('test') {

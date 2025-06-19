@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class PalyerStat {
+public class PlayerStat {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
