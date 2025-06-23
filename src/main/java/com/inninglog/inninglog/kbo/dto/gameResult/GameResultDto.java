@@ -1,4 +1,4 @@
-package com.inninglog.inninglog.kbo.dto;
+package com.inninglog.inninglog.kbo.dto.gameResult;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

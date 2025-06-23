@@ -1,6 +1,10 @@
 package com.inninglog.inninglog.kbo.controller;
 
 import com.inninglog.inninglog.kbo.dto.*;
+import com.inninglog.inninglog.kbo.dto.gameResult.GameResultRequestDto;
+import com.inninglog.inninglog.kbo.dto.gameSchdule.GameScheduleRequestDto;
+import com.inninglog.inninglog.kbo.dto.gameSchdule.GameScheduleResponseDto;
+import com.inninglog.inninglog.kbo.dto.playerstat.GameWithBoxscoreDto;
 import com.inninglog.inninglog.kbo.service.GameScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

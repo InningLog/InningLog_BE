@@ -1,7 +1,6 @@
-package com.inninglog.inninglog.kbo.dto;
+package com.inninglog.inninglog.kbo.dto.gameSchdule;
 
 import lombok.Data;
-import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.util.List;

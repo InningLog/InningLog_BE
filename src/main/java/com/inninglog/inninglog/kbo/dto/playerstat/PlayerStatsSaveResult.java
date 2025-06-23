@@ -1,5 +1,5 @@
 // 4. PlayerStatsSaveResult DTO (이미 있다면 스킵)
-package com.inninglog.inninglog.kbo.dto;
+package com.inninglog.inninglog.kbo.dto.playerstat;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
