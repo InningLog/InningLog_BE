@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 @Builder
 public class JourCreateReqDto {
     @Schema(description = "게임 Id", example = "20250622OBLG0")
-    private Long gameId;
+    private String gameId;
 
     @Schema(description = "경기 날짜 (LocalDateTime 형식)", example = "2025-06-03T18:30:00")
     private LocalDateTime date;
