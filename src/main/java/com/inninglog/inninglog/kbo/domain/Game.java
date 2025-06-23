@@ -42,11 +42,11 @@ public class Game {
     @JoinColumn(name = "stadium_id", nullable = false)
     private Stadium stadium;
 
-    @Column(name = "local_date_time", nullable = false)
+    @Column(name = "game_date_time", nullable = false)
     private LocalDateTime localDateTime;
 
-    @Column(name = "local_date", nullable = false)
-    private LocalDate localDate;
+//    @Column(name = "game_date", nullable = false)
+//    private LocalDate localDate;
 
     @Column(name = "boxscore_url", length = 500)
     private String boxscoreUrl;
@@ -95,11 +95,11 @@ public class Game {
         this.updatedAt = LocalDateTime.now();
     }
 
-    @PrePersist
-    protected void onCreate() {
-        // localDate가 설정되지 않았으면 localDateTime에서 추출
-        if (this.localDate == null && this.localDateTime != null) {
-            this.localDate = this.localDateTime.toLocalDate();
-        }
-    }
+//    @PrePersist
+//    protected void onCreate() {
+//        // localDate가 설정되지 않았으면 localDateTime에서 추출
+//        if (this.localDate == null && this.localDateTime != null) {
+//            this.localDate = this.localDateTime.toLocalDate();
+//        }
+//    }
 }
