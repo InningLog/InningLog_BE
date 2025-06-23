@@ -21,6 +21,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class JourCreateReqDto {
+    @Schema(description = "게임 Id", example = "20250622OBLG0")
+    private Long gameId;
 
     @Schema(description = "경기 날짜 (LocalDateTime 형식)", example = "2025-06-03T18:30:00")
     private LocalDateTime date;
@@ -48,4 +50,6 @@ public class JourCreateReqDto {
 
     @Schema(description = "일지 공개 여부 (true: 공개 / false: 비공개)", example = "true")
     private Boolean is_public;
+
+
 }

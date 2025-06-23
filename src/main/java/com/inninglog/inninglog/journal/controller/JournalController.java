@@ -10,6 +10,7 @@ import com.inninglog.inninglog.journal.dto.JourCreateResDto;
 import com.inninglog.inninglog.journal.dto.JournalCalListResDto;
 import com.inninglog.inninglog.journal.dto.JournalSumListResDto;
 import com.inninglog.inninglog.journal.service.JournalService;
+import com.inninglog.inninglog.kbo.service.GameReportService;
 import com.inninglog.inninglog.member.dto.TypeRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -39,6 +40,7 @@ import java.util.List;
 public class JournalController {
 
     private final JournalService journalService;
+    private final GameReportService gameReportService;
 
     //직관 일지 이미지 업로드
     @Operation(
@@ -124,6 +126,8 @@ public class JournalController {
             @RequestBody JourCreateReqDto request)
     {
         Journal journal = journalService.createJournal(user.getMember().getId(), request);
+        gameReportService.createVisitedGame(user.getMember().getId(), request.getGameId(), journal.getId());
+
         return ResponseEntity.ok(journal.getId());
     }
 
