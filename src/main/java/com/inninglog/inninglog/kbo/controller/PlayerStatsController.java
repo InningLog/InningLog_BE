@@ -1,6 +1,7 @@
 package com.inninglog.inninglog.kbo.controller;
 
-import com.inninglog.inninglog.kbo.dto.*;
+import com.inninglog.inninglog.kbo.dto.playerstat.PlayerStatsSaveResult;
+import com.inninglog.inninglog.kbo.dto.playerstat.ReviewStatsDto;
 import com.inninglog.inninglog.kbo.service.PlayerStatsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

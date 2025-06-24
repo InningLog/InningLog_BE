@@ -1,4 +1,4 @@
-package com.inninglog.inninglog.kbo.dto;
+package com.inninglog.inninglog.kbo.dto.playerstat;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
