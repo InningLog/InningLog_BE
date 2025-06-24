@@ -54,7 +54,7 @@ public class GameReportService {
     }
 
     //나의 직관 승률 계산
-    public GameReportResDto caculateWin(Long memberId){
+    public GameReportResDto caculateWin(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -63,18 +63,21 @@ public class GameReportService {
         int totalVisitedGames = visitedGames.size();
         int winGames = 0;
 
-        for(VisitedGame visitedGame : visitedGames){
-            if(visitedGame.getResult()){
-             winGames++;
+        for (VisitedGame visitedGame : visitedGames) {
+            if (Boolean.TRUE.equals(visitedGame.getResult())) {
+                winGames++;
             }
         }
 
-        double winningRate =(double) winGames /totalVisitedGames;
+        //할푼리로 계산
+        int winningRateHalPoongRi = totalVisitedGames == 0
+                ? 0 //경기 수가 0이면 0 반환
+                : (int) Math.round(((double) winGames / totalVisitedGames) * 1000);
 
         return GameReportResDto.builder()
                 .win(winGames)
                 .visited(totalVisitedGames)
-                .winningRate(winningRate)
+                .winningRate(winningRateHalPoongRi)
                 .build();
     }
 
