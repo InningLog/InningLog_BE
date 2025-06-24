@@ -1,6 +1,8 @@
 package com.inninglog.inninglog.member.controller;
 
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
+import com.inninglog.inninglog.global.response.CustomApiResponse;
+import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.member.service.MemberService;
 import com.inninglog.inninglog.member.dto.NicknameRequestDto;
 import com.inninglog.inninglog.member.dto.TypeRequestDto;
@@ -8,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,12 +37,12 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PatchMapping("/nickname")
-    public ResponseEntity<Void> updateNickname(
+    public ResponseEntity<CustomApiResponse<Void>> updateNickname(
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestBody NicknameRequestDto request
     ) {
         memberService.updateNickname(user.getMember().getId(), request.getNickname());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(CustomApiResponse.success(SuccessCode.NICKNAME_UPDATED));
     }
 
 
@@ -72,16 +75,15 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PatchMapping("/setup")
-    public ResponseEntity<Void> updateType(
+    public ResponseEntity<CustomApiResponse<Void>> updateType(
             @AuthenticationPrincipal CustomUserDetails user,
-
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "유저가 응원하는 팀 설정",
                     required = true,
                     content = @Content(schema = @Schema(implementation = TypeRequestDto.class)))
-            @RequestBody TypeRequestDto request)
-    {
+            @RequestBody TypeRequestDto request
+    ) {
         memberService.updateMemberType(user.getMember().getId(), request.getTeamShortCode());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(CustomApiResponse.success(SuccessCode.TEAM_SET));
     }
 }
