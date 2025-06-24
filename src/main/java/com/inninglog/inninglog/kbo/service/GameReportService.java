@@ -126,25 +126,41 @@ public class GameReportService {
         }
 
         // 5. 투수/타자 분리 및 정렬
-        List<PlayerRankingDto> batters = playerStatMap.values().stream()
+        List<PlayerRankingDto> topBatters = playerStatMap.values().stream()
                 .filter(dto -> dto.getPlayerType() == PlayerType.HITTER)
                 .sorted(Comparator.comparingInt(PlayerRankingDto::getHalPoongRi).reversed()) // 타자는 높은 순
                 .limit(2)
                 .toList();
 
-        List<PlayerRankingDto> pitchers = playerStatMap.values().stream()
+        List<PlayerRankingDto> topPitchers = playerStatMap.values().stream()
                 .filter(dto -> dto.getPlayerType() == PlayerType.PITCHER)
                 .sorted(Comparator.comparingInt(PlayerRankingDto::getHalPoongRi))
                 .limit(2)
                 .toList();
 
-        return new PlayerRankingResult(batters, pitchers);
+
+        List<PlayerRankingDto> buttomBatters = playerStatMap.values().stream()
+                .filter(dto -> dto.getPlayerType() == PlayerType.HITTER)
+                .sorted(Comparator.comparingInt(PlayerRankingDto::getHalPoongRi))
+                .limit(2)
+                .toList();
+
+        List<PlayerRankingDto> buttomPitchers = playerStatMap.values().stream()
+                .filter(dto -> dto.getPlayerType() == PlayerType.PITCHER)
+                .sorted(Comparator.comparingInt(PlayerRankingDto::getHalPoongRi).reversed())
+                .limit(2)
+                .toList();
+
+        return new PlayerRankingResult(topBatters, topPitchers,buttomBatters,buttomPitchers);
     }
 
     // 결과 DTO
     public record PlayerRankingResult(
-            List<PlayerRankingDto> batters,
-            List<PlayerRankingDto> pitchers
+            List<PlayerRankingDto> topBatters,
+            List<PlayerRankingDto> topPitchers,
+            List<PlayerRankingDto> bottomBatters,
+            List<PlayerRankingDto> bottomPitchers
+
     ) {}
 
     public record WinningRateResult(
@@ -169,8 +185,10 @@ public class GameReportService {
                 .totalVisitedGames(winningRateResult.totalVisitedGames)
                 .winGames(winningRateResult.winGames)
                 .winningRateHalPoongRi(winningRateResult.winningRateHalPoongRi)
-                .topBatters(rankingResult.batters())
-                .topPitchers(rankingResult.pitchers())
+                .topBatters(rankingResult.topBatters())
+                .topPitchers(rankingResult.topPitchers())
+                .bottomBatters(rankingResult.bottomBatters())
+                .bottomPitchers(rankingResult.bottomPitchers())
                 .build();
     }
 }

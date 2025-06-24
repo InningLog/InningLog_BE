@@ -16,6 +16,9 @@ public class GameReportResDto {
 
     private List<PlayerRankingDto> topBatters;
     private List<PlayerRankingDto> topPitchers;
+
+    private List<PlayerRankingDto> bottomBatters;
+    private List<PlayerRankingDto> bottomPitchers;
 }
 
 
