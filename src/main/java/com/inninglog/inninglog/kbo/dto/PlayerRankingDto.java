@@ -62,8 +62,9 @@ public class PlayerRankingDto {
             this.halPoongRi = totalAtBats == 0 ? 0 :
                     (int) Math.round(((double) totalHits / totalAtBats) * 1000);
         } else {
-            this.halPoongRi = totalInning == 0 ? 0 :
-                    (int) Math.round(((double) totalEarned / totalInning) * 1000);
+            this.halPoongRi = totalInning == 0
+                    ? (totalEarned > 0 ? 9999 : 0)
+                    : (int) Math.round(((double) totalEarned / totalInning) * 1000);
         }
     }
 }

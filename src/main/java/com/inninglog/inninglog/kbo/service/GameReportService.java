@@ -134,7 +134,7 @@ public class GameReportService {
 
         List<PlayerRankingDto> pitchers = playerStatMap.values().stream()
                 .filter(dto -> dto.getPlayerType() == PlayerType.PITCHER)
-                .sorted(Comparator.comparingInt(PlayerRankingDto::getHalPoongRi)) // 투수는 낮은 순
+                .sorted(Comparator.comparingInt(PlayerRankingDto::getHalPoongRi))
                 .limit(2)
                 .toList();
 
