@@ -36,7 +36,7 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private MemberType memberType = MemberType.NEWBIE;
+    private MemberType memberType = MemberType.USER;
 
     //응원하는 팀
     @ManyToOne(fetch = FetchType.LAZY) //지연 로딩

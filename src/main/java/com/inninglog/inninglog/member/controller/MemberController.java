@@ -42,15 +42,33 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
+
+    //회원 응원팀 설정
     @Operation(
-            summary = "회원 타입 및 팀 설정",
-            description = "회원 ID를 바탕으로, 회원 타입(뉴비/고인물)과 응원 팀의 식별자(shortCode)를 설정합니다.\n" +
-                    "회원 타입은 뉴비,NEWBIE 또는 고인물,VETERAN, 팀 shortCode는 DOOSAN, KIA 등으로 전달해야 합니다."
+            summary = "회원의 응원 팀 설정",
+            description = """
+        로그인한 회원의 응원 팀을 설정합니다.  
+        요청 시 아래의 **구단 식별자(shortCode)** 중 하나를 전달해야 합니다.
+
+        - LG 트윈스: `LG`
+        - 두산 베어스: `OB`
+        - SSG 랜더스: `SK`
+        - 한화 이글스: `HH`
+        - 삼성 라이온즈: `SS`
+        - KT 위즈: `KT`
+        - 롯데 자이언츠: `LT`
+        - KIA 타이거즈: `HT`
+        - NC 다이노스: `NC`
+        - 키움 히어로즈: `WO`
+
+        ⚠️ **주의:** 이미 응원 팀이 설정된 회원은 변경할 수 없습니다.  
+        이 경우 `400 Bad Request` 에러가 반환됩니다.
+    """
     )    @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원 정보 수정 성공"),
             @ApiResponse(responseCode = "404", description = "회원 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "400", description = "이미 유저 타입이나 팀이 설정되어 있는 경우",
+            @ApiResponse(responseCode = "400", description = "이미 팀이 설정되어 있는 경우",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PatchMapping("/setup")
@@ -58,12 +76,12 @@ public class MemberController {
             @AuthenticationPrincipal CustomUserDetails user,
 
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "유저 타입(뉴비/고인물)",
+                    description = "유저가 응원하는 팀 설정",
                     required = true,
                     content = @Content(schema = @Schema(implementation = TypeRequestDto.class)))
             @RequestBody TypeRequestDto request)
     {
-        memberService.updateMemberType(user.getMember().getId(), request.getMemberType(), request.getTeamShortCode());
+        memberService.updateMemberType(user.getMember().getId(), request.getTeamShortCode());
         return ResponseEntity.ok().build();
     }
 }

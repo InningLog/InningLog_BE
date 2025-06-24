@@ -4,7 +4,6 @@ import com.inninglog.inninglog.global.exception.CustomException;
 import com.inninglog.inninglog.global.exception.ErrorCode;
 import com.inninglog.inninglog.kakao.KakaoUserInfoResponseDto;
 import com.inninglog.inninglog.member.domain.Member;
-import com.inninglog.inninglog.member.domain.MemberType;
 import com.inninglog.inninglog.member.repository.MemberRepository;
 import com.inninglog.inninglog.team.domain.Team;
 import com.inninglog.inninglog.team.repository.TeamRepository;
@@ -43,15 +42,13 @@ public class MemberService {
 
     //유저 타입 & 응원 팀 설정
     @Transactional
-    public void updateMemberType(Long memberId, MemberType userType, String teamShortCode) {
+    public void updateMemberType(Long memberId, String teamShortCode) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         if (member.getTeam() != null) {
             throw new CustomException(ErrorCode.ALREADY_SET);
         }
-
-        member.setMemberType(userType);
 
         Team team = teamRepository.findByShortCode(teamShortCode)
                 .orElseThrow(() -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
