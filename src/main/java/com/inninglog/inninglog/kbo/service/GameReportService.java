@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -52,9 +54,28 @@ public class GameReportService {
     }
 
     //나의 직관 승률 계산
-    public GameReportResDto caculateWin(){
+    public GameReportResDto caculateWin(Long memberId){
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        return GameReportResDto.builder().build();
+        List<VisitedGame> visitedGames = visitedGameRepository.findByMember(member);
+
+        int totalVisitedGames = visitedGames.size();
+        int winGames = 0;
+
+        for(VisitedGame visitedGame : visitedGames){
+            if(visitedGame.getResult()){
+             winGames++;
+            }
+        }
+
+        double winningRate =(double) winGames /totalVisitedGames;
+
+        return GameReportResDto.builder()
+                .win(winGames)
+                .visited(totalVisitedGames)
+                .winningRate(winningRate)
+                .build();
     }
 
 

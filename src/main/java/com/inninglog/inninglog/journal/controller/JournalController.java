@@ -108,6 +108,7 @@ public class JournalController {
 
                 ```json
                 {
+                  "gameId": "20250622OBLG0"
                   "media_url": "https://your-s3-bucket-url/image.jpg",
                   "ourScore": 4,
                   "theirScore": 2,

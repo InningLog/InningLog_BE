@@ -18,6 +18,6 @@ public class GameReportResDto {
     private int win;
 
     //나의 승률
-    private double winScore;
+    private double winningRate;
 
 }
