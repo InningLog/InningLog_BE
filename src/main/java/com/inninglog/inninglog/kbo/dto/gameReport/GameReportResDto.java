@@ -1,23 +1,21 @@
 package com.inninglog.inninglog.kbo.dto.gameReport;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.inninglog.inninglog.kbo.dto.PlayerRankingDto;
+import lombok.*;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+import java.util.List;
+
 @Builder
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class GameReportResDto {
+    private int totalVisitedGames;
+    private int winGames;
+    private int winningRateHalPoongRi;
 
-    //나의 직관 횟수
-    private int visited;
-
-    //나의 직관 승리 획수
-    private int win;
-
-    //나의 승률
-    private int winningRate;
-
+    private List<PlayerRankingDto> topBatters;
+    private List<PlayerRankingDto> topPitchers;
 }
+
+

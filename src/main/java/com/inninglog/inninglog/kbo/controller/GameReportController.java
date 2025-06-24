@@ -34,13 +34,15 @@ public class GameReportController {
     @Operation(
             summary = "직관 리포트 정보 가져오기",
             description = """
-                로그인한 유저의 직관 기록을 바탕으로 리포트 내용을 불러옵니다.
-                
-                현재 제공 정보:
-                1. 직관 경기 수
-                2. 직관 경기 중 응원팀 승리 횟수
-                3. 직관 승률
-                """
+        로그인한 유저의 직관 기록을 바탕으로 리포트를 제공합니다.
+        
+        제공 정보:
+        1. 직관 경기 수
+        2. 응원팀 승리 수
+        3. 직관 승률 (할푼리)
+        4. 응원팀 상위 타자 2명
+        5. 응원팀 상위 투수 2명
+        """
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -55,9 +57,9 @@ public class GameReportController {
             )
     })
     @GetMapping("/main")
-    public ResponseEntity<?> main(
+    public ResponseEntity<?> mainPage(
             @AuthenticationPrincipal CustomUserDetails user){
-        GameReportResDto gameReportResDto = gameReportService.caculateWin(user.getMember().getId());
+        GameReportResDto gameReportResDto = gameReportService.generateReport(user.getMember().getId());
 
         return ResponseEntity.ok(gameReportResDto);
     }

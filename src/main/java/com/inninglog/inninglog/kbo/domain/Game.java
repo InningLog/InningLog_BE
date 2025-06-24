@@ -45,9 +45,6 @@ public class Game {
     @Column(name = "game_date_time", nullable = false)
     private LocalDateTime localDateTime;
 
-//    @Column(name = "game_date", nullable = false)
-//    private LocalDate localDate;
-
     @Column(name = "boxscore_url", length = 500)
     private String boxscoreUrl;
 
@@ -94,12 +91,4 @@ public class Game {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-
-//    @PrePersist
-//    protected void onCreate() {
-//        // localDate가 설정되지 않았으면 localDateTime에서 추출
-//        if (this.localDate == null && this.localDateTime != null) {
-//            this.localDate = this.localDateTime.toLocalDate();
-//        }
-//    }
 }

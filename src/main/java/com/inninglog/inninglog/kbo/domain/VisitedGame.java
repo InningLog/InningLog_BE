@@ -26,5 +26,6 @@ public class VisitedGame extends BaseTimeEntity{
     @JoinColumn(name = "game_id")
     private Game game;
 
-    private Boolean result; //유저의 응원팀 기준 승 - true, 패 - false, 무승부 -
+    private Boolean result; //유저의 응원팀 기준 승 - true, 패 - false, 무승부
+
 }
