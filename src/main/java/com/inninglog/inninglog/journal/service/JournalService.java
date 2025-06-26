@@ -67,32 +67,7 @@ public class JournalService {
         Stadium stadium = stadiumRepository.findByShortCode(dto.getStadiumShortCode())
                 .orElseThrow(() -> new CustomException(ErrorCode.STADIUM_NOT_FOUND));
 
-
-        //경기 결과 계산 (백엔드 자동 처리)
-        ResultScore resultScore;
-
-        if (dto.getOurScore() > dto.getTheirScore()) {
-            resultScore = ResultScore.WIN;
-        } else if (dto.getOurScore() < dto.getTheirScore()) {
-            resultScore = ResultScore.LOSE;
-        } else {
-            resultScore = ResultScore.DRAW;
-        }
-
-        Journal journal = Journal.builder()
-                .member(member)
-                .date(dto.getDate())
-                .opponentTeam(opponentTeam)
-                .stadium(stadium)
-                .resultScore(resultScore)
-                .ourScore(dto.getOurScore())
-                .theirScore(dto.getTheirScore())
-                .emotion(dto.getEmotion())
-                .review_text(dto.getReview_text())
-                .is_public(dto.getIs_public())
-                .media_url(dto.getMedia_url())
-                .build();
-
+        Journal journal = Journal.from(dto, member, opponentTeam, stadium);
         journalRepository.save(journal);
 
         return journal;
