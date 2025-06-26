@@ -23,12 +23,15 @@ public class Member extends BaseTimeEntity {
     private Long kakaoId;
 
     //카카오 닉네임
+    @Column(unique = true)
     private String kakao_nickname;
 
     //카카오 프로필 링크
+    @Column(unique = true)
     private String kakao_profile_url;
 
     //서비스 내 닉네임
+    @Column(unique = true)
     private String nickname;
 
     //서비스 내 프로필 링크
@@ -60,4 +63,5 @@ public class Member extends BaseTimeEntity {
                 .profile_url(dto.getKakaoAccount().getProfile().getProfileImageUrl()) // 최초 프로필 이미지
                 .build();
     }
+
 }
