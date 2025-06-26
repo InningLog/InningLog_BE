@@ -30,10 +30,16 @@ public class MemberController {
 
 
     //닉네임 수정
-    @Operation(summary = "닉네임 수정", description = "토큰에서 회원 정보를 받아 닉네임을 수정합니다.")
+    @Operation(
+            summary = "닉네임 수정",
+            description = "JWT 토큰에서 인증된 회원 정보를 추출하여, 사용자의 닉네임을 수정합니다.\n\n" +
+                    "요청 바디에는 새로운 닉네임이 포함되어야 하며, 중복된 닉네임일 경우 오류가 반환됩니다.\n"
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "닉네임 수정 성공"),
-            @ApiResponse(responseCode = "404", description = "회원 없음",
+            @ApiResponse(responseCode = "400", description = "중복된 닉네임",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "회원 정보를 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PatchMapping("/nickname")

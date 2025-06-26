@@ -20,6 +20,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final TeamRepository teamRepository;
 
+    @Transactional
     public MemberWithFlag saveOrUpdateMember(KakaoUserInfoResponseDto userInfo) {
         Optional<Member> existing = memberRepository.findByKakaoId(userInfo.getId());
 
@@ -37,8 +38,14 @@ public class MemberService {
     //닉네임 업데이트
     @Transactional
     public void updateNickname(Long memberId, String nickname) {
+
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // 중복 닉네임 검사
+        if (memberRepository.existsByNickname(nickname)) {
+            throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
+        }
 
         member.setNickname(nickname);
     }
