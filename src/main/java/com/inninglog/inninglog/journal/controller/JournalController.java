@@ -185,26 +185,26 @@ public class JournalController {
     @Operation(
             summary = "본인 직관 일지 목록 조회 - 모아보기",
             description = """
-                로그인한 유저의 직관 일지를 목록 형식으로 조회합니다.
+        로그인한 유저의 직관 일지를 목록 형식으로 조회합니다.
 
-                📌 *무한 스크롤 방식 지원*  
-                🔍 *`resultScore` 파라미터를 통해 경기 결과(WIN, LOSE, DRAW)로 필터링 가능*  
-                🧭 *`page`, `size` 파라미터로 페이지네이션 처리 (기본: 1페이지당 10개)*  
-                
-                ✅ 예시 요청:
-                - 전체 조회: `/journals/summary?page=0&size=10`
-                - 승리 경기만: `/journals/summary?page=1&size=10&resultScore=WIN`
-                """
+        📌 *무한 스크롤 방식 지원*  
+        🔍 *`resultScore` 파라미터를 통해 경기 결과(WIN, LOSE, DRAW)로 필터링 가능*  
+        🧭 *`page`, `size` 파라미터로 페이지네이션 처리 (기본: 1페이지당 10개)*  
+
+        ✅ 예시 요청:
+        - 전체 조회: `/journals/summary?page=0&size=10`
+        - 승리 경기만: `/journals/summary?page=1&size=10&resultScore=WIN`
+        """
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "직관 일지 목록 조회 성공",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = JournalCalListResDto.class)))),
-            @ApiResponse(responseCode = "404", description = "회원 정보 없음",
-                    content = @Content)
+            @ApiResponse(responseCode = "200", description = "직관 일지 목록 조회 성공 or 없음",
+                    content = @Content(schema = @Schema(implementation = CustomApiResponse.class))),
+            @ApiResponse(responseCode = "404", description = "회원 정보 없음")
     })
     @GetMapping("/summary")
-    public ResponseEntity<?> getMyJournalsSum(
+    public ResponseEntity<CustomApiResponse<Page<JournalSumListResDto>>> getMyJournalsSum(
             @AuthenticationPrincipal CustomUserDetails user,
+
             @Parameter(description = "페이징 정보 (page: 0부터 시작, size: 페이지당 아이템 수)", example = "0")
             @PageableDefault(size = 10, sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
 
@@ -212,7 +212,9 @@ public class JournalController {
             @RequestParam(required = false) ResultScore resultScore
     ) {
         Page<JournalSumListResDto> result = journalService.getJournalsByMemberSum(user.getMember().getId(), pageable, resultScore);
-        return ResponseEntity.ok(result);
+
+        SuccessCode code = result.isEmpty() ? SuccessCode.JOURNAL_EMPTY : SuccessCode.JOURNAL_LIST_FETCHED;
+        return ResponseEntity.ok(CustomApiResponse.success(code, result));
     }
 }
 
