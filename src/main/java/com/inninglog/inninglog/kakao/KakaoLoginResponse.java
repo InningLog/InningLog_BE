@@ -1,7 +1,6 @@
 package com.inninglog.inninglog.kakao;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import org.springframework.http.HttpHeaders;
 
@@ -10,5 +9,6 @@ import org.springframework.http.HttpHeaders;
 public class KakaoLoginResponse {
     private String message;
     private String nickname;
+    private boolean isNewUser;
     private HttpHeaders headers;
 }
