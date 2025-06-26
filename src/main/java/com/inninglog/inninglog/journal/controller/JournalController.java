@@ -3,6 +3,8 @@ package com.inninglog.inninglog.journal.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
+import com.inninglog.inninglog.global.response.CustomApiResponse;
+import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
 import com.inninglog.inninglog.journal.dto.JourCreateReqDto;
@@ -27,6 +29,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -155,18 +158,23 @@ public class JournalController {
                 """
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "직관 일지 목록 조회 성공",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = JournalCalListResDto.class)))),
-            @ApiResponse(responseCode = "404", description = "회원 정보 없음",
-                    content = @Content)
+            @ApiResponse(responseCode = "200", description = "직관 일지 조회 성공 or 결과 없음",
+                    content = @Content(schema = @Schema(implementation = CustomApiResponse.class))),
+            @ApiResponse(responseCode = "404", description = "회원 없음",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/calendar")
-    public ResponseEntity<?> getMyJournalsCal(
+    public ResponseEntity<CustomApiResponse<List<JournalCalListResDto>>> getCalendarJournals(
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestParam(required = false) ResultScore resultScore
     ) {
         List<JournalCalListResDto> result = journalService.getJournalsByMemberCal(user.getMember().getId(), resultScore);
-        return ResponseEntity.ok(result);
+
+        SuccessCode code = result.isEmpty()
+                ? SuccessCode.JOURNAL_EMPTY
+                : SuccessCode.JOURNAL_LIST_FETCHED;
+
+        return ResponseEntity.ok(CustomApiResponse.success(code, result));
     }
 
 

@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.journal.dto;
 
+import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,4 +20,17 @@ public class JournalSumListResDto {
     private LocalDateTime date;
     private String opponentTeamName;
     private String stadiumName;
+
+    public static JournalSumListResDto from(Journal journal) {
+        return new JournalSumListResDto(
+                journal.getId(),
+                journal.getMedia_url(),
+                journal.getResultScore(),
+                journal.getDate(),
+                journal.getOpponentTeam().getName(),
+                journal.getStadium().getName()
+        );
+    }
+
 }
+

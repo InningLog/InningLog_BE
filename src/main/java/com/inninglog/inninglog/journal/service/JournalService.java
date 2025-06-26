@@ -2,6 +2,8 @@ package com.inninglog.inninglog.journal.service;
 
 import com.inninglog.inninglog.global.exception.CustomException;
 import com.inninglog.inninglog.global.exception.ErrorCode;
+import com.inninglog.inninglog.global.response.CustomApiResponse;
+import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.s3.S3Uploader;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
@@ -17,6 +19,7 @@ import com.inninglog.inninglog.team.domain.Team;
 import com.inninglog.inninglog.team.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -80,24 +83,12 @@ public class JournalService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        List<Journal> journals;
-
-        if (resultScore != null) {
-            journals = journalRepository.findAllByMemberAndResultScore(member, resultScore);
-        } else {
-            journals = journalRepository.findAllByMember(member);
-        }
+        List<Journal> journals = (resultScore != null) ?
+                journalRepository.findAllByMemberAndResultScore(member, resultScore) :
+                journalRepository.findAllByMember(member);
 
         return journals.stream()
-                .map(journal -> new JournalCalListResDto(
-                        journal.getId(),
-                        journal.getOurScore(),
-                        journal.getTheirScore(),
-                        journal.getResultScore(),
-                        journal.getDate(),
-                        journal.getOpponentTeam().getName(),
-                        journal.getStadium().getName()
-                ))
+                .map(JournalCalListResDto::from)
                 .collect(Collectors.toList());
     }
 
@@ -117,14 +108,7 @@ public class JournalService {
             journals = journalRepository.findAllByMember(member, pageable);
         }
 
-        return journals.map(journal -> new JournalSumListResDto(
-                journal.getId(),
-                journal.getMedia_url(),
-                journal.getResultScore(),
-                journal.getDate(),
-                journal.getOpponentTeam().getName(),
-                journal.getStadium().getName()
-        ));
+        return journals.map(JournalSumListResDto::from);
     }
 
 }
