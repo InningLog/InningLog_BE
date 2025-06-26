@@ -48,32 +48,26 @@ public class JournalController {
     //직관 일지 이미지 업로드
     @Operation(
             summary = "직관 일지 이미지 업로드",
-            description = "JWT 토큰에서 유저 정보를 추출하고, S3에 이미지를 업로드합니다. 이후 URL을 반환하며, 이후 JSON 생성 API에서 이 URL을 사용합니다."
+            description = """
+                JWT 토큰에서 유저 정보를 추출하고, S3에 이미지를 업로드합니다.  
+                이후 반환된 URL을 JSON 생성 API에 사용합니다.
+                """
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "이미지 업로드 성공",
-                    content = @Content(schema = @Schema(implementation = String.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 (파일 없음)",
-                    content = @Content),
-            @ApiResponse(responseCode = "500", description = "서버 에러 (S3 업로드 실패)",
-                    content = @Content)
+                    content = @Content(schema = @Schema(implementation = CustomApiResponse.class))),
+            @ApiResponse(responseCode = "400", description = "파일 누락 또는 잘못된 요청",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "이미지 업로드 실패",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> uploadImage(
-
-            @Parameter(description = "업로드할 이미지 파일 (선택사항)")
-            @RequestPart(value = "file", required = false) MultipartFile file
+    public ResponseEntity<CustomApiResponse<String>> uploadImage(
+            @Parameter(description = "업로드할 이미지 파일", required = true)
+            @RequestPart("file") MultipartFile file
     ) {
-        if (file == null || file.isEmpty()) {
-            return ResponseEntity.badRequest().body("파일이 없습니다.");
-        }
-
-        try {
-           String media_url = journalService.uploadImage(file);
-            return ResponseEntity.ok(media_url);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("이미지 업로드 실패: " + e.getMessage());
-        }
+        String url = journalService.uploadImage(file);
+        return ResponseEntity.ok(CustomApiResponse.success(SuccessCode.S3_UPLOAD_SUCCESS, url));
     }
 
 
