@@ -1,6 +1,7 @@
 package com.inninglog.inninglog.journal.domain;
 
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
+import com.inninglog.inninglog.journal.dto.JourCreateReqDto;
 import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.seatView.domain.SeatView;
 import com.inninglog.inninglog.stadium.domain.Stadium;
@@ -68,5 +69,29 @@ public class Journal extends BaseTimeEntity {
     @JoinColumn(name = "seatView_id")
     private SeatView seatView;
 
+    public static Journal from(JourCreateReqDto dto, Member member, Team team, Stadium stadium) {
+        ResultScore resultScore;
+        if (dto.getOurScore() > dto.getTheirScore()) {
+            resultScore = ResultScore.WIN;
+        } else if (dto.getOurScore() < dto.getTheirScore()) {
+            resultScore = ResultScore.LOSE;
+        } else {
+            resultScore = ResultScore.DRAW;
+        }
+
+        return Journal.builder()
+                .member(member)
+                .date(dto.getDate())
+                .opponentTeam(team)
+                .stadium(stadium)
+                .resultScore(resultScore)
+                .ourScore(dto.getOurScore())
+                .theirScore(dto.getTheirScore())
+                .emotion(dto.getEmotion())
+                .review_text(dto.getReview_text())
+                .is_public(dto.getIs_public())
+                .media_url(dto.getMedia_url())
+                .build();
+    }
 
 }
