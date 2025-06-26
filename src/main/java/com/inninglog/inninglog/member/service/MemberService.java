@@ -4,6 +4,7 @@ import com.inninglog.inninglog.global.exception.CustomException;
 import com.inninglog.inninglog.global.exception.ErrorCode;
 import com.inninglog.inninglog.kakao.KakaoUserInfoResponseDto;
 import com.inninglog.inninglog.member.domain.Member;
+import com.inninglog.inninglog.member.dto.MemberWithFlag;
 import com.inninglog.inninglog.member.repository.MemberRepository;
 import com.inninglog.inninglog.team.domain.Team;
 import com.inninglog.inninglog.team.repository.TeamRepository;
@@ -11,23 +12,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
     private final TeamRepository teamRepository;
 
-    @Transactional
-    public Member saveOrUpdateMember(KakaoUserInfoResponseDto kakaoUserInfo) {
-        Long kakaoId = kakaoUserInfo.getId();
-        return memberRepository.findByKakaoId(kakaoId)
-                .orElseGet(() -> {
-                    Member newMember = new Member();
-                    newMember.setKakaoId(kakaoId);
-                    newMember.setKakao_nickname(kakaoUserInfo.getKakaoAccount().getProfile().getNickName());
-                    newMember.setKakao_profile_url(kakaoUserInfo.getKakaoAccount().getProfile().getProfileImageUrl());
-                    return memberRepository.save(newMember); // join 대신 save
-                });
+    public MemberWithFlag saveOrUpdateMember(KakaoUserInfoResponseDto userInfo) {
+        Optional<Member> existing = memberRepository.findByKakaoId(userInfo.getId());
+
+        if (existing.isPresent()) {
+            Member member = existing.get();
+            member.updateInfo(userInfo);
+            return new MemberWithFlag(member, false);
+        } else {
+            Member newMember = Member.fromKakaoDto(userInfo); // 💡 static 팩토리 메서드 사용
+            memberRepository.save(newMember);
+            return new MemberWithFlag(newMember, true);
+        }
     }
 
     //닉네임 업데이트

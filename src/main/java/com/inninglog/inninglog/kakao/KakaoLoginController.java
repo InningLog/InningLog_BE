@@ -26,8 +26,12 @@ public class KakaoLoginController {
     public ResponseEntity<?> callback(@RequestParam("code") String code) {
         try {
             KakaoLoginResponse response = kakaoAuthService.loginWithKakao(code);
-            HttpHeaders headers = response.getHeaders();
-            return ResponseEntity.ok().headers(headers).body(response);
+
+            AuthResDto authResDto = AuthResDto.fromKakaoLoginRes(response);
+
+            return ResponseEntity.ok()
+                    .headers(response.getHeaders())
+                    .body(authResDto);
         } catch (Exception e) {
             log.error("Error during Kakao login process", e);
             return new ResponseEntity<>("로그인 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
