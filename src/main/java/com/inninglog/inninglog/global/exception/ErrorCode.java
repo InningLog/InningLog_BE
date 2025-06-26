@@ -19,6 +19,8 @@ public enum ErrorCode {
     NO_VISITED_GAMES("NO_VISITED_GAME", HttpStatus.BAD_REQUEST, "직관한 경기가 없습니다."),
 
     // 일지 / 시야 / 태그 관련
+    S3_UPLOAD_FAILED("S3_UPLOAD_FAILED", HttpStatus.INTERNAL_SERVER_ERROR, "이미지 업로드 중 오류가 발생했습니다."),
+    FILE_IS_EMPTY("FILE_IS_EMPTY", HttpStatus.BAD_REQUEST, "업로드할 파일이 없습니다."),
     JOURNAL_NOT_FOUND("JOURNAL_NOT_FOUND", HttpStatus.NOT_FOUND, "작성하지 않은 일지입니다."),
     EMOTION_TAG_NOT_FOUND("EMOTION_TAG_NOT_FOUND", HttpStatus.NOT_FOUND, "감정 태그가 없습니다."),
     ZONE_NOT_FOUND("ZONE_NOT_FOUND", HttpStatus.NOT_FOUND, "등록되지 않은 존입니다."),

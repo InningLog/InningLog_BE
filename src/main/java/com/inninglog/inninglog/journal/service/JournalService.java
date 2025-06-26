@@ -39,23 +39,20 @@ public class JournalService {
     private final TeamRepository teamRepository;
     private final S3Uploader s3Uploader;
 
-    //직관 일지 이미지 업로드
+    //S3 업로드
     @Transactional
     public String uploadImage(MultipartFile file) {
-
-        String media_url = null;
-        if (file != null && !file.isEmpty()) {
-            try {
-                media_url = s3Uploader.uploadFile(file, "journal");
-            } catch (IOException e) {
-                throw new RuntimeException("S3 업로드 실패", e);
-            }
+        if (file == null || file.isEmpty()) {
+            throw new CustomException(ErrorCode.FILE_IS_EMPTY);
         }
 
-        //S3에 업로드한 url 반환
-        return media_url;
-
+        try {
+            return s3Uploader.uploadFile(file, "journal");
+        } catch (IOException e) {
+            throw new CustomException(ErrorCode.S3_UPLOAD_FAILED);
+        }
     }
+
 
     //직관 일지 내용 업로드
     @Transactional
