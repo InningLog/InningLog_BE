@@ -13,13 +13,11 @@ public class AuthResDto {
     @Schema(description = "신규 가입 여부")
     private boolean isNewMember;
 
-    private String message;
 
     public static AuthResDto fromKakaoLoginRes(KakaoLoginResponse loginResponse) {
        return AuthResDto.builder()
                 .nickname(loginResponse.getNickname())
                 .isNewMember(loginResponse.isNewUser())
-                .message(loginResponse.getMessage())
                 .build();
 
     }
