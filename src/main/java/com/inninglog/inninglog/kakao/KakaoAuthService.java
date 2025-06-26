@@ -45,6 +45,6 @@ public class KakaoAuthService {
         headers.set("Refresh-Token", jwtRefreshToken);
         headers.set("kakaoId", member.getKakaoId().toString());
 
-        return new KakaoLoginResponse("로그인 성공", member.getNickname(), isNewUser, headers);
+        return new KakaoLoginResponse(member.getNickname(), isNewUser, headers);
     }
 }

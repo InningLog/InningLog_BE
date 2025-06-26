@@ -2,6 +2,8 @@ package com.inninglog.inninglog.kakao;
 
 
 import com.inninglog.inninglog.global.auth.JwtProvider;
+import com.inninglog.inninglog.global.response.CustomApiResponse;
+import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.util.AmplitudeService;
 import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.member.service.MemberService;
@@ -26,12 +28,13 @@ public class KakaoLoginController {
     public ResponseEntity<?> callback(@RequestParam("code") String code) {
         try {
             KakaoLoginResponse response = kakaoAuthService.loginWithKakao(code);
-
             AuthResDto authResDto = AuthResDto.fromKakaoLoginRes(response);
 
-            return ResponseEntity.ok()
+            return ResponseEntity
+                    .status(SuccessCode.LOGIN_SUCCESS.getStatus())
                     .headers(response.getHeaders())
-                    .body(authResDto);
+                    .body(CustomApiResponse.success(SuccessCode.LOGIN_SUCCESS, authResDto));
+
         } catch (Exception e) {
             log.error("Error during Kakao login process", e);
             return new ResponseEntity<>("로그인 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
