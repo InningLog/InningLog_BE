@@ -9,6 +9,7 @@ import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -41,8 +42,18 @@ public class KakaoLoginController {
                             schema = @Schema(implementation = LoginSuccessSwaggerDto.class)
                     )
             ),
-            @ApiResponse(responseCode = "500", description = "서버 내부 오류",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류 발생",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "에러 예시",
+                                    value = "{\n" +
+                                            "  \"code\": \"INTERNAL_SERVER_ERROR\",\n" +
+                                            "  \"message\": \"서버 내부 오류가 발생했습니다.\"\n" +
+                                            "}"
+                            )
+                    )
             )
     })
     @GetMapping("/callback")
