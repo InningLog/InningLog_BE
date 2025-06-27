@@ -34,6 +34,8 @@ public class JourGameResDto {
                 .gameId(game.getGameId())
                 .gameDate(game.getLocalDateTime())
                 .supportTeamSC(supportTeamSC)
-                .opponentTeamSC(opponentTeamSC).build();
+                .opponentTeamSC(opponentTeamSC)
+                .stadiumSC(game.getStadium().getShortCode())
+                .build();
     }
 }

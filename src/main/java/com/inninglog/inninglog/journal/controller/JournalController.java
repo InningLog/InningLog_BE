@@ -8,6 +8,7 @@ import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
 import com.inninglog.inninglog.journal.dto.JourCreateReqDto;
+import com.inninglog.inninglog.journal.dto.JourGameResDto;
 import com.inninglog.inninglog.journal.dto.JournalCalListResDto;
 import com.inninglog.inninglog.journal.dto.JournalSumListResDto;
 import com.inninglog.inninglog.journal.service.JournalService;
@@ -189,6 +190,21 @@ public class JournalController {
 
         SuccessCode code = result.isEmpty() ? SuccessCode.JOURNAL_EMPTY : SuccessCode.JOURNAL_LIST_FETCHED;
         return ResponseEntity.ok(SuccessResponse.success(code, result));
+    }
+
+
+    //직관 일지 작성시 경기 정보 제공
+    @GetMapping("/contents")
+    public ResponseEntity<?> getGameInfo(
+            @AuthenticationPrincipal CustomUserDetails user,
+
+            @Parameter(description = "경기 Id (gameId)")
+            @RequestParam(required = true) String gameId
+    ){
+
+        JourGameResDto resDto = journalService.infoJournal(user.getMember().getId(), gameId);
+
+        return ResponseEntity.ok(resDto);
     }
 }
 
