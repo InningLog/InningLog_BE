@@ -1,14 +1,18 @@
 package com.inninglog.inninglog.journal.service;
 
 import com.inninglog.inninglog.global.exception.CustomException;
+import com.inninglog.inninglog.global.exception.ErrorApiResponses;
 import com.inninglog.inninglog.global.exception.ErrorCode;
 import com.inninglog.inninglog.global.s3.S3Uploader;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
 import com.inninglog.inninglog.journal.dto.JourCreateReqDto;
+import com.inninglog.inninglog.journal.dto.JourGameResDto;
 import com.inninglog.inninglog.journal.dto.JournalCalListResDto;
 import com.inninglog.inninglog.journal.dto.JournalSumListResDto;
 import com.inninglog.inninglog.journal.repository.JournalRepository;
+import com.inninglog.inninglog.kbo.domain.Game;
+import com.inninglog.inninglog.kbo.repository.GameRepository;
 import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.member.repository.MemberRepository;
 import com.inninglog.inninglog.stadium.domain.Stadium;
@@ -24,6 +28,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Pageable;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +40,7 @@ public class JournalService {
     private final MemberRepository memberRepository;
     private final StadiumRepository stadiumRepository;
     private final TeamRepository teamRepository;
+    private final GameRepository gameRepository;
     private final S3Uploader s3Uploader;
 
     //S3 업로드
@@ -105,4 +112,34 @@ public class JournalService {
         return journals.map(JournalSumListResDto::from);
     }
 
+
+    //일지 기본 정보 제공
+    @Transactional(readOnly = true)
+    public JourGameResDto infoJournal(Long memberId, String gameId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Game game = gameRepository.findByGameId(gameId)
+                .orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND));
+
+
+        Long supportTeamId = member.getTeam().getId();
+
+        Long opponentTeamId = 0L;
+
+        //게임의 원정팀이 유저의 응원팀과 다를 경우
+        if(!Objects.equals(game.getAwayTeam().getId(), supportTeamId)){
+            //원정팀이 상대팀
+             opponentTeamId = game.getAwayTeam().getId();
+        }else {
+            //게임의 원정팀이 유저의 응원팀과 같은 경우
+            //상대팀은 홈팀이였다.
+            opponentTeamId = game.getHomeTeam().getId();
+        }
+
+        Team team = teamRepository.findById(opponentTeamId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
+
+        return JourGameResDto.fromGame(member.getTeam().getShortCode(), team.getShortCode(), game );
+    }
 }
