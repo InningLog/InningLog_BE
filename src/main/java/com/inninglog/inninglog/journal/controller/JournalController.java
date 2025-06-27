@@ -69,25 +69,25 @@ public class JournalController {
     @Operation(
             summary = "직관 일지 콘텐츠 업로드",
             description = """
-            직관 일지 본문 데이터를 업로드하는 API입니다. 
-            
-            사용자는 사전에 이미지 파일을 S3 업로드 API를 통해 업로드하고, 
-            응답받은 media URL을 포함한 JSON 데이터를 본 API에 전달합니다.
-            
-            이 API는 전달받은 정보로 새로운 Journal 객체를 생성합니다.
+        직관 일지 본문 데이터를 업로드하는 API입니다. 
+        
+        사용자는 사전에 이미지 파일을 S3 업로드 API를 통해 업로드하고,  
+        응답받은 media URL을 포함한 JSON 데이터를 본 API에 전달합니다.
+        
+        이 API는 전달받은 정보로 새로운 Journal 객체를 생성합니다.
 
-            ✅ 필수 필드:
-            - `media_url`: 이미지 S3 URL
-            - `ourScore`, `theirScore`: 점수 정보
-            - `opponentTeamShortCode`, `stadiumShortCode`
-            - `date`, `emotion`
+        ✅ 필수 필드:
+        - `media_url`: 이미지 S3 URL
+        - `ourScore`, `theirScore`: 점수 정보
+        - `opponentTeamShortCode`, `stadiumShortCode`
+        - `date`, `emotion`
         """
     )
     @ErrorApiResponses.Common
     @ErrorApiResponses.Game
     @SuccessApiResponses.JournalCreate
     @PostMapping("/contents")
-    public ResponseEntity<?> createContents(
+    public ResponseEntity<SuccessResponse<Long>> createContents(
             @Parameter(hidden = true)
             @AuthenticationPrincipal CustomUserDetails user,
 
@@ -100,7 +100,9 @@ public class JournalController {
         Journal journal = journalService.createJournal(user.getMember().getId(), request);
         gameReportService.createVisitedGame(user.getMember().getId(), request.getGameId(), journal.getId());
 
-        return ResponseEntity.ok(journal.getId());
+        return ResponseEntity.ok(
+                SuccessResponse.success(SuccessCode.JOURNAL_CREATED, journal.getId())
+        );
     }
 
 

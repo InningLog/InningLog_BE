@@ -129,26 +129,26 @@ public class GameReportService {
         List<PlayerRankingDto> topBatters = playerStatMap.values().stream()
                 .filter(dto -> dto.getPlayerType() == PlayerType.HITTER)
                 .sorted(Comparator.comparingInt(PlayerRankingDto::getHalPoongRi).reversed()) // 타자는 높은 순
-                .limit(2)
+                .limit(1)
                 .toList();
 
         List<PlayerRankingDto> topPitchers = playerStatMap.values().stream()
                 .filter(dto -> dto.getPlayerType() == PlayerType.PITCHER)
                 .sorted(Comparator.comparingInt(PlayerRankingDto::getHalPoongRi))
-                .limit(2)
+                .limit(1)
                 .toList();
 
 
         List<PlayerRankingDto> buttomBatters = playerStatMap.values().stream()
                 .filter(dto -> dto.getPlayerType() == PlayerType.HITTER)
                 .sorted(Comparator.comparingInt(PlayerRankingDto::getHalPoongRi))
-                .limit(2)
+                .limit(1)
                 .toList();
 
         List<PlayerRankingDto> buttomPitchers = playerStatMap.values().stream()
                 .filter(dto -> dto.getPlayerType() == PlayerType.PITCHER)
                 .sorted(Comparator.comparingInt(PlayerRankingDto::getHalPoongRi).reversed())
-                .limit(2)
+                .limit(1)
                 .toList();
 
         return new PlayerRankingResult(topBatters, topPitchers,buttomBatters,buttomPitchers);
