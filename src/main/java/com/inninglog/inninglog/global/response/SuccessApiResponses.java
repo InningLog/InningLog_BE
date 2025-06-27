@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.global.response;
 
+import com.inninglog.inninglog.journal.dto.res.JourCreateResDto;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -119,7 +120,7 @@ public @interface SuccessApiResponses {
             @ApiResponse(responseCode = "201", description = "일지 생성 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = SuccessResponse.class),
+                            schema = @Schema(implementation = JourCreateResDto.class),
                             examples = @ExampleObject(name = "일지 생성", value = """
                                     {
                                       "code": "JOURNAL_CREATED",
