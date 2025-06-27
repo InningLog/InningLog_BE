@@ -17,6 +17,7 @@ import com.inninglog.inninglog.member.dto.TypeRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -54,12 +55,58 @@ public class JournalController {
                 """
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "이미지 업로드 성공",
-                    content = @Content(schema = @Schema(implementation = CustomApiResponse.class))),
-            @ApiResponse(responseCode = "400", description = "파일 누락 또는 잘못된 요청",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "이미지 업로드 실패",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "이미지 업로드 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = CustomApiResponse.class),
+                            examples = @ExampleObject(
+                                    name = "업로드 성공 예시",
+                                    value = """
+                                        {
+                                          "code": "S3_UPLOAD_SUCCESS",
+                                          "message": "이미지 업로드가 완료되었습니다.",
+                                          "data": "https://your-s3-url/journal/example.jpg"
+                                        }
+                                        """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "파일 누락 또는 잘못된 요청",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "파일 누락 에러 예시",
+                                    value = """
+                                        {
+                                          "code": "FILE_IS_EMPTY",
+                                          "message": "업로드할 파일이 없습니다.."
+                                        }
+                                        """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "이미지 업로드 실패 (S3 업로드 오류)",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(
+                                    name = "업로드 실패 예시",
+                                    value = """
+                                        {
+                                          "code": "S3_UPLOAD_FAILED",
+                                          "message": "이미지 업로드에 실패했습니다. 다시 시도해주세요."
+                                        }
+                                        """
+                            )
+                    )
+            )
     })
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CustomApiResponse<String>> uploadImage(
