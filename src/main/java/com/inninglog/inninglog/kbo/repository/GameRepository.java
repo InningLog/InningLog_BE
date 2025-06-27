@@ -27,6 +27,20 @@ public interface GameRepository extends JpaRepository<Game, Long> {
     List<Game> findByLocalDateTime(@Param("date") LocalDate date);
 
     /**
+     * 특정 날짜의 특정 팀 경기 조회
+     */
+    @Query("""
+    SELECT g FROM Game g 
+    WHERE DATE(g.localDateTime) = :date 
+      AND (g.homeTeam.id = :teamId OR g.awayTeam.id = :teamId) 
+    ORDER BY g.localDateTime
+""")
+   Game findByDateAndTeamId(
+            @Param("date") LocalDate date,
+            @Param("teamId") Long teamId
+    );
+
+    /**
      * 특정 날짜의 박스스코어 URL이 있는 경기 조회
      */
     @Query("SELECT g FROM Game g WHERE DATE(g.localDateTime) = :date AND g.boxscoreUrl IS NOT NULL ORDER BY g.localDateTime")

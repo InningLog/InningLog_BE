@@ -154,6 +154,18 @@ public class JournalService {
         return GameSchResDto.listFrom(games, supportTeamId);
     }
 
+    //해당 일자의 경기 가져오기
+    @Transactional(readOnly = true)
+    public GameSchResDto getSingleGameSch(Long memberId, LocalDate gameDate) {
 
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Long supportTeamId = member.getTeam().getId();
+
+        Game game = gameRepository.findByDateAndTeamId(gameDate, supportTeamId);
+
+        return GameSchResDto.from(game, supportTeamId);
+    }
 
 }
