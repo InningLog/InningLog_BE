@@ -215,6 +215,8 @@ public @interface SuccessApiResponses {
                                     }
                                     """)
                     ))
+
+
     })
     public @interface ReportGenerate {
     }
@@ -339,26 +341,39 @@ public @interface SuccessApiResponses {
     @Target({ElementType.METHOD})
     @Retention(RetentionPolicy.RUNTIME)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "경기 일정 조회 성공",
+            @ApiResponse(responseCode = "200", description = "경기 일정 조회 성공 (또는 해당일에 경기 없음)",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = SuccessResponse.class),
-                            examples = @ExampleObject(
-                                    name = "성공 응답 예시",
-                                    value = """
-                                            {
-                                              "code": "SUCCESS",
-                                              "status": 200,
-                                              "message": "요청이 정상적으로 처리되었습니다.",
-                                              "data": {
-                                                "gameId": "20250701OBLT0",
-                                                "gameDate": "2025-07-01T18:30:00",
-                                                "opponentSC": "LT",
-                                                "stadiumSC": "JAM"
-                                              }
-                                            }
-                                            """
-                            )
+                            examples = {
+                                    @ExampleObject(
+                                            name = "경기 있음 예시",
+                                            value = """
+                    {
+                      "code": "SUCCESS",
+                      "status": 200,
+                      "message": "요청이 정상적으로 처리되었습니다.",
+                      "data": {
+                        "gameId": "20250701OBLT0",
+                        "gameDate": "2025-07-01T18:30:00",
+                        "opponentSC": "LT",
+                        "stadiumSC": "JAM"
+                      }
+                    }
+                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "경기 없음 예시",
+                                            value = """
+                    {
+                      "code": "SUCCESS",
+                      "status": 200,
+                      "message": "요청이 정상적으로 처리되었습니다.",
+                      "data": null
+                    }
+                    """
+                                    )
+                            }
                     )
             )
     })

@@ -245,6 +245,10 @@ public class JournalController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate gameDate
     ){
         GameSchResDto resDto = journalService.getSingleGameSch(user.getMember().getId(), gameDate);
+
+        if (resDto == null) {
+            return ResponseEntity.ok(SuccessResponse.success(SuccessCode.NO_SCHEDULE_ON_DATE, null));
+        }
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resDto));
     }
 }
