@@ -49,7 +49,7 @@ public @interface SuccessApiResponses {
                                               "message": "로그인이 성공적으로 되었습니다.",
                                               "data": {
                                                 "nickname": "야구팬123",
-                                                "isNewMember": false
+                                                "newMember": false
                                               }
                                             }
                                             """),
@@ -59,7 +59,7 @@ public @interface SuccessApiResponses {
                                               "message": "로그인이 성공적으로 되었습니다.",
                                               "data": {
                                                 "nickname": "카카오_1234567890",
-                                                "isNewMember": true
+                                                "newMember": true
                                               }
                                             }
                                             """)

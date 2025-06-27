@@ -2,18 +2,13 @@ package com.inninglog.inninglog.journal.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.inninglog.inninglog.global.entity.BaseTimeEntity;
 
-public enum EmotionTag  {
-    HAPPY("기쁨"),        // 😆
-    SAD("슬픔"),          // 😢
-    FRUSTRATED("짜증"),   // 😤
-    EXCITED("흥분"),      // 🤩
-    PROUD("자랑스러움"), // 😎
-    TOUCHED("감동"),      // 🥹
-    SHOCKED("충격"),      // 🤯
-    BORED("지루함"),      // 😐
-    PEACEFUL("평온함");   // 😇
+public enum EmotionTag {
+    TOUCHED("감동"),
+    EXCITED("짜릿함"),
+    FRUSTRATED("답답함"),
+    REGRETFUL("아쉬움"),
+    ANGRY("분노");
 
     private final String description;
 
