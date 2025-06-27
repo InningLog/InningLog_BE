@@ -179,19 +179,21 @@ public @interface SuccessApiResponses {
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = SuccessResponse.class),
-                            examples = @ExampleObject(value = """
-                                    {
-                                      "code": "S3_UPLOAD_SUCCESS",
-                                      "message": "이미지 업로드가 성공적으로 완료되었습니다.",
-                                      "data": {
-                                        "url": "https://s3.amazonaws.com/bucket/images/journal_123.jpg",
-                                      }
-                                    }
-                                    """)
-                    ))
+                            examples = @ExampleObject(
+                                    value = """
+                {
+                  "code": "S3_UPLOAD_SUCCESS",
+                  "message": "이미지 업로드가 성공적으로 완료되었습니다.",
+                  "data": {
+                    "url": "https://s3.amazonaws.com/bucket/images/journal_123.jpg"
+                  }
+                }
+                """
+                            )
+                    )
+            )
     })
-    public @interface FileUpload {
-    }
+    public @interface FileUpload {}
 
     // 리포트 생성 성공 응답
     @Target(ElementType.METHOD)
