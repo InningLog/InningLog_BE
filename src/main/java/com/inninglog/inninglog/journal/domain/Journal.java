@@ -1,7 +1,7 @@
 package com.inninglog.inninglog.journal.domain;
 
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
-import com.inninglog.inninglog.journal.dto.JourCreateReqDto;
+import com.inninglog.inninglog.journal.dto.req.JourCreateReqDto;
 import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.seatView.domain.SeatView;
 import com.inninglog.inninglog.stadium.domain.Stadium;
@@ -9,7 +9,6 @@ import com.inninglog.inninglog.team.domain.Team;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -56,9 +55,6 @@ public class Journal extends BaseTimeEntity {
     //미디어 링크
     private String media_url;
 
-    //공개, 비공개 여부
-    private Boolean is_public;
-
     //경기장 정보
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stadium_id")
@@ -81,7 +77,7 @@ public class Journal extends BaseTimeEntity {
 
         return Journal.builder()
                 .member(member)
-                .date(dto.getDate())
+                .date(dto.getGameDateTime())
                 .opponentTeam(team)
                 .stadium(stadium)
                 .resultScore(resultScore)
@@ -89,7 +85,6 @@ public class Journal extends BaseTimeEntity {
                 .theirScore(dto.getTheirScore())
                 .emotion(dto.getEmotion())
                 .review_text(dto.getReview_text())
-                .is_public(dto.getIs_public())
                 .media_url(dto.getMedia_url())
                 .build();
     }

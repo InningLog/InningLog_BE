@@ -7,15 +7,18 @@ import com.inninglog.inninglog.global.response.SuccessResponse;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
-import com.inninglog.inninglog.journal.dto.*;
+import com.inninglog.inninglog.journal.dto.req.JourCreateReqDto;
+import com.inninglog.inninglog.journal.dto.res.JourGameResDto;
+import com.inninglog.inninglog.journal.dto.res.JournalCalListResDto;
+import com.inninglog.inninglog.journal.dto.res.JournalSumListResDto;
 import com.inninglog.inninglog.journal.service.JournalService;
+import com.inninglog.inninglog.kbo.dto.gameSchdule.GameSchResDto;
 import com.inninglog.inninglog.kbo.service.GameReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -24,7 +27,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -78,7 +80,7 @@ public class JournalController {
             - `media_url`: 이미지 S3 URL
             - `ourScore`, `theirScore`: 점수 정보
             - `opponentTeamShortCode`, `stadiumShortCode`
-            - `date`, `emotion`, `review_text`, `is_public`
+            - `date`, `emotion`
         """
     )
     @ErrorApiResponses.Common
@@ -90,24 +92,6 @@ public class JournalController {
             @AuthenticationPrincipal CustomUserDetails user,
 
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = """
-                직관 일지 생성 요청 JSON 예시입니다.
-
-                ```json
-                {
-                  "gameId": "20250622OBLG0"
-                  "media_url": "https://your-s3-bucket-url/image.jpg",
-                  "ourScore": 4,
-                  "theirScore": 2,
-                  "opponentTeamShortCode": "KIA",
-                  "stadiumShortCode": "JAM",
-                  "date": "2025-06-06T18:30:00",
-                  "emotion": "기쁨",
-                  "review_text": "역전승에 울었다...",
-                  "is_public": true
-                }
-                ```
-                """,
                     required = true,
                     content = @Content(schema = @Schema(implementation = JourCreateReqDto.class))
             )

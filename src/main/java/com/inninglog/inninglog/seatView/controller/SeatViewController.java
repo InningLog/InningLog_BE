@@ -1,20 +1,13 @@
 package com.inninglog.inninglog.seatView.controller;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
-import com.inninglog.inninglog.journal.domain.Journal;
-import com.inninglog.inninglog.journal.dto.JourCreateReqDto;
-import com.inninglog.inninglog.journal.dto.JourCreateResDto;
 import com.inninglog.inninglog.seatView.domain.SeatView;
 import com.inninglog.inninglog.seatView.dto.SeatCreateReqDto;
-import com.inninglog.inninglog.seatView.dto.SeatCreateResDto;
 import com.inninglog.inninglog.seatView.service.SeatViewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -25,9 +18,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
-
-
-import java.awt.*;
 
 @RestController
 @RequiredArgsConstructor

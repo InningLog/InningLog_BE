@@ -1,14 +1,17 @@
 package com.inninglog.inninglog.journal.service;
 
 import com.inninglog.inninglog.global.exception.CustomException;
-import com.inninglog.inninglog.global.exception.ErrorApiResponses;
 import com.inninglog.inninglog.global.exception.ErrorCode;
 import com.inninglog.inninglog.global.s3.S3Uploader;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
-import com.inninglog.inninglog.journal.dto.*;
+import com.inninglog.inninglog.journal.dto.req.JourCreateReqDto;
+import com.inninglog.inninglog.journal.dto.res.JourGameResDto;
+import com.inninglog.inninglog.journal.dto.res.JournalCalListResDto;
+import com.inninglog.inninglog.journal.dto.res.JournalSumListResDto;
 import com.inninglog.inninglog.journal.repository.JournalRepository;
 import com.inninglog.inninglog.kbo.domain.Game;
+import com.inninglog.inninglog.kbo.dto.gameSchdule.GameSchResDto;
 import com.inninglog.inninglog.kbo.repository.GameRepository;
 import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.member.repository.MemberRepository;
@@ -27,7 +30,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
