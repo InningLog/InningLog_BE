@@ -165,6 +165,8 @@ public class JournalService {
 
         Game game = gameRepository.findByDateAndTeamId(gameDate, supportTeamId);
 
+        if(game==null) return null;
+
         return GameSchResDto.from(game, supportTeamId);
     }
 
