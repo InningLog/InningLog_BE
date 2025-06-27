@@ -7,10 +7,7 @@ import com.inninglog.inninglog.global.response.SuccessResponse;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
-import com.inninglog.inninglog.journal.dto.JourCreateReqDto;
-import com.inninglog.inninglog.journal.dto.JourGameResDto;
-import com.inninglog.inninglog.journal.dto.JournalCalListResDto;
-import com.inninglog.inninglog.journal.dto.JournalSumListResDto;
+import com.inninglog.inninglog.journal.dto.*;
 import com.inninglog.inninglog.journal.service.JournalService;
 import com.inninglog.inninglog.kbo.service.GameReportService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,17 +15,22 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -193,29 +195,57 @@ public class JournalController {
     }
 
 
-    //직관 일지 작성시 경기 정보 제공
     @Operation(
             summary = "직관 일지 콘텐츠 사전 정보 조회",
             description = """
-        해당 경기 ID(gameId)를 기반으로, 현재 로그인한 사용자의 응원 팀과 상대 팀 정보를 조회합니다.
-          
-        - 이 API는 직관 일지 작성을 시작하기 전, 필요한 기본 정보를 제공합니다.  
-        - 반환되는 데이터는 사용자의 응원 팀, 상대 팀, 경기장 정보, 경기 일시 등을 포함합니다.  
-        - 유저의 응원 팀은 미리 설정되어 있어야 하며, gameId는 유효한 경기여야 합니다.
-        """
+    해당 경기 ID(gameId)를 기반으로, 현재 로그인한 사용자의 응원 팀과 상대 팀 정보를 조회합니다.
+      
+    - 이 API는 직관 일지 작성을 시작하기 전, 필요한 기본 정보를 제공합니다.  
+    - 반환되는 데이터는 사용자의 응원 팀, 상대 팀, 경기장 정보, 경기 일시 등을 포함합니다.  
+    - 유저의 응원 팀은 미리 설정되어 있어야 하며, gameId는 유효한 경기여야 합니다.
+    """
     )
     @ErrorApiResponses.Common
     @ErrorApiResponses.Game
     @SuccessApiResponses.JournalInfo
     @GetMapping("/contents")
-    public ResponseEntity<?> getGameInfo(
+    public ResponseEntity<SuccessResponse<JourGameResDto>> getGameInfo(
             @AuthenticationPrincipal CustomUserDetails user,
 
-            @Parameter(description = "경기 Id (gameId)")
-            @RequestParam(required = true) String gameId
+            @Parameter(description = "경기 Id (gameId)", required = true)
+            @RequestParam String gameId
     ){
         JourGameResDto resDto = journalService.infoJournal(user.getMember().getId(), gameId);
-        return ResponseEntity.ok(resDto);
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resDto));
+    }
+
+
+    //특정 날짜 경기 일정 조회 - 유저의 응원팀 기준
+    @Operation(
+            summary = "유저 응원팀의 특정 날짜 경기 일정 조회",
+            description = """
+            로그인한 유저의 **응원팀 기준으로**, 특정 날짜의 경기 일정을 조회합니다.  
+            
+            반환된 `gameId`는 이후 **직관 일지 콘텐츠 업로드 API (`/journals/contents`)**에 사용됩니다.
+
+            🗓️ 요청 날짜는 `YYYY-MM-DD` 형식으로 전달해야 합니다.
+
+            ✅ 예시:
+            `/journals/schedule?gameDate=2025-07-01`
+        """
+    )
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Game
+    @SuccessApiResponses.GameSchedule
+    @GetMapping("/schedule")
+    public ResponseEntity<SuccessResponse<GameSchResDto>> getSchedule(
+            @AuthenticationPrincipal CustomUserDetails user,
+
+            @Parameter(description = "경기 일정 날짜 (예: 2025-07-01)", required = true)
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate gameDate
+    ){
+        GameSchResDto resDto = journalService.getSingleGameSch(user.getMember().getId(), gameDate);
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resDto));
     }
 }
 
