@@ -1,4 +1,4 @@
-package com.inninglog.inninglog.journal.dto;
+package com.inninglog.inninglog.kbo.dto.gameSchdule;
 
 import com.inninglog.inninglog.kbo.domain.Game;
 import lombok.AllArgsConstructor;
@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+//직관일지에서 쓰는거
 @Getter
 @Builder
 @AllArgsConstructor

@@ -1,11 +1,9 @@
 package com.inninglog.inninglog.kbo.controller;
 
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
-import com.inninglog.inninglog.journal.dto.JournalCalListResDto;
 import com.inninglog.inninglog.kbo.dto.gameReport.GameReportResDto;
 import com.inninglog.inninglog.kbo.service.GameReportService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
