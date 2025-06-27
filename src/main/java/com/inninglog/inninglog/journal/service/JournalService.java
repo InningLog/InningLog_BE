@@ -2,8 +2,6 @@ package com.inninglog.inninglog.journal.service;
 
 import com.inninglog.inninglog.global.exception.CustomException;
 import com.inninglog.inninglog.global.exception.ErrorCode;
-import com.inninglog.inninglog.global.response.CustomApiResponse;
-import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.s3.S3Uploader;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
@@ -19,7 +17,6 @@ import com.inninglog.inninglog.team.domain.Team;
 import com.inninglog.inninglog.team.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;

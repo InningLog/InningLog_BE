@@ -11,7 +11,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-public class ErrorApiResponses {
+public @interface ErrorApiResponses {
 
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
@@ -66,16 +66,6 @@ public class ErrorApiResponses {
                                             }
                                             """)
                             })),
-            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class),
-                            examples = {
-                                    @ExampleObject(name = "일지 없음", value = """
-                                            {
-                                                "code": "JOURNAL_NOT_FOUND",
-                                                "message": "작성하지 않은 일지입니다."
-                                            }
-                                            """)
-                            })),
             @ApiResponse(responseCode = "500", description = "서버 내부 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class),
                             examples = {
@@ -88,7 +78,7 @@ public class ErrorApiResponses {
                             }))
     })
     //S3 업로드
-    public @interface Journal {
+    public @interface S3Failed {
     }
 
     @Target(ElementType.METHOD)
@@ -120,18 +110,31 @@ public class ErrorApiResponses {
     public @interface Game {
     }
 
+    // 팀 설정 관련 에러
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "409", description = "충돌",
+            @ApiResponse(responseCode = "409", description = "이미 팀이 설정됨",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(name = "이미 설정됨", value = """
+                                    {
+                                        "code": "ALREADY_SET",
+                                        "message": "이미 팀이 설정되었습니다."
+                                    }
+                                    """)
+                    ))
+    })
+    public @interface TeamSetting {
+    }
+
+
+    // 닉네임 관련 에러
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "잘못된 요청",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class),
                             examples = {
-                                    @ExampleObject(name = "이미 설정됨", value = """
-                                            {
-                                                "code": "ALREADY_SET",
-                                                "message": "이미 팀이 설정되었습니다."
-                                            }
-                                            """),
                                     @ExampleObject(name = "중복 닉네임", value = """
                                             {
                                                 "code": "DUPLICATE_NICKNAME",
@@ -143,28 +146,10 @@ public class ErrorApiResponses {
                                                 "code": "INVALID_NICKNAME",
                                                 "message": "닉네임 형식이 올바르지 않습니다."
                                             }
-                                            """)
+                                            """),
                             }))
     })
-    //유저
-    public @interface User {
+    public @interface Nickname {
     }
 
-    // ErrorResponse DTO 클래스
-    public static class ErrorResponse {
-        private String code;
-        private String message;
-
-        public ErrorResponse() {}
-
-        public ErrorResponse(String code, String message) {
-            this.code = code;
-            this.message = message;
-        }
-
-        public String getCode() { return code; }
-        public void setCode(String code) { this.code = code; }
-        public String getMessage() { return message; }
-        public void setMessage(String message) { this.message = message; }
-    }
 }
