@@ -6,10 +6,7 @@ import com.inninglog.inninglog.global.exception.ErrorCode;
 import com.inninglog.inninglog.global.s3.S3Uploader;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
-import com.inninglog.inninglog.journal.dto.JourCreateReqDto;
-import com.inninglog.inninglog.journal.dto.JourGameResDto;
-import com.inninglog.inninglog.journal.dto.JournalCalListResDto;
-import com.inninglog.inninglog.journal.dto.JournalSumListResDto;
+import com.inninglog.inninglog.journal.dto.*;
 import com.inninglog.inninglog.journal.repository.JournalRepository;
 import com.inninglog.inninglog.kbo.domain.Game;
 import com.inninglog.inninglog.kbo.repository.GameRepository;
@@ -27,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import org.springframework.data.domain.Pageable;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -142,4 +140,20 @@ public class JournalService {
 
         return JourGameResDto.fromGame(member.getTeam().getShortCode(), team.getShortCode(), game );
     }
+
+    //유저의 응원팀 경기 일정 - 월기준 -홈에서 쓰기
+    @Transactional(readOnly = true)
+    public List<GameSchResDto> getGameSch(Long memberId, LocalDate startDate, LocalDate endDate) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Long supportTeamId = member.getTeam().getId();
+
+        List<Game> games = gameRepository.findByTeamAndDateRange(supportTeamId, startDate, endDate);
+
+        return GameSchResDto.listFrom(games, supportTeamId);
+    }
+
+
+
 }
