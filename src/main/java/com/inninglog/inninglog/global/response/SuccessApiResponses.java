@@ -305,4 +305,34 @@ public @interface SuccessApiResponses {
     })
     public @interface JournalApi {
     }
+
+
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청이 정상적으로 처리되었습니다.",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = SuccessResponse.class),
+                    examples = @ExampleObject(
+                            name = "직관 콘텐츠 사전 정보 응답 예시",
+                            summary = "성공 응답",
+                            value = """
+                                {
+                                  "code": "SUCCESS",
+                                  "message": "요청이 정상적으로 처리되었습니다.",
+                                  "data": {
+                                    "gameId": "20250625OBLG0",
+                                    "gameDate": "2025-06-25T18:30:00",
+                                    "supportTeamSC": "LG",
+                                    "opponentTeamSC": "OB",
+                                    "stadiumSC": "JAM"
+                                  }
+                                }
+                                """
+                    )
+            )
+    )
+    public @interface JournalInfo {}
 }

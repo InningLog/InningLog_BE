@@ -194,6 +194,19 @@ public class JournalController {
 
 
     //직관 일지 작성시 경기 정보 제공
+    @Operation(
+            summary = "직관 일지 콘텐츠 사전 정보 조회",
+            description = """
+        해당 경기 ID(gameId)를 기반으로, 현재 로그인한 사용자의 응원 팀과 상대 팀 정보를 조회합니다.
+          
+        - 이 API는 직관 일지 작성을 시작하기 전, 필요한 기본 정보를 제공합니다.  
+        - 반환되는 데이터는 사용자의 응원 팀, 상대 팀, 경기장 정보, 경기 일시 등을 포함합니다.  
+        - 유저의 응원 팀은 미리 설정되어 있어야 하며, gameId는 유효한 경기여야 합니다.
+        """
+    )
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Game
+    @SuccessApiResponses.JournalInfo
     @GetMapping("/contents")
     public ResponseEntity<?> getGameInfo(
             @AuthenticationPrincipal CustomUserDetails user,
@@ -201,9 +214,7 @@ public class JournalController {
             @Parameter(description = "경기 Id (gameId)")
             @RequestParam(required = true) String gameId
     ){
-
         JourGameResDto resDto = journalService.infoJournal(user.getMember().getId(), gameId);
-
         return ResponseEntity.ok(resDto);
     }
 }
