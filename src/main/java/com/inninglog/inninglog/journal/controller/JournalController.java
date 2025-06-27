@@ -1,28 +1,22 @@
 package com.inninglog.inninglog.journal.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
-import com.inninglog.inninglog.global.response.CustomApiResponse;
+import com.inninglog.inninglog.global.exception.ErrorApiResponses;
+import com.inninglog.inninglog.global.response.SuccessApiResponses;
+import com.inninglog.inninglog.global.response.SuccessResponse;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
 import com.inninglog.inninglog.journal.dto.JourCreateReqDto;
-import com.inninglog.inninglog.journal.dto.JourCreateResDto;
 import com.inninglog.inninglog.journal.dto.JournalCalListResDto;
 import com.inninglog.inninglog.journal.dto.JournalSumListResDto;
 import com.inninglog.inninglog.journal.service.JournalService;
 import com.inninglog.inninglog.kbo.service.GameReportService;
-import com.inninglog.inninglog.member.dto.TypeRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -30,7 +24,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -54,67 +47,16 @@ public class JournalController {
                 이후 반환된 URL을 JSON 생성 API에 사용합니다.
                 """
     )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "이미지 업로드 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = CustomApiResponse.class),
-                            examples = @ExampleObject(
-                                    name = "업로드 성공 예시",
-                                    value = """
-                                        {
-                                          "code": "S3_UPLOAD_SUCCESS",
-                                          "message": "이미지 업로드가 완료되었습니다.",
-                                          "data": "https://your-s3-url/journal/example.jpg"
-                                        }
-                                        """
-                            )
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "파일 누락 또는 잘못된 요청",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
-                            examples = @ExampleObject(
-                                    name = "파일 누락 에러 예시",
-                                    value = """
-                                        {
-                                          "code": "FILE_IS_EMPTY",
-                                          "message": "업로드할 파일이 없습니다.."
-                                        }
-                                        """
-                            )
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "이미지 업로드 실패 (S3 업로드 오류)",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ErrorResponse.class),
-                            examples = @ExampleObject(
-                                    name = "업로드 실패 예시",
-                                    value = """
-                                        {
-                                          "code": "S3_UPLOAD_FAILED",
-                                          "message": "이미지 업로드에 실패했습니다. 다시 시도해주세요."
-                                        }
-                                        """
-                            )
-                    )
-            )
-    })
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.S3Failed
+    @SuccessApiResponses.FileUpload
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CustomApiResponse<String>> uploadImage(
+    public ResponseEntity<SuccessResponse<String>> uploadImage(
             @Parameter(description = "업로드할 이미지 파일", required = true)
             @RequestPart("file") MultipartFile file
     ) {
         String url = journalService.uploadImage(file);
-        return ResponseEntity.ok(CustomApiResponse.success(SuccessCode.S3_UPLOAD_SUCCESS, url));
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.S3_UPLOAD_SUCCESS, url));
     }
 
 
@@ -136,11 +78,9 @@ public class JournalController {
             - `date`, `emotion`, `review_text`, `is_public`
         """
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "일지 콘텐츠 업로드 및 Journal 생성 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 또는 필드 누락"),
-            @ApiResponse(responseCode = "404", description = "회원 또는 팀/경기장 정보 없음")
-    })
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Game
+    @SuccessApiResponses.JournalCreate
     @PostMapping("/contents")
     public ResponseEntity<?> createContents(
             @Parameter(hidden = true)
@@ -198,14 +138,10 @@ public class JournalController {
                 - 무승부 (DRAW)
                 """
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "직관 일지 조회 성공 or 결과 없음",
-                    content = @Content(schema = @Schema(implementation = CustomApiResponse.class))),
-            @ApiResponse(responseCode = "404", description = "회원 없음",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
+    @ErrorApiResponses.Common
+    @SuccessApiResponses.JournalList
     @GetMapping("/calendar")
-    public ResponseEntity<CustomApiResponse<List<JournalCalListResDto>>> getCalendarJournals(
+    public ResponseEntity<SuccessResponse<List<JournalCalListResDto>>> getCalendarJournals(
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestParam(required = false) ResultScore resultScore
     ) {
@@ -215,7 +151,7 @@ public class JournalController {
                 ? SuccessCode.JOURNAL_EMPTY
                 : SuccessCode.JOURNAL_LIST_FETCHED;
 
-        return ResponseEntity.ok(CustomApiResponse.success(code, result));
+        return ResponseEntity.ok(SuccessResponse.success(code, result));
     }
 
 
@@ -237,13 +173,10 @@ public class JournalController {
         - 승리 경기만: `/journals/summary?page=1&size=10&resultScore=WIN`
         """
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "직관 일지 목록 조회 성공 or 없음",
-                    content = @Content(schema = @Schema(implementation = CustomApiResponse.class))),
-            @ApiResponse(responseCode = "404", description = "회원 정보 없음")
-    })
+    @ErrorApiResponses.Common
+    @SuccessApiResponses.JournalList
     @GetMapping("/summary")
-    public ResponseEntity<CustomApiResponse<Page<JournalSumListResDto>>> getMyJournalsSum(
+    public ResponseEntity<SuccessResponse<Page<JournalSumListResDto>>> getMyJournalsSum(
             @AuthenticationPrincipal CustomUserDetails user,
 
             @Parameter(description = "페이징 정보 (page: 0부터 시작, size: 페이지당 아이템 수)", example = "0")
@@ -255,7 +188,7 @@ public class JournalController {
         Page<JournalSumListResDto> result = journalService.getJournalsByMemberSum(user.getMember().getId(), pageable, resultScore);
 
         SuccessCode code = result.isEmpty() ? SuccessCode.JOURNAL_EMPTY : SuccessCode.JOURNAL_LIST_FETCHED;
-        return ResponseEntity.ok(CustomApiResponse.success(code, result));
+        return ResponseEntity.ok(SuccessResponse.success(code, result));
     }
 }
 

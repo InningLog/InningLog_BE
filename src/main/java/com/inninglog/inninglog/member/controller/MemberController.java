@@ -1,13 +1,14 @@
 package com.inninglog.inninglog.member.controller;
 
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
-import com.inninglog.inninglog.global.response.CustomApiResponse;
+import com.inninglog.inninglog.global.exception.ErrorApiResponses;
+import com.inninglog.inninglog.global.response.SuccessApiResponses;
+import com.inninglog.inninglog.global.response.SuccessResponse;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.member.service.MemberService;
 import com.inninglog.inninglog.member.dto.NicknameRequestDto;
 import com.inninglog.inninglog.member.dto.TypeRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
@@ -43,12 +44,12 @@ public class MemberController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PatchMapping("/nickname")
-    public ResponseEntity<CustomApiResponse<Void>> updateNickname(
+    public ResponseEntity<SuccessResponse<Void>> updateNickname(
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestBody NicknameRequestDto request
     ) {
         memberService.updateNickname(user.getMember().getId(), request.getNickname());
-        return ResponseEntity.ok(CustomApiResponse.success(SuccessCode.NICKNAME_UPDATED));
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.NICKNAME_UPDATED));
     }
 
 
@@ -73,15 +74,12 @@ public class MemberController {
         ⚠️ **주의:** 이미 응원 팀이 설정된 회원은 변경할 수 없습니다.  
         이 경우 `400 Bad Request` 에러가 반환됩니다.
     """
-    )    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "회원 정보 수정 성공"),
-            @ApiResponse(responseCode = "404", description = "회원 없음",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "400", description = "이미 팀이 설정되어 있는 경우",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
+    )
+    @SuccessApiResponses.UserUpdate
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.TeamSetting
     @PatchMapping("/setup")
-    public ResponseEntity<CustomApiResponse<Void>> updateType(
+    public ResponseEntity<SuccessResponse<Void>> updateType(
             @AuthenticationPrincipal CustomUserDetails user,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "유저가 응원하는 팀 설정",
@@ -90,6 +88,6 @@ public class MemberController {
             @RequestBody TypeRequestDto request
     ) {
         memberService.updateMemberType(user.getMember().getId(), request.getTeamShortCode());
-        return ResponseEntity.ok(CustomApiResponse.success(SuccessCode.TEAM_SET));
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.TEAM_SET));
     }
 }
