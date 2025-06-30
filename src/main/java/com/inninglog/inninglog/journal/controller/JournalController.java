@@ -17,6 +17,8 @@ import com.inninglog.inninglog.kbo.dto.gameSchdule.GameSchResDto;
 import com.inninglog.inninglog.kbo.service.GameReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -239,17 +241,67 @@ public class JournalController {
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resDto));
     }
 
-
-    //특정 직관일지 상세 조회
+    // 특정 직관일지 상세 조회
+    @ErrorApiResponses.GameApi
+    @Operation(
+            summary = "특정 직관일지 상세 조회",
+            description = "journalId는 직관일지 목록 API를 통해 확인된 값을 전달해야 합니다.",
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "직관일지 상세 조회 성공",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = JourDetailResDto.class),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "선택값 비어 있음",
+                                                    summary = "사진, 리뷰 미입력 상태",
+                                                    value = "{\n" +
+                                                            "  \"code\": \"SUCCESS\",\n" +
+                                                            "  \"message\": \"요청이 정상적으로 처리되었습니다.\",\n" +
+                                                            "  \"data\": {\n" +
+                                                            "    \"journalId\": 4,\n" +
+                                                            "    \"gameDate\": \"2025-06-30T13:06:40.457\",\n" +
+                                                            "    \"supportTeamSC\": \"OB\",\n" +
+                                                            "    \"opponentTeamSC\": \"OB\",\n" +
+                                                            "    \"stadiumSC\": \"JAM\",\n" +
+                                                            "    \"emotion\": \"감동\",\n" +
+                                                            "    \"media_url\": \"\",\n" +
+                                                            "    \"review_text\": \"\"\n" +
+                                                            "  }\n" +
+                                                            "}"
+                                            ),
+                                            @ExampleObject(
+                                                    name = "모든 값 입력됨",
+                                                    summary = "사진 및 리뷰 포함된 경우",
+                                                    value = "{\n" +
+                                                            "  \"code\": \"SUCCESS\",\n" +
+                                                            "  \"message\": \"요청이 정상적으로 처리되었습니다.\",\n" +
+                                                            "  \"data\": {\n" +
+                                                            "    \"journalId\": 2,\n" +
+                                                            "    \"gameDate\": \"2025-06-27T12:15:06.535\",\n" +
+                                                            "    \"supportTeamSC\": \"OB\",\n" +
+                                                            "    \"opponentTeamSC\": \"OB\",\n" +
+                                                            "    \"stadiumSC\": \"JAM\",\n" +
+                                                            "    \"emotion\": \"감동\",\n" +
+                                                            "    \"media_url\": \"https://s3.amazonaws.com/.../image.jpg\",\n" +
+                                                            "    \"review_text\": \"오늘 경기는 정말 재미있었다!\"\n" +
+                                                            "  }\n" +
+                                                            "}"
+                                            )
+                                    }
+                            )
+                    )
+            }
+    )
     @GetMapping("/datail")
     public ResponseEntity<SuccessResponse<JourDetailResDto>> getDetailJournal(
             @AuthenticationPrincipal CustomUserDetails user,
 
-            @Parameter(description = "직관 일지 Id(예: journalId - 12)", required = true)
+            @Parameter(description = "직관 일지 Id(예: journalId - 12). 이 값은 직관일지 목록 API(/summary, /schedule)에서 선택한 항목의 ID를 사용합니다.", required = true)
             @RequestParam Long journalId
     ){
         JourDetailResDto resDto = journalService.getDetailJournal(user.getMember().getId(), journalId);
-
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resDto));
     }
 }

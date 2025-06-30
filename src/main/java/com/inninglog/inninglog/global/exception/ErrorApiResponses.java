@@ -152,4 +152,65 @@ public @interface ErrorApiResponses {
     public @interface Nickname {
     }
 
+    // 게임 API 전용 (공통 에러 포함)
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "잘못된 요청",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "유효성 검사 실패", value = """
+                                            {
+                                                "code": "VALIDATION_ERROR",
+                                                "message": "요청값이 올바르지 않습니다."
+                                            }
+                                            """),
+                                    @ExampleObject(name = "직관 경기 없음", value = """
+                                            {
+                                                "code": "NO_VISITED_GAME",
+                                                "message": "직관한 경기가 없습니다."
+                                            }
+                                            """)
+                            })),
+            @ApiResponse(responseCode = "404", description = "리소스를 찾을 수 없음",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "사용자 없음", value = """
+                                            {
+                                                "code": "USER_NOT_FOUND",
+                                                "message": "존재하지 않는 회원입니다."
+                                            }
+                                            """),
+                                    @ExampleObject(name = "팀 없음", value = """
+                                            {
+                                                "code": "TEAM_NOT_FOUND",
+                                                "message": "등록되지 않은 팀입니다."
+                                            }
+                                            """),
+                                    @ExampleObject(name = "경기장 없음", value = """
+                                            {
+                                                "code": "STADIUM_NOT_FOUND",
+                                                "message": "등록되지 않은 경기장입니다."
+                                            }
+                                            """),
+                                    @ExampleObject(name = "게임 없음", value = """
+                                            {
+                                                "code": "GAME_NOT_FOUND",
+                                                "message": "등록되지 않은 게임입니다."
+                                            }
+                                            """)
+                            })),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(name = "서버 오류", value = """
+                                    {
+                                        "code": "INTERNAL_SERVER_ERROR",
+                                        "message": "서버에 문제가 발생했습니다."
+                                    }
+                                    """)
+                    ))
+    })
+    public @interface GameApi {
+    }
+
 }
