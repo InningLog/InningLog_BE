@@ -148,16 +148,59 @@ public @interface SuccessApiResponses {
                                             {
                                               "code": "JOURNAL_LIST_FETCHED",
                                               "message": "직관 일지 리스트 조회 성공",
-                                              "data": [
-                                                {
-                                                  "journalId": 123,
-                                                  "gameDate": "2024-06-27",
-                                                  "stadium": "잠실야구장",
-                                                  "homeTeam": "두산 베어스",
-                                                  "awayTeam": "LG 트윈스",
-                                                  "score": "7-3"
-                                                }
-                                              ]
+                                              "data": {
+                                                "content": [
+                                                  {
+                                                    "journalId": 3,
+                                                    "media_url": "",
+                                                    "resultScore": "승",
+                                                    "date": "2025-06-30T13:06:40.457",
+                                                    "opponentTeamName": "두산",
+                                                    "stadiumName": "잠실"
+                                                  },
+                                                  {
+                                                    "journalId": 4,
+                                                    "media_url": "",
+                                                    "resultScore": "승",
+                                                    "date": "2025-06-30T13:06:40.457",
+                                                    "opponentTeamName": "두산",
+                                                    "stadiumName": "잠실"
+                                                  },
+                                                  {
+                                                    "journalId": 2,
+                                                    "media_url": "https://s3.amazonaws.com/.../image.jpg",
+                                                    "resultScore": "승",
+                                                    "date": "2025-06-27T12:15:06.535",
+                                                    "opponentTeamName": "두산",
+                                                    "stadiumName": "잠실"
+                                                  }
+                                                ],
+                                                "pageable": {
+                                                  "pageNumber": 0,
+                                                  "pageSize": 10,
+                                                  "sort": {
+                                                    "empty": false,
+                                                    "unsorted": false,
+                                                    "sorted": true
+                                                  },
+                                                  "offset": 0,
+                                                  "unpaged": false,
+                                                  "paged": true
+                                                },
+                                                "last": true,
+                                                "totalElements": 3,
+                                                "totalPages": 1,
+                                                "first": true,
+                                                "size": 10,
+                                                "number": 0,
+                                                "sort": {
+                                                  "empty": false,
+                                                  "unsorted": false,
+                                                  "sorted": true
+                                                },
+                                                "numberOfElements": 3,
+                                                "empty": false
+                                              }
                                             }
                                             """),
                                     @ExampleObject(name = "일지 목록 없음", value = """
