@@ -6,6 +6,7 @@ import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.seatView.domain.SeatView;
 import com.inninglog.inninglog.stadium.domain.Stadium;
 import com.inninglog.inninglog.team.domain.Team;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 

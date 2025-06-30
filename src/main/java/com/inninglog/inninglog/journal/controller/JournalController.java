@@ -8,6 +8,7 @@ import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
 import com.inninglog.inninglog.journal.dto.req.JourCreateReqDto;
+import com.inninglog.inninglog.journal.dto.res.JourDetailResDto;
 import com.inninglog.inninglog.journal.dto.res.JourGameResDto;
 import com.inninglog.inninglog.journal.dto.res.JournalCalListResDto;
 import com.inninglog.inninglog.journal.dto.res.JournalSumListResDto;
@@ -235,6 +236,20 @@ public class JournalController {
         if (resDto == null) {
             return ResponseEntity.ok(SuccessResponse.success(SuccessCode.NO_SCHEDULE_ON_DATE, null));
         }
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resDto));
+    }
+
+
+    //특정 직관일지 상세 조회
+    @GetMapping("/datail")
+    public ResponseEntity<SuccessResponse<JourDetailResDto>> getDetailJournal(
+            @AuthenticationPrincipal CustomUserDetails user,
+
+            @Parameter(description = "직관 일지 Id(예: journalId - 12)", required = true)
+            @RequestParam Long journalId
+    ){
+        JourDetailResDto resDto = journalService.getDetailJournal(user.getMember().getId(), journalId);
+
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resDto));
     }
 }
