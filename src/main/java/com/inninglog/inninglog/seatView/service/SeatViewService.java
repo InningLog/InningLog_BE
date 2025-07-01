@@ -71,7 +71,6 @@ public class SeatViewService {
         Zone zone = zoneRepository.findByShortCode(dto.getZoneShortCode())
                 .orElseThrow(()-> new CustomException(ErrorCode.ZONE_NOT_FOUND));
 
-        // SeatView 먼저 저장 (view_media_url은 일단 null 처리 또는 dto 필드에서 받아도 OK)
         SeatView seatView = SeatView.builder()
                 .member(member)
                 .journal(journal)
