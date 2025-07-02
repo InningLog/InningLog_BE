@@ -6,20 +6,13 @@ services:
     container_name: inninglog-rest
     ports:
       - "8080:8080"
-    depends_on:
-      inninglog-db:
-        condition: service_healthy
-      my-cache-server:
-        condition: service_healthy
     env_file:
-      - .env
+      - /home/ubuntu/.env
     environment:
-      # DB 설정
-      DB_HOST: "${DB_HOST}"
-      DB_PORT: "${DB_PORT}"
-      DB_NAME: "${DB_NAME}"
-      DB_USERNAME: "${DB_USERNAME}"
-      DB_PASSWORD: "${DB_PASSWORD}"
+      # DB 설정 - RDS 정보로 변경
+      DB_URL: jdbc:mysql://inninglogdb.cz24w0wqez52.ap-northeast-2.rds.amazonaws.com:3306/inningLog?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+      DB_USERNAME: root
+      DB_PASSWORD: pw930516
 
       # JWT
       JWT_SECRET_KEY: "${JWT_SECRET_KEY}"
@@ -37,19 +30,3 @@ services:
 
       # Amplitude
       AMPLITUDE_API_KEY: "${AMPLITUDE_API_KEY}"
-
-  inninglog-db:
-    image: mysql
-    container_name: inninglog-db
-    environment:
-      MYSQL_ROOT_PASSWORD: pwd1234
-      MYSQL_DATABASE: inningLog
-    volumes:
-      - ./mysql_data:/var/lib/mysql
-    ports:
-      - "3306:3306"
-    healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      interval: 5s
-      timeout: 5s
-      retries: 10
