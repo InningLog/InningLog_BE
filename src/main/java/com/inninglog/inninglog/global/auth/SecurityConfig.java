@@ -58,7 +58,8 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:8000",
                 "http://127.0.0.1:8000",
-                "*"  // 개발 환경용 - 프로덕션에서는 구체적인 도메인 지정 필요
+                "http://inninglog.shop",
+                "https://inninglog.shop"  // 개발 환경용 - 프로덕션에서는 구체적인 도메인 지정 필요
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
