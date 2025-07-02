@@ -22,14 +22,36 @@ configurations {
 repositories {
 	mavenCentral()
 }
+def loadEnv = { File envFile ->
+	def map = [:]
+	if (envFile.exists()) {
+		envFile.eachLine { line ->
+			if (line && line.contains("=") && !line.trim().startsWith("#")) {
+				def (key, value) = line.split("=", 2)
+				map[key.trim()] = value.trim()
+			}
+		}
+	}
+	return map
+}
 
+def env = loadEnv(file(".env"))
+
+tasks.withType(JavaExec).configureEach {
+	environment env
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+	environment env
+}
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'com.mysql:mysql-connector-j'
+	implementation 'com.mysql:mysql-connector-j:8.0.33'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

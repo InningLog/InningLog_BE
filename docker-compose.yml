@@ -10,9 +10,9 @@ services:
       - /home/ubuntu/.env
     environment:
       # DB 설정 - RDS 정보로 변경
-      DB_URL: jdbc:mysql://inninglogdb.cz24w0wqez52.ap-northeast-2.rds.amazonaws.com:3306/inningLog?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
-      DB_USERNAME: root
-      DB_PASSWORD: pw930516
+      DB_URL: "${DB_URL}"
+      DB_USERNAME: "${DB_USERNAME}"
+      DB_PASSWORD: "${DB_PASSWORD}"
 
       # JWT
       JWT_SECRET_KEY: "${JWT_SECRET_KEY}"
