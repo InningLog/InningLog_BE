@@ -2,7 +2,9 @@ package com.inninglog.inninglog.seatView.controller;
 
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.response.SuccessResponse;
-import com.inninglog.inninglog.seatView.dto.*;
+import com.inninglog.inninglog.seatView.dto.req.HashtagSearchReq;
+import com.inninglog.inninglog.seatView.dto.res.HashtagSearchRes;
+import com.inninglog.inninglog.seatView.dto.res.SeatViewDetailResult;
 import com.inninglog.inninglog.seatView.service.HashtagSearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -137,7 +139,7 @@ public class HashtagSearchController {
             )
     })
     @GetMapping("/gallery")
-    public ResponseEntity<SuccessResponse<HashtagSearchResponse>> searchSeatViewsGallery(
+    public ResponseEntity<SuccessResponse<HashtagSearchRes>> searchSeatViewsGallery(
             @Parameter(
                     description = "구장 단축코드",
                     required = true,
@@ -169,13 +171,15 @@ public class HashtagSearchController {
             )
             @RequestParam(required = false, defaultValue = "false") Boolean isAndCondition
     ) {
-        HashtagSearchRequest request = HashtagSearchRequest.builder()
+        HashtagSearchReq request = HashtagSearchReq.builder()
                 .stadiumShortCode(stadiumShortCode)
                 .hashtagCodes(hashtagCodes)
                 .isAndCondition(isAndCondition)
                 .build();
 
-        HashtagSearchResponse response = hashtagSearchService.searchSeatViewsByHashtagsGallery(request);
+        HashtagSearchRes response = hashtagSearchService.searchSeatViewsByHashtagsGallery(
+                stadiumShortCode, hashtagCodes, isAndCondition
+        );
 
         SuccessCode code = (response.getTotalCount() == 0) ? SuccessCode.SEATVIEW_EMPTY
                 : SuccessCode.SEATVIEW_LIST_FETCHED;
@@ -330,13 +334,9 @@ public class HashtagSearchController {
             )
             @RequestParam(required = false, defaultValue = "false") Boolean isAndCondition
     ) {
-        HashtagSearchRequest request = HashtagSearchRequest.builder()
-                .stadiumShortCode(stadiumShortCode)
-                .hashtagCodes(hashtagCodes)
-                .isAndCondition(isAndCondition)
-                .build();
-
-        List<SeatViewDetailResult> response = hashtagSearchService.searchSeatViewsByHashtagsDetail(request);
+        List<SeatViewDetailResult> response = hashtagSearchService.searchSeatViewsByHashtagsDetail(
+                stadiumShortCode, hashtagCodes, isAndCondition
+        );
 
         SuccessCode code = (response.isEmpty()) ? SuccessCode.SEATVIEW_EMPTY
                 : SuccessCode.SEATVIEW_LIST_FETCHED;

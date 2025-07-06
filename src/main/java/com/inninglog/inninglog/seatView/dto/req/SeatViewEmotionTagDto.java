@@ -1,4 +1,4 @@
-package com.inninglog.inninglog.seatView.dto;
+package com.inninglog.inninglog.seatView.dto.req;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

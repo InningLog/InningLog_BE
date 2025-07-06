@@ -3,7 +3,7 @@ package com.inninglog.inninglog.seatView.controller;
 
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.seatView.domain.SeatView;
-import com.inninglog.inninglog.seatView.dto.SeatCreateReqDto;
+import com.inninglog.inninglog.seatView.dto.req.SeatCreateReqDto;
 import com.inninglog.inninglog.seatView.service.SeatViewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

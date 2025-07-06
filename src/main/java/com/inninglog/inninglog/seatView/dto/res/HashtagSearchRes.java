@@ -1,4 +1,4 @@
-package com.inninglog.inninglog.seatView.dto;
+package com.inninglog.inninglog.seatView.dto.res;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class HashtagSearchResponse {
+public class HashtagSearchRes {
     private String searchSummary;
     private List<SeatViewImageResult> seatViews;
     private int totalCount;

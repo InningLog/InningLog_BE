@@ -2,7 +2,11 @@ package com.inninglog.inninglog.seatView.service;
 
 import com.inninglog.inninglog.seatView.domain.SeatView;
 import com.inninglog.inninglog.seatView.domain.SeatViewEmotionTagMap;
-import com.inninglog.inninglog.seatView.dto.*;
+import com.inninglog.inninglog.seatView.dto.req.SeatSearchReq;
+import com.inninglog.inninglog.seatView.dto.req.SeatViewEmotionTagDto;
+import com.inninglog.inninglog.seatView.dto.res.SeatInfo;
+import com.inninglog.inninglog.seatView.dto.res.SeatSearchRes;
+import com.inninglog.inninglog.seatView.dto.res.SeatViewDetailResult;
 import com.inninglog.inninglog.seatView.repository.SeatViewEmotionTagMapRepository;
 import com.inninglog.inninglog.seatView.repository.SeatViewRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +26,14 @@ public class SeatSearchService {
     private final SeatViewRepository seatViewRepository;
     private final SeatViewEmotionTagMapRepository emotionTagMapRepository;
 
-    public SeatSearchResponse searchSeats(SeatSearchRequest request) {
+    public SeatSearchRes searchSeats(
+            String stadiumShortCode,
+            String zoneShortCode,
+            String section,
+            String seatRow
+    ) {
+        SeatSearchReq request = SeatSearchReq.from(stadiumShortCode, zoneShortCode, section, seatRow);
+
         // 요청 검증
         if (!request.isValidRequest()) {
             throw new IllegalArgumentException("열 정보만으로는 검색할 수 없습니다. 최소 존 정보가 필요합니다.");
@@ -36,10 +47,10 @@ public class SeatSearchService {
                 request.getSeatRow()
         );
 
-        // 감정 태그 데이터 조회
+        // 감정 태그 조회
         List<Long> seatViewIds = seatViews.stream()
                 .map(SeatView::getId)
-                .collect(Collectors.toList());
+                .toList();
 
         Map<Long, List<SeatViewEmotionTagDto>> emotionTagMap = getEmotionTagMap(seatViewIds);
 
@@ -60,12 +71,11 @@ public class SeatSearchService {
                             .emotionTags(tags)
                             .build();
                 })
-                .collect(Collectors.toList());
+                .toList();
 
-        // 검색 요약 생성
         String searchSummary = generateSearchSummary(request, seatViews);
 
-        return SeatSearchResponse.builder()
+        return SeatSearchRes.builder()
                 .searchSummary(searchSummary)
                 .seatViews(results)
                 .totalCount(results.size())
@@ -92,7 +102,7 @@ public class SeatSearchService {
                 ));
     }
 
-    private String generateSearchSummary(SeatSearchRequest request, List<SeatView> seatViews) {
+    private String generateSearchSummary(SeatSearchReq request, List<SeatView> seatViews) {
         StringBuilder summary = new StringBuilder();
 
         // 구장 정보는 항상 있다고 가정

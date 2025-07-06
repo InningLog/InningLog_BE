@@ -1,5 +1,6 @@
-package com.inninglog.inninglog.seatView.dto;
+package com.inninglog.inninglog.seatView.dto.res;
 
+import com.inninglog.inninglog.seatView.dto.req.SeatViewEmotionTagDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

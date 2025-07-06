@@ -3,7 +3,12 @@ package com.inninglog.inninglog.seatView.service;
 import com.inninglog.inninglog.seatView.domain.SeatView;
 import com.inninglog.inninglog.seatView.domain.SeatViewEmotionTag;
 import com.inninglog.inninglog.seatView.domain.SeatViewEmotionTagMap;
-import com.inninglog.inninglog.seatView.dto.*;
+import com.inninglog.inninglog.seatView.dto.req.HashtagSearchReq;
+import com.inninglog.inninglog.seatView.dto.req.SeatViewEmotionTagDto;
+import com.inninglog.inninglog.seatView.dto.res.HashtagSearchRes;
+import com.inninglog.inninglog.seatView.dto.res.SeatInfo;
+import com.inninglog.inninglog.seatView.dto.res.SeatViewDetailResult;
+import com.inninglog.inninglog.seatView.dto.res.SeatViewImageResult;
 import com.inninglog.inninglog.seatView.repository.SeatViewEmotionTagMapRepository;
 import com.inninglog.inninglog.seatView.repository.SeatViewEmotionTagRepository;
 import com.inninglog.inninglog.seatView.repository.SeatViewRepository;
@@ -26,28 +31,33 @@ public class HashtagSearchService {
     private final SeatViewEmotionTagMapRepository emotionTagMapRepository;
 
     // 모아보기 형태 검색 (사진만)
-    public HashtagSearchResponse searchSeatViewsByHashtagsGallery(HashtagSearchRequest request) {
-        // 요청 검증
+    public HashtagSearchRes searchSeatViewsByHashtagsGallery(
+            String stadiumShortCode,
+            List<String> hashtagCodes,
+            Boolean isAndCondition
+    ) {
+        HashtagSearchReq request = HashtagSearchReq.from(
+                stadiumShortCode, hashtagCodes, isAndCondition
+        );
+
+        // 검증
         if (!request.isValidRequest()) {
             throw new IllegalArgumentException("해시태그는 최소 1개, 최대 2개까지 선택할 수 있습니다.");
         }
 
-        // 좌석 시야 데이터 조회 (AND/OR 조건에 따라 분기)
-        List<SeatView> seatViews;
-        if (request.isAndCondition()) {
-            seatViews = seatViewRepository.findSeatViewsByHashtagsAnd(
-                    request.getStadiumShortCode(),
-                    request.getHashtagCodes(),
-                    request.getHashtagCodes().size()
-            );
-        } else {
-            seatViews = seatViewRepository.findSeatViewsByHashtagsOr(
-                    request.getStadiumShortCode(),
-                    request.getHashtagCodes()
-            );
-        }
+        // 조회 분기
+        List<SeatView> seatViews = request.isAndCondition()
+                ? seatViewRepository.findSeatViewsByHashtagsAnd(
+                request.getStadiumShortCode(),
+                request.getHashtagCodes(),
+                request.getHashtagCodes().size()
+        )
+                : seatViewRepository.findSeatViewsByHashtagsOr(
+                request.getStadiumShortCode(),
+                request.getHashtagCodes()
+        );
 
-        // 모아보기용 결과 변환 (사진만)
+        // 변환
         List<SeatViewImageResult> results = seatViews.stream()
                 .map(sv -> SeatViewImageResult.builder()
                         .seatViewId(sv.getId())
@@ -55,10 +65,9 @@ public class HashtagSearchService {
                         .build())
                 .collect(Collectors.toList());
 
-        // 검색 요약 생성
         String searchSummary = generateHashtagSearchSummary(request, seatViews);
 
-        return HashtagSearchResponse.builder()
+        return HashtagSearchRes.builder()
                 .searchSummary(searchSummary)
                 .seatViews(results)
                 .totalCount(results.size())
@@ -67,26 +76,31 @@ public class HashtagSearchService {
     }
 
     // 게시물 형태 검색 (상세 정보 포함)
-    public List<SeatViewDetailResult> searchSeatViewsByHashtagsDetail(HashtagSearchRequest request) {
+    public List<SeatViewDetailResult> searchSeatViewsByHashtagsDetail(
+            String stadiumShortCode,
+            List<String> hashtagCodes,
+            Boolean isAndCondition
+    ) {
+        HashtagSearchReq request = HashtagSearchReq.from(
+                stadiumShortCode, hashtagCodes, isAndCondition
+        );
+
         // 요청 검증
         if (!request.isValidRequest()) {
             throw new IllegalArgumentException("해시태그는 최소 1개, 최대 2개까지 선택할 수 있습니다.");
         }
 
         // 좌석 시야 데이터 조회 (상세 정보 포함, AND/OR 조건에 따라 분기)
-        List<SeatView> seatViews;
-        if (request.isAndCondition()) {
-            seatViews = seatViewRepository.findSeatViewsByHashtagsWithDetailsAnd(
-                    request.getStadiumShortCode(),
-                    request.getHashtagCodes(),
-                    request.getHashtagCodes().size()
-            );
-        } else {
-            seatViews = seatViewRepository.findSeatViewsByHashtagsWithDetailsOr(
-                    request.getStadiumShortCode(),
-                    request.getHashtagCodes()
-            );
-        }
+        List<SeatView> seatViews = request.isAndCondition()
+                ? seatViewRepository.findSeatViewsByHashtagsWithDetailsAnd(
+                request.getStadiumShortCode(),
+                request.getHashtagCodes(),
+                request.getHashtagCodes().size()
+        )
+                : seatViewRepository.findSeatViewsByHashtagsWithDetailsOr(
+                request.getStadiumShortCode(),
+                request.getHashtagCodes()
+        );
 
         // 감정 태그 데이터 조회
         List<Long> seatViewIds = seatViews.stream()
@@ -135,7 +149,7 @@ public class HashtagSearchService {
                 ));
     }
 
-    private String generateHashtagSearchSummary(HashtagSearchRequest request, List<SeatView> seatViews) {
+    private String generateHashtagSearchSummary(HashtagSearchReq request, List<SeatView> seatViews) {
         StringBuilder summary = new StringBuilder();
 
         // 구장 정보

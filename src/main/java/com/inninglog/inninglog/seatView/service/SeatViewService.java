@@ -9,7 +9,7 @@ import com.inninglog.inninglog.journal.repository.JournalRepository;
 import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.member.repository.MemberRepository;
 import com.inninglog.inninglog.seatView.domain.*;
-import com.inninglog.inninglog.seatView.dto.SeatCreateReqDto;
+import com.inninglog.inninglog.seatView.dto.req.SeatCreateReqDto;
 import com.inninglog.inninglog.seatView.repository.*;
 import com.inninglog.inninglog.stadium.domain.Stadium;
 import com.inninglog.inninglog.stadium.repository.StadiumRepository;

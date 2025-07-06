@@ -1,16 +1,15 @@
-package com.inninglog.inninglog.seatView.dto;
+package com.inninglog.inninglog.seatView.dto.req;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import java.util.List;
 
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SeatSearchRequest {
+public class SeatSearchReq {
     private String stadiumShortCode;
     private String zoneShortCode;
     private String section;
@@ -24,5 +23,14 @@ public class SeatSearchRequest {
             return false;
         }
         return true;
+    }
+
+    public static SeatSearchReq from(String stadiumShortCode, String zoneShortCode, String section, String seatRow) {
+        return SeatSearchReq.builder()
+                .stadiumShortCode(stadiumShortCode)
+                .zoneShortCode(zoneShortCode)
+                .section(section)
+                .seatRow(seatRow)
+                .build();
     }
 }

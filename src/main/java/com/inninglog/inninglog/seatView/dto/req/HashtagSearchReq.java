@@ -1,4 +1,4 @@
-package com.inninglog.inninglog.seatView.dto;
+package com.inninglog.inninglog.seatView.dto.req;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +10,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class HashtagSearchRequest {
+public class HashtagSearchReq {
     private String stadiumShortCode;
     private List<String> hashtagCodes; // 최대 2개
     private Boolean isAndCondition; // true: AND 조건, false: OR 조건
@@ -25,5 +25,13 @@ public class HashtagSearchRequest {
     // AND 조건 여부 확인 (기본값: false - OR 조건)
     public boolean isAndCondition() {
         return isAndCondition != null && isAndCondition;
+    }
+
+    public static HashtagSearchReq from(String stadiumShortCode, List<String> hashtagCodes, Boolean isAndCondition) {
+        return HashtagSearchReq.builder()
+                .stadiumShortCode(stadiumShortCode)
+                .hashtagCodes(hashtagCodes)
+                .isAndCondition(isAndCondition)
+                .build();
     }
 }

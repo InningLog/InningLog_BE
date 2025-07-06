@@ -2,8 +2,7 @@ package com.inninglog.inninglog.seatView.controller;
 
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.response.SuccessResponse;
-import com.inninglog.inninglog.seatView.dto.SeatSearchRequest;
-import com.inninglog.inninglog.seatView.dto.SeatSearchResponse;
+import com.inninglog.inninglog.seatView.dto.res.SeatSearchRes;
 import com.inninglog.inninglog.seatView.service.SeatSearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -117,7 +116,7 @@ public class SeatSearchController {
             )
     })
     @GetMapping("/search")
-    public ResponseEntity<SuccessResponse<SeatSearchResponse>> searchSeats(
+    public ResponseEntity<SuccessResponse<SeatSearchRes>> searchSeats(
             @Parameter(
                     description = "구장 단축코드",
                     required = true,
@@ -149,14 +148,9 @@ public class SeatSearchController {
             )
             @RequestParam(required = false) String seatRow
     ) {
-        SeatSearchRequest request = SeatSearchRequest.builder()
-                .stadiumShortCode(stadiumShortCode)
-                .zoneShortCode(zoneShortCode)
-                .section(section)
-                .seatRow(seatRow)
-                .build();
-
-        SeatSearchResponse response = seatSearchService.searchSeats(request);
+        SeatSearchRes response = seatSearchService.searchSeats(
+                stadiumShortCode, zoneShortCode, section, seatRow
+        );
 
         SuccessCode code = (response.getTotalCount() == 0) ? SuccessCode.SEATVIEW_EMPTY
                 : SuccessCode.SEATVIEW_LIST_FETCHED;
