@@ -100,5 +100,4 @@ public class SeatViewService {
     }
 
 
-    //좌석 검색 - 정보 기반
 }
