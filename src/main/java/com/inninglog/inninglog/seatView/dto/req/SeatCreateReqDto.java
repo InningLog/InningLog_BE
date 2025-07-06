@@ -1,7 +1,6 @@
-package com.inninglog.inninglog.seatView.dto;
+package com.inninglog.inninglog.seatView.dto.req;
 
 
-import com.inninglog.inninglog.seatView.domain.SeatViewEmotionTag;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

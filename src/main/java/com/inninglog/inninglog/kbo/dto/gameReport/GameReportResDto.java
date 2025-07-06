@@ -12,7 +12,10 @@ import java.util.List;
 public class GameReportResDto {
     private int totalVisitedGames;
     private int winGames;
-    private int winningRateHalPoongRi;
+    private int loseGames;
+    private int drawGames;
+    private int myWeaningRate;
+    private double teamWinRate;
 
     private List<PlayerRankingDto> topBatters;
     private List<PlayerRankingDto> topPitchers;

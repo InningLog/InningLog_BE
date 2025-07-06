@@ -17,6 +17,7 @@ import com.inninglog.inninglog.kbo.repository.VisitedGameRepository;
 import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.member.repository.MemberRepository;
 import com.inninglog.inninglog.team.domain.Team;
+import com.inninglog.inninglog.team.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class GameReportService {
     private final GameRepository gameRepository;
     private final VisitedGameRepository visitedGameRepository;
     private final PlayerStatRepository playerStatRepository;
+    private final TeamRepository teamRepository;
 
     //나의 직관 게임 일정 기록
     public void createVisitedGame(Long memberId, String gameId, Long journalId){
@@ -48,12 +50,15 @@ public class GameReportService {
         Game game = gameRepository.findByGameId(gameId)
                 .orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND));
 
-        boolean isWin = journal.getResultScore() == ResultScore.WIN;
+        ResultScore score = journal.getResultScore();
+        if (score == null) {
+            System.out.println("없음");
+        }
 
         VisitedGame visitedGame = VisitedGame.builder()
                 .member(member)
                 .game(game)
-                .result(isWin)
+                .resultScore(journal.getResultScore())
                 .build();
 
         visitedGameRepository.save(visitedGame);
@@ -67,10 +72,18 @@ public class GameReportService {
 
         int totalVisitedGames = visitedGames.size();
         int winGames = 0;
+        int lossGames = 0;
+        int drawGames = 0;
 
         for (VisitedGame visitedGame : visitedGames) {
-            if (Boolean.TRUE.equals(visitedGame.getResult())) {
+            if (visitedGame.getResultScore().equals(ResultScore.WIN)) {
                 winGames++;
+            }
+            else if(visitedGame.getResultScore().equals(ResultScore.LOSE)) {
+                lossGames++;
+            }
+            else if(visitedGame.getResultScore().equals(ResultScore.DRAW)) {
+                drawGames++;
             }
         }
 
@@ -79,7 +92,7 @@ public class GameReportService {
                 ? 0 //경기 수가 0이면 0 반환
                 : (int) Math.round(((double) winGames / totalVisitedGames) * 1000);
 
-        return new WinningRateResult(totalVisitedGames, winGames, winningRateHalPoongRi);
+        return new WinningRateResult(totalVisitedGames, winGames, lossGames, drawGames, winningRateHalPoongRi);
     }
 
 
@@ -166,6 +179,8 @@ public class GameReportService {
     public record WinningRateResult(
             int totalVisitedGames,
             int winGames,
+            int loseGames,
+            int drawGames,
             int winningRateHalPoongRi
     ){}
 
@@ -181,10 +196,18 @@ public class GameReportService {
         // 선수 랭킹 계산
         PlayerRankingResult rankingResult = calculatePlayer(member);
 
+        // 유저의 응원팀의 승률
+        Team team = teamRepository.findByShortCode(member.getTeam().getShortCode())
+                .orElseThrow(() -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
+
+
         return GameReportResDto.builder()
                 .totalVisitedGames(winningRateResult.totalVisitedGames)
                 .winGames(winningRateResult.winGames)
-                .winningRateHalPoongRi(winningRateResult.winningRateHalPoongRi)
+                .loseGames(winningRateResult.loseGames)
+                .drawGames(winningRateResult.drawGames)
+                .myWeaningRate(winningRateResult.winningRateHalPoongRi)
+                .teamWinRate(team.getWinRate())
                 .topBatters(rankingResult.topBatters())
                 .topPitchers(rankingResult.topPitchers())
                 .bottomBatters(rankingResult.bottomBatters())

@@ -3,7 +3,7 @@ package com.inninglog.inninglog.seatView.controller;
 
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.seatView.domain.SeatView;
-import com.inninglog.inninglog.seatView.dto.SeatCreateReqDto;
+import com.inninglog.inninglog.seatView.dto.req.SeatCreateReqDto;
 import com.inninglog.inninglog.seatView.service.SeatViewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/seatView")
-@Tag(name = "SeatView", description = "좌석 시야 관련 API")
+@Tag(name = "좌석 시야", description = "좌석 시야글 작성 관련 API")
 public class SeatViewController {
 
     private final SeatViewService seatViewService;

@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/report")
 @RequiredArgsConstructor
-@Tag(name = "GameReport", description = "직관 리포트 관련 API")
+@Tag(name = "직관 리포트", description = "직관 리포트 관련 API")
 public class GameReportController {
 
     private final GameReportService gameReportService;
@@ -36,10 +36,11 @@ public class GameReportController {
         
         제공 정보:
         1. 직관 경기 수
-        2. 응원팀 승리 수
-        3. 직관 승률 (할푼리)
-        4. 응원팀 상위 타자 2명
-        5. 응원팀 상위 투수 2명
+        2. 응원팀 직관 승리/무승부/패배 수
+        3. 유저의 직관 승률 (할푼리)
+        4. 유저의 응원팀 승률
+        5. 응원팀 상하위 타자 각각 1명
+        6. 응원팀 상하위 투수 각각 1명
         """
     )
     @ApiResponses(value = {

@@ -6,6 +6,7 @@ import com.inninglog.inninglog.kbo.dto.gameSchdule.GameScheduleRequestDto;
 import com.inninglog.inninglog.kbo.dto.gameSchdule.GameScheduleResponseDto;
 import com.inninglog.inninglog.kbo.dto.playerstat.GameWithBoxscoreDto;
 import com.inninglog.inninglog.kbo.service.GameScheduleService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/kbo/games")
 @RequiredArgsConstructor
+@Tag(name = "KBO 크롤링(FAST 서버 통신용)", description = "크롤링 관련 api")
 public class GameScheduleController {
 
     private final GameScheduleService gameScheduleService;

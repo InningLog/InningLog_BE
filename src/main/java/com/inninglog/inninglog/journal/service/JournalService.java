@@ -6,6 +6,7 @@ import com.inninglog.inninglog.global.s3.S3Uploader;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
 import com.inninglog.inninglog.journal.dto.req.JourCreateReqDto;
+import com.inninglog.inninglog.journal.dto.res.JourDetailResDto;
 import com.inninglog.inninglog.journal.dto.res.JourGameResDto;
 import com.inninglog.inninglog.journal.dto.res.JournalCalListResDto;
 import com.inninglog.inninglog.journal.dto.res.JournalSumListResDto;
@@ -170,6 +171,21 @@ public class JournalService {
         if(game==null) return null;
 
         return GameSchResDto.from(game, supportTeamId);
+    }
+
+
+    //특정 직관 일지 조회
+    @Transactional(readOnly = true)
+    public JourDetailResDto getDetailJournal(Long memberId, Long journalId){
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Journal journal = journalRepository.findById(journalId)
+                .orElseThrow(() -> new CustomException(ErrorCode.JOURNAL_NOT_FOUND));
+
+        return JourDetailResDto.from(member, journal);
+
     }
 
 }

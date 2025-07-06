@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/login")
-@Tag(name = "Kakao", description = "카카오 관련 API")
+@Tag(name = "카카오 로그인", description = "카카오 관련 API")
 public class KakaoLoginPageController {
 
     @Value("${kakao.client_id}")

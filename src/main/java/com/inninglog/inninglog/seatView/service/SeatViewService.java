@@ -9,7 +9,7 @@ import com.inninglog.inninglog.journal.repository.JournalRepository;
 import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.member.repository.MemberRepository;
 import com.inninglog.inninglog.seatView.domain.*;
-import com.inninglog.inninglog.seatView.dto.SeatCreateReqDto;
+import com.inninglog.inninglog.seatView.dto.req.SeatCreateReqDto;
 import com.inninglog.inninglog.seatView.repository.*;
 import com.inninglog.inninglog.stadium.domain.Stadium;
 import com.inninglog.inninglog.stadium.repository.StadiumRepository;
@@ -71,7 +71,6 @@ public class SeatViewService {
         Zone zone = zoneRepository.findByShortCode(dto.getZoneShortCode())
                 .orElseThrow(()-> new CustomException(ErrorCode.ZONE_NOT_FOUND));
 
-        // SeatView 먼저 저장 (view_media_url은 일단 null 처리 또는 dto 필드에서 받아도 OK)
         SeatView seatView = SeatView.builder()
                 .member(member)
                 .journal(journal)
@@ -99,4 +98,6 @@ public class SeatViewService {
 
         return seatView;
     }
+
+
 }
