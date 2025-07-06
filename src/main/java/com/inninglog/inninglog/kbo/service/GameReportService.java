@@ -48,12 +48,15 @@ public class GameReportService {
         Game game = gameRepository.findByGameId(gameId)
                 .orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND));
 
-        boolean isWin = journal.getResultScore() == ResultScore.WIN;
+        ResultScore score = journal.getResultScore();
+        if (score == null) {
+            System.out.println("없음");
+        }
 
         VisitedGame visitedGame = VisitedGame.builder()
                 .member(member)
                 .game(game)
-                .result(isWin)
+                .resultScore(journal.getResultScore())
                 .build();
 
         visitedGameRepository.save(visitedGame);
@@ -67,10 +70,18 @@ public class GameReportService {
 
         int totalVisitedGames = visitedGames.size();
         int winGames = 0;
+        int lossGames = 0;
+        int drawGames = 0;
 
         for (VisitedGame visitedGame : visitedGames) {
-            if (Boolean.TRUE.equals(visitedGame.getResult())) {
+            if (visitedGame.getResultScore().equals(ResultScore.WIN)) {
                 winGames++;
+            }
+            else if(visitedGame.getResultScore().equals(ResultScore.LOSE)) {
+                lossGames++;
+            }
+            else if(visitedGame.getResultScore().equals(ResultScore.DRAW)) {
+                drawGames++;
             }
         }
 
@@ -79,7 +90,7 @@ public class GameReportService {
                 ? 0 //경기 수가 0이면 0 반환
                 : (int) Math.round(((double) winGames / totalVisitedGames) * 1000);
 
-        return new WinningRateResult(totalVisitedGames, winGames, winningRateHalPoongRi);
+        return new WinningRateResult(totalVisitedGames, winGames, lossGames, drawGames, winningRateHalPoongRi);
     }
 
 
@@ -166,6 +177,8 @@ public class GameReportService {
     public record WinningRateResult(
             int totalVisitedGames,
             int winGames,
+            int loseGames,
+            int drawGames,
             int winningRateHalPoongRi
     ){}
 
@@ -184,6 +197,8 @@ public class GameReportService {
         return GameReportResDto.builder()
                 .totalVisitedGames(winningRateResult.totalVisitedGames)
                 .winGames(winningRateResult.winGames)
+                .loseGames(winningRateResult.loseGames)
+                .drawGames(winningRateResult.drawGames)
                 .winningRateHalPoongRi(winningRateResult.winningRateHalPoongRi)
                 .topBatters(rankingResult.topBatters())
                 .topPitchers(rankingResult.topPitchers())

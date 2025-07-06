@@ -12,6 +12,8 @@ import java.util.List;
 public class GameReportResDto {
     private int totalVisitedGames;
     private int winGames;
+    private int loseGames;
+    private int drawGames;
     private int winningRateHalPoongRi;
 
     private List<PlayerRankingDto> topBatters;
