@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/home")
-@Tag(name = "Home", description = "홈 관련 API")
+@Tag(name = "홈", description = "홈 관련 API")
 public class HomeController {
 
     private final HomeService homeService;

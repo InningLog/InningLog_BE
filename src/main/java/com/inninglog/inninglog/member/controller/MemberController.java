@@ -24,7 +24,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/member")
-@Tag(name = "Member", description = "회원 관련 API")
+@Tag(name = "회원", description = "회원 관련 API")
 public class MemberController {
 
     private final MemberService memberService;

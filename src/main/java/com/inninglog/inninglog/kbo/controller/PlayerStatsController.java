@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@Tag(name = "KBO 선수 기록", description = "KBO 선수들의 경기별 기록 관리 API")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/kbo/player-stats")
+@Tag(name = "KBO 크롤링(FAST 서버 통신용)", description = "크롤링 관련 api")
 public class PlayerStatsController {
 
     private final PlayerStatsService playerStatsService;

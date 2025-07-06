@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/report")
 @RequiredArgsConstructor
-@Tag(name = "GameReport", description = "직관 리포트 관련 API")
+@Tag(name = "직관 리포트", description = "직관 리포트 관련 API")
 public class GameReportController {
 
     private final GameReportService gameReportService;

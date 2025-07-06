@@ -17,14 +17,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("")
-@Tag(name = "Kakao", description = "카카오 관련 API")
+@Tag(name = "카카오 로그인", description = "카카오 관련 API")
 public class KakaoLoginController {
 
     private final KakaoAuthService kakaoAuthService;
 
     @Operation(
             summary = "카카오 로그인 콜백",
-            description = "카카오 로그인 인가 코드를 통해 JWT 토큰과 사용자 정보를 반환합니다."
+            description = "카카오 로그인 인가 코드를 통해 JWT 토큰과 사용자 정보를 반환합니다." +
+                    "프론트에서 신경 쓰지 않아도 됨"
     )
     @ErrorApiResponses.Common
     @SuccessApiResponses.Login

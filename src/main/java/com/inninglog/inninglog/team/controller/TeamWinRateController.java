@@ -2,6 +2,7 @@ package com.inninglog.inninglog.team.controller;
 
 import com.inninglog.inninglog.team.dto.TeamWinRateDto;
 import com.inninglog.inninglog.team.service.TeamWinRateService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.Optional;
 @RequestMapping("/api/kbo/team-rankings")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "KBO 크롤링(FAST 서버 통신용)", description = "크롤링 관련 api")
 public class TeamWinRateController {
 
     private final TeamWinRateService teamWinRateService;
