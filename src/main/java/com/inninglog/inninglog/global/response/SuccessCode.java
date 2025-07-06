@@ -16,9 +16,11 @@ public enum SuccessCode {
     JOURNAL_CREATED("JOURNAL_CREATED", HttpStatus.CREATED, "직관 일지가 등록되었습니다."),
     REPORT_GENERATED("REPORT_GENERATED", HttpStatus.OK, "리포트가 생성되었습니다."),
     JOURNAL_LIST_FETCHED("JOURNAL_LIST_FETCHED", HttpStatus.OK, "직관 일지 리스트 조회 성공"),
+
     JOURNAL_EMPTY("JOURNAL_EMPTY", HttpStatus.OK, "해당 조건에 해당하는 직관 일지가 없습니다."),
     SEATVIEW_LIST_FETCHED("SEATVIEW_LIST_FETCHED", HttpStatus.OK, "시야 사진 조회 성공"),
     SEATVIEW_EMPTY("SEAT_VIEW_EMPTY", HttpStatus.OK, "해당 조건에 해당하는 시야 사진이 없습니다.");
+
 
 
     private final String code;

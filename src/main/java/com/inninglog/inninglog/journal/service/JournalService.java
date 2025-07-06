@@ -185,6 +185,7 @@ public class JournalService {
                 .orElseThrow(() -> new CustomException(ErrorCode.JOURNAL_NOT_FOUND));
 
         return JourDetailResDto.from(member, journal);
+
     }
 
 }

@@ -146,6 +146,7 @@ public @interface SuccessApiResponses {
                             examples = {
                                     @ExampleObject(name = "일지 목록 있음", value = """
                                             {
+
                                                 "code": "JOURNAL_LIST_FETCHED",
                                                 "message": "직관 일지 리스트 조회 성공",
                                                 "data": {
@@ -204,8 +205,7 @@ public @interface SuccessApiResponses {
                                                   "numberOfElements": 3,
                                                   "empty": false
                                                 }
-                                              }
-                                            """),
+                                              },
                                     @ExampleObject(name = "일지 목록 없음", value = """
                                             {
                                               "code": "JOURNAL_EMPTY",
