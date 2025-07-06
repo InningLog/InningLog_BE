@@ -98,4 +98,7 @@ public class SeatViewService {
 
         return seatView;
     }
+
+
+    //좌석 검색 - 정보 기반
 }
