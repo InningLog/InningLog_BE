@@ -5,15 +5,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
+// 모아보기용 - 사진만
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SeatViewResult {
+public class SeatViewImageResult {
     private Long seatViewId;
     private String viewMediaUrl;
-    private SeatInfo seatInfo;
-    private List<SeatViewEmotionTagDto> emotionTags;
 }

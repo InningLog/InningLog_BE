@@ -11,8 +11,9 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SeatSearchResponse {
-    private String searchSummary;
-    private List<SeatViewDetailResult> seatViews;
-    private int totalCount;
+public class SeatViewDetailResult {
+    private Long seatViewId;
+    private String viewMediaUrl;
+    private SeatInfo seatInfo;
+    private List<SeatViewEmotionTagDto> emotionTags;
 }

@@ -44,10 +44,10 @@ public class SeatSearchService {
         Map<Long, List<SeatViewEmotionTagDto>> emotionTagMap = getEmotionTagMap(seatViewIds);
 
         // 결과 변환
-        List<SeatViewResult> results = seatViews.stream()
+        List<SeatViewDetailResult> results = seatViews.stream()
                 .map(sv -> {
                     List<SeatViewEmotionTagDto> tags = emotionTagMap.getOrDefault(sv.getId(), new ArrayList<>());
-                    return SeatViewResult.builder()
+                    return SeatViewDetailResult.builder()
                             .seatViewId(sv.getId())
                             .viewMediaUrl(sv.getView_media_url())
                             .seatInfo(SeatInfo.builder()
@@ -121,4 +121,5 @@ public class SeatSearchService {
 
         return summary.toString();
     }
+
 }

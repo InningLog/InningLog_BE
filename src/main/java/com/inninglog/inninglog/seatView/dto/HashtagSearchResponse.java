@@ -11,8 +11,9 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SeatSearchResponse {
+public class HashtagSearchResponse {
     private String searchSummary;
-    private List<SeatViewDetailResult> seatViews;
+    private List<SeatViewImageResult> seatViews;
     private int totalCount;
+    private boolean isGalleryView; // 모아보기 형태인지 구분
 }
