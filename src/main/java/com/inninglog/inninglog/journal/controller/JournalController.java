@@ -80,6 +80,7 @@ public class JournalController {
         이 API는 전달받은 정보로 새로운 Journal 객체를 생성합니다.
 
         ✅ 필수 필드:
+        - `gameId`: 경기 게임 Id
         - `media_url`: 이미지 S3 URL
         - `ourScore`, `theirScore`: 점수 정보
         - `opponentTeamShortCode`, `stadiumShortCode`
