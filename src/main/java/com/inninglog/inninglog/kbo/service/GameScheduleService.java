@@ -125,7 +125,9 @@ public class GameScheduleService {
 
         for (GameResultDto gameDto : requestDto.getGames()) {
             try {
-                Optional<Game> existingGameOpt = gameRepository.findByGameId(gameDto.getGameId());
+                String incomingGameId = gameDto.getGameId().trim();
+
+                Optional<Game> existingGameOpt = gameRepository.findByGameId(incomingGameId);
 
                 if (existingGameOpt.isPresent()) {
                     // 기존 경기 업데이트
