@@ -14,7 +14,8 @@ public class GameReportResDto {
     private int winGames;
     private int loseGames;
     private int drawGames;
-    private int winningRateHalPoongRi;
+    private int myWeaningRate;
+    private double teamWinRate;
 
     private List<PlayerRankingDto> topBatters;
     private List<PlayerRankingDto> topPitchers;

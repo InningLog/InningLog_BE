@@ -17,6 +17,7 @@ import com.inninglog.inninglog.kbo.repository.VisitedGameRepository;
 import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.member.repository.MemberRepository;
 import com.inninglog.inninglog.team.domain.Team;
+import com.inninglog.inninglog.team.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class GameReportService {
     private final GameRepository gameRepository;
     private final VisitedGameRepository visitedGameRepository;
     private final PlayerStatRepository playerStatRepository;
+    private final TeamRepository teamRepository;
 
     //나의 직관 게임 일정 기록
     public void createVisitedGame(Long memberId, String gameId, Long journalId){
@@ -194,12 +196,18 @@ public class GameReportService {
         // 선수 랭킹 계산
         PlayerRankingResult rankingResult = calculatePlayer(member);
 
+        // 유저의 응원팀의 승률
+        Team team = teamRepository.findByShortCode(member.getTeam().getShortCode())
+                .orElseThrow(() -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
+
+
         return GameReportResDto.builder()
                 .totalVisitedGames(winningRateResult.totalVisitedGames)
                 .winGames(winningRateResult.winGames)
                 .loseGames(winningRateResult.loseGames)
                 .drawGames(winningRateResult.drawGames)
-                .winningRateHalPoongRi(winningRateResult.winningRateHalPoongRi)
+                .myWeaningRate(winningRateResult.winningRateHalPoongRi)
+                .teamWinRate(team.getWinRate())
                 .topBatters(rankingResult.topBatters())
                 .topPitchers(rankingResult.topPitchers())
                 .bottomBatters(rankingResult.bottomBatters())
