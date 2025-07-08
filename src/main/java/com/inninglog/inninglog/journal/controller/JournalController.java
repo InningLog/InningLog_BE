@@ -8,10 +8,7 @@ import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
 import com.inninglog.inninglog.journal.dto.req.JourCreateReqDto;
-import com.inninglog.inninglog.journal.dto.res.JourDetailResDto;
-import com.inninglog.inninglog.journal.dto.res.JourGameResDto;
-import com.inninglog.inninglog.journal.dto.res.JournalCalListResDto;
-import com.inninglog.inninglog.journal.dto.res.JournalSumListResDto;
+import com.inninglog.inninglog.journal.dto.res.*;
 import com.inninglog.inninglog.journal.service.JournalService;
 import com.inninglog.inninglog.kbo.dto.gameSchdule.GameSchResDto;
 import com.inninglog.inninglog.kbo.service.GameReportService;
@@ -45,7 +42,6 @@ import java.util.List;
 public class JournalController {
 
     private final JournalService journalService;
-    private final GameReportService gameReportService;
 
     //직관 일지 이미지 업로드
     @Operation(
@@ -91,7 +87,7 @@ public class JournalController {
     @ErrorApiResponses.Game
     @SuccessApiResponses.JournalCreate
     @PostMapping("/contents")
-    public ResponseEntity<SuccessResponse<Long>> createContents(
+    public ResponseEntity<SuccessResponse<JourCreateResDto>> createContents(
             @Parameter(hidden = true)
             @AuthenticationPrincipal CustomUserDetails user,
 
@@ -101,11 +97,10 @@ public class JournalController {
             )
             @RequestBody JourCreateReqDto request)
     {
-        Journal journal = journalService.createJournal(user.getMember().getId(), request);
-        gameReportService.createVisitedGame(user.getMember().getId(), request.getGameId(), journal.getId());
+        JourCreateResDto resDto = journalService.createJournal(user.getMember().getId(), request);
 
         return ResponseEntity.ok(
-                SuccessResponse.success(SuccessCode.JOURNAL_CREATED, journal.getId())
+                SuccessResponse.success(SuccessCode.JOURNAL_CREATED, resDto)
         );
     }
 
