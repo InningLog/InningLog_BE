@@ -1,6 +1,7 @@
 package com.inninglog.inninglog.kbo.dto.gameReport;
 
 import com.inninglog.inninglog.kbo.dto.PlayerRankingDto;
+import com.inninglog.inninglog.kbo.service.GameReportService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -42,4 +43,20 @@ public class GameReportResDto {
 
     @Schema(description = "직관 시 가장 성적이 부진했던 투수 1명", implementation = PlayerRankingDto.class)
     private List<PlayerRankingDto> bottomPitchers;
+
+
+    public static GameReportResDto from(GameReportService.WinningRateResult winningRateResult, double teamWinRate, GameReportService.PlayerRankingResult rankingResult) {
+        return GameReportResDto.builder()
+                .totalVisitedGames(winningRateResult.totalVisitedGames())
+                .winGames(winningRateResult.winGames())
+                .loseGames(winningRateResult.loseGames())
+                .drawGames(winningRateResult.drawGames())
+                .myWeaningRate(winningRateResult.winningRateHalPoongRi())
+                .teamWinRate(teamWinRate)
+                .topBatters(rankingResult.topBatters())
+                .topPitchers(rankingResult.topPitchers())
+                .bottomBatters(rankingResult.bottomBatters())
+                .bottomPitchers(rankingResult.bottomPitchers())
+                .build();
+    }
 }
