@@ -81,6 +81,7 @@ public class SeatViewService {
                 .seatRow(dto.getSeatRow())
                 .build();
 
+        journal.setSeatView(seatView);
         seatViewRepository.save(seatView);
 
 

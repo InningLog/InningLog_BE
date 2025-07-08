@@ -63,7 +63,6 @@ public class Journal extends BaseTimeEntity {
 
     //시야 정보
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seatView_id")
     private SeatView seatView;
 
     public static Journal from(JourCreateReqDto dto, Member member, Team team, Stadium stadium) {
