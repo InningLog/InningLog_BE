@@ -178,7 +178,7 @@ public class JournalService {
 
     //특정 직관 일지 조회
     @Transactional(readOnly = true)
-    public JourDetailResDto getDetailJournal(Long memberId, Long journalId){
+    public JourUpdateResDto getDetailJournal(Long memberId, Long journalId){
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -186,7 +186,8 @@ public class JournalService {
         Journal journal = journalRepository.findById(journalId)
                 .orElseThrow(() -> new CustomException(ErrorCode.JOURNAL_NOT_FOUND));
 
-        return JourDetailResDto.from(member, journal);
+        JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal);
+        return JourUpdateResDto.from(jourDetailResDto, journal.getSeatView().getId());
     }
 
     //특정 직관 일지 수정
