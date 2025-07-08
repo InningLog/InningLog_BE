@@ -7,14 +7,18 @@ import com.inninglog.inninglog.global.response.SuccessResponse;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.journal.domain.ResultScore;
 import com.inninglog.inninglog.journal.dto.req.JourCreateReqDto;
+
 import com.inninglog.inninglog.journal.dto.req.JourUpdateReqDto;
 import com.inninglog.inninglog.journal.dto.res.*;
+
 import com.inninglog.inninglog.journal.service.JournalService;
 import com.inninglog.inninglog.kbo.dto.gameSchdule.GameSchResDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -306,6 +310,7 @@ public class JournalController {
     ) {
         JourUpdateResDto resDto = journalService.getDetailJournal(user.getMember().getId(), journalId);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resDto));
+
     }
 
 

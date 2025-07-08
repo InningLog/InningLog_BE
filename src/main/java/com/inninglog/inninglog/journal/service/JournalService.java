@@ -208,6 +208,7 @@ public class JournalService {
         JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal);
 
         return JourUpdateResDto.from(jourDetailResDto, journal.getSeatView().getId());
+
     }
 
 }

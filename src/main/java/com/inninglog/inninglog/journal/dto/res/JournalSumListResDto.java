@@ -1,6 +1,8 @@
 package com.inninglog.inninglog.journal.dto.res;
 
+
 import com.inninglog.inninglog.journal.domain.EmotionTag;
+
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
 import lombok.AllArgsConstructor;
