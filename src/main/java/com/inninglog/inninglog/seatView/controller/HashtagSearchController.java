@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/seatsView/hashtag")
+@RequestMapping("/seatViews/hashtag")
 @RequiredArgsConstructor
-@Tag(name = "해시태그 기반 좌석 검색", description = "감정 태그 기반 좌석 시야 검색 API")
+@Tag(name = "좌석 시야 검색", description = "구장 좌석 시야 후기 검색 API")
 public class HashtagSearchController {
 
     private final HashtagSearchService hashtagSearchService;
@@ -171,11 +171,6 @@ public class HashtagSearchController {
             )
             @RequestParam(required = false, defaultValue = "false") Boolean isAndCondition
     ) {
-        HashtagSearchReq request = HashtagSearchReq.builder()
-                .stadiumShortCode(stadiumShortCode)
-                .hashtagCodes(hashtagCodes)
-                .isAndCondition(isAndCondition)
-                .build();
 
         HashtagSearchRes response = hashtagSearchService.searchSeatViewsByHashtagsGallery(
                 stadiumShortCode, hashtagCodes, isAndCondition
@@ -301,7 +296,7 @@ public class HashtagSearchController {
                     )
             )
     })
-    @GetMapping("/detail")
+    @GetMapping("/feed")
     public ResponseEntity<SuccessResponse<List<SeatViewDetailResult>>> searchSeatViewsDetail(
             @Parameter(
                     description = "구장 단축코드",

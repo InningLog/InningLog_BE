@@ -10,6 +10,8 @@ import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.member.repository.MemberRepository;
 import com.inninglog.inninglog.seatView.domain.*;
 import com.inninglog.inninglog.seatView.dto.req.SeatCreateReqDto;
+import com.inninglog.inninglog.seatView.dto.req.SeatViewEmotionTagDto;
+import com.inninglog.inninglog.seatView.dto.res.SeatViewDetailResult;
 import com.inninglog.inninglog.seatView.repository.*;
 import com.inninglog.inninglog.stadium.domain.Stadium;
 import com.inninglog.inninglog.stadium.repository.StadiumRepository;
@@ -19,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +37,6 @@ public class SeatViewService {
 
     private final SeatViewEmotionTagRepository seatViewEmotionTagRepository;
     private final SeatViewEmotionTagMapRepository seatViewEmotionTagMapRepository;
-
     private final S3Uploader s3Uploader;
 
     //좌석 시야 사진 업로드
@@ -98,6 +101,27 @@ public class SeatViewService {
             }
 
         return seatView;
+    }
+
+
+    //특정 좌석 시야 조회
+    public SeatViewDetailResult getSeatView(Long memberId, Long seatViewId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        SeatView seatView = seatViewRepository.findById(seatViewId)
+                .orElseThrow(() -> new CustomException(ErrorCode.SEATVIEW_NOT_FOUND));
+
+        // 감정 태그 매핑 조회
+        List<SeatViewEmotionTagDto> tags = seatViewEmotionTagMapRepository.findBySeatViewId(seatViewId).stream()
+                .map(tagMap -> SeatViewEmotionTagDto.builder()
+                        .code(tagMap.getSeatViewEmotionTag().getCode())
+                        .label(tagMap.getSeatViewEmotionTag().getLabel())
+                        .build())
+                .collect(Collectors.toList());
+
+        // 결과 생성
+        return SeatViewDetailResult.from(seatView, tags);
     }
 
 

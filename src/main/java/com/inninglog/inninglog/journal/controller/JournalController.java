@@ -353,7 +353,7 @@ public class JournalController {
                     )
             }
     )
-    @PatchMapping("/{journalId}")
+    @PatchMapping("/update/{journalId}")
     @ErrorApiResponses.Common
     public ResponseEntity<SuccessResponse<JourUpdateResDto>> updateJournal(
             @AuthenticationPrincipal CustomUserDetails user,

@@ -17,15 +17,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/seatsView/normal")
+@RequestMapping("/seatViews/normal")
 @RequiredArgsConstructor
-@Tag(name = "일반 좌석 검색", description = "구장 좌석 시야 후기 검색 API")
+@Tag(name = "좌석 시야 검색", description = "구장 좌석 시야 후기 검색 API")
 public class SeatSearchController {
 
     private final SeatSearchService seatSearchService;
 
     @Operation(
-            summary = "좌석 검색",
+            summary = "일반 좌석 검색 (게시물 형태)",
             description = "구장, 존, 구역, 열 정보를 통해 좌석 시야 후기를 검색합니다. " +
                     "모든 조건은 선택사항이지만, 열 정보만으로는 검색할 수 없습니다 (최소 존 정보 필요)."
     )
@@ -115,7 +115,7 @@ public class SeatSearchController {
                     description = "서버 내부 오류"
             )
     })
-    @GetMapping("/search")
+    @GetMapping("/feed")
     public ResponseEntity<SuccessResponse<SeatSearchRes>> searchSeats(
             @Parameter(
                     description = "구장 단축코드",
