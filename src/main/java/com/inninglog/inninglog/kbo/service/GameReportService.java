@@ -50,11 +50,6 @@ public class GameReportService {
         Game game = gameRepository.findByGameId(gameId)
                 .orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND));
 
-        ResultScore score = journal.getResultScore();
-        if (score == null) {
-            System.out.println("없음");
-        }
-
         VisitedGame visitedGame = VisitedGame.builder()
                 .member(member)
                 .game(game)
@@ -69,6 +64,10 @@ public class GameReportService {
     public WinningRateResult caculateWin(Member member) {
 
         List<VisitedGame> visitedGames = visitedGameRepository.findByMember(member);
+
+        if (visitedGames.isEmpty()) {
+            throw new CustomException(ErrorCode.NO_VISITED_GAMES);
+        }
 
         int totalVisitedGames = visitedGames.size();
         int winGames = 0;
@@ -100,6 +99,10 @@ public class GameReportService {
     public PlayerRankingResult calculatePlayer(Member member) {
 
         Team supportTeam = member.getTeam();
+
+        if (supportTeam == null) {
+            throw new CustomException(ErrorCode.TEAM_NOT_FOUND);
+        }
 
         // 1. 유저가 직관한 경기들
         List<VisitedGame> visitedGames = visitedGameRepository.findByMember(member);
@@ -201,18 +204,7 @@ public class GameReportService {
                 .orElseThrow(() -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
 
-        return GameReportResDto.builder()
-                .totalVisitedGames(winningRateResult.totalVisitedGames)
-                .winGames(winningRateResult.winGames)
-                .loseGames(winningRateResult.loseGames)
-                .drawGames(winningRateResult.drawGames)
-                .myWeaningRate(winningRateResult.winningRateHalPoongRi)
-                .teamWinRate(team.getWinRate())
-                .topBatters(rankingResult.topBatters())
-                .topPitchers(rankingResult.topPitchers())
-                .bottomBatters(rankingResult.bottomBatters())
-                .bottomPitchers(rankingResult.bottomPitchers())
-                .build();
+        return GameReportResDto.from(winningRateResult, team.getWinRate(), rankingResult);
     }
 }
 

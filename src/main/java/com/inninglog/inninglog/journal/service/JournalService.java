@@ -6,14 +6,13 @@ import com.inninglog.inninglog.global.s3.S3Uploader;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
 import com.inninglog.inninglog.journal.dto.req.JourCreateReqDto;
-import com.inninglog.inninglog.journal.dto.res.JourDetailResDto;
-import com.inninglog.inninglog.journal.dto.res.JourGameResDto;
-import com.inninglog.inninglog.journal.dto.res.JournalCalListResDto;
-import com.inninglog.inninglog.journal.dto.res.JournalSumListResDto;
+import com.inninglog.inninglog.journal.dto.req.JourUpdateReqDto;
+import com.inninglog.inninglog.journal.dto.res.*;
 import com.inninglog.inninglog.journal.repository.JournalRepository;
 import com.inninglog.inninglog.kbo.domain.Game;
 import com.inninglog.inninglog.kbo.dto.gameSchdule.GameSchResDto;
 import com.inninglog.inninglog.kbo.repository.GameRepository;
+import com.inninglog.inninglog.kbo.service.GameReportService;
 import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.member.repository.MemberRepository;
 import com.inninglog.inninglog.stadium.domain.Stadium;
@@ -37,6 +36,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class JournalService {
 
+    private final GameReportService gameReportService;
     private final JournalRepository journalRepository;
     private final MemberRepository memberRepository;
     private final StadiumRepository stadiumRepository;
@@ -61,7 +61,7 @@ public class JournalService {
 
     //직관 일지 내용 업로드
     @Transactional
-    public Journal createJournal(Long memberId, JourCreateReqDto dto) {
+    public JourCreateResDto createJournal(Long memberId, JourCreateReqDto dto) {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -75,7 +75,9 @@ public class JournalService {
         Journal journal = Journal.from(dto, member, opponentTeam, stadium);
         journalRepository.save(journal);
 
-        return journal;
+        gameReportService.createVisitedGame(memberId, dto.getGameId(), journal.getId());
+
+        return JourCreateResDto.from(journal);
     }
 
 
@@ -176,7 +178,7 @@ public class JournalService {
 
     //특정 직관 일지 조회
     @Transactional(readOnly = true)
-    public JourDetailResDto getDetailJournal(Long memberId, Long journalId){
+    public JourUpdateResDto getDetailJournal(Long memberId, Long journalId){
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -184,7 +186,28 @@ public class JournalService {
         Journal journal = journalRepository.findById(journalId)
                 .orElseThrow(() -> new CustomException(ErrorCode.JOURNAL_NOT_FOUND));
 
-        return JourDetailResDto.from(member, journal);
+        JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal);
+        return JourUpdateResDto.from(jourDetailResDto, journal.getSeatView().getId());
+    }
+
+    //특정 직관 일지 수정
+    @Transactional
+    public JourUpdateResDto updateJournal(Long memberId, Long journalId, JourUpdateReqDto dto) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Journal journal = journalRepository.findById(journalId)
+                .orElseThrow(() -> new CustomException(ErrorCode.JOURNAL_NOT_FOUND));
+
+        if (!journal.getMember().getId().equals(memberId)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
+        journal.updateFrom(dto);
+
+        JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal);
+
+        return JourUpdateResDto.from(jourDetailResDto, journal.getSeatView().getId());
 
     }
 

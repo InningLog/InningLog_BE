@@ -5,18 +5,14 @@ import com.inninglog.inninglog.global.exception.ErrorApiResponses;
 import com.inninglog.inninglog.global.response.SuccessApiResponses;
 import com.inninglog.inninglog.global.response.SuccessResponse;
 import com.inninglog.inninglog.global.response.SuccessCode;
-import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
 import com.inninglog.inninglog.journal.dto.req.JourCreateReqDto;
 
-import com.inninglog.inninglog.journal.dto.res.JourDetailResDto;
+import com.inninglog.inninglog.journal.dto.req.JourUpdateReqDto;
+import com.inninglog.inninglog.journal.dto.res.*;
 
-import com.inninglog.inninglog.journal.dto.res.JourGameResDto;
-import com.inninglog.inninglog.journal.dto.res.JournalCalListResDto;
-import com.inninglog.inninglog.journal.dto.res.JournalSumListResDto;
 import com.inninglog.inninglog.journal.service.JournalService;
 import com.inninglog.inninglog.kbo.dto.gameSchdule.GameSchResDto;
-import com.inninglog.inninglog.kbo.service.GameReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 
@@ -49,7 +45,6 @@ import java.util.List;
 public class JournalController {
 
     private final JournalService journalService;
-    private final GameReportService gameReportService;
 
     //직관 일지 이미지 업로드
     @Operation(
@@ -95,7 +90,7 @@ public class JournalController {
     @ErrorApiResponses.Game
     @SuccessApiResponses.JournalCreate
     @PostMapping("/contents")
-    public ResponseEntity<SuccessResponse<Long>> createContents(
+    public ResponseEntity<SuccessResponse<JourCreateResDto>> createContents(
             @Parameter(hidden = true)
             @AuthenticationPrincipal CustomUserDetails user,
 
@@ -105,11 +100,10 @@ public class JournalController {
             )
             @RequestBody JourCreateReqDto request)
     {
-        Journal journal = journalService.createJournal(user.getMember().getId(), request);
-        gameReportService.createVisitedGame(user.getMember().getId(), request.getGameId(), journal.getId());
+        JourCreateResDto resDto = journalService.createJournal(user.getMember().getId(), request);
 
         return ResponseEntity.ok(
-                SuccessResponse.success(SuccessCode.JOURNAL_CREATED, journal.getId())
+                SuccessResponse.success(SuccessCode.JOURNAL_CREATED, resDto)
         );
     }
 
@@ -246,69 +240,133 @@ public class JournalController {
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resDto));
     }
 
-    // 특정 직관일지 상세 조회
-    @ErrorApiResponses.GameApi
     @Operation(
             summary = "특정 직관일지 상세 조회",
-            description = "journalId는 직관일지 목록 API를 통해 확인된 값을 전달해야 합니다.",
+            description = "journalId는 직관일지 목록 API(/summary, /schedule)를 통해 확인된 값을 전달해야 합니다. seatViewId는 시야 정보가 연결된 경우에만 포함됩니다.",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
                             description = "직관일지 상세 조회 성공",
-                            content = @Content(mediaType = "application/json",
+                            content = @Content(
+                                    mediaType = "application/json",
                                     schema = @Schema(implementation = JourDetailResDto.class),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "선택값 비어 있음",
-                                                    summary = "사진, 리뷰 미입력 상태",
-                                                    value = "{\n" +
-                                                            "  \"code\": \"SUCCESS\",\n" +
-                                                            "  \"message\": \"요청이 정상적으로 처리되었습니다.\",\n" +
-                                                            "  \"data\": {\n" +
-                                                            "    \"journalId\": 4,\n" +
-                                                            "    \"gameDate\": \"2025-06-30T13:06:40.457\",\n" +
-                                                            "    \"supportTeamSC\": \"OB\",\n" +
-                                                            "    \"opponentTeamSC\": \"OB\",\n" +
-                                                            "    \"stadiumSC\": \"JAM\",\n" +
-                                                            "    \"emotion\": \"감동\",\n" +
-                                                            "    \"media_url\": \"\",\n" +
-                                                            "    \"review_text\": \"\"\n" +
-                                                            "  }\n" +
-                                                            "}"
+                                                    name = "시야 정보 미포함",
+                                                    summary = "seatView가 연결되지 않은 경우",
+                                                    value = """
+                        {
+                          "code": "SUCCESS",
+                          "message": "요청이 정상적으로 처리되었습니다.",
+                          "data": {
+                            "jourDetail": {
+                              "journalId": 4,
+                              "gameDate": "2025-06-30T13:06:40.457",
+                              "supportTeamSC": "OB",
+                              "opponentTeamSC": "OB",
+                              "stadiumSC": "JAM",
+                              "emotion": "감동",
+                              "media_url": "",
+                              "review_text": ""
+                            },
+                            "seatViewId": null
+                          }
+                        }
+                        """
                                             ),
                                             @ExampleObject(
-                                                    name = "모든 값 입력됨",
-                                                    summary = "사진 및 리뷰 포함된 경우",
-                                                    value = "{\n" +
-                                                            "  \"code\": \"SUCCESS\",\n" +
-                                                            "  \"message\": \"요청이 정상적으로 처리되었습니다.\",\n" +
-                                                            "  \"data\": {\n" +
-                                                            "    \"journalId\": 2,\n" +
-                                                            "    \"gameDate\": \"2025-06-27T12:15:06.535\",\n" +
-                                                            "    \"supportTeamSC\": \"OB\",\n" +
-                                                            "    \"opponentTeamSC\": \"OB\",\n" +
-                                                            "    \"stadiumSC\": \"JAM\",\n" +
-                                                            "    \"emotion\": \"감동\",\n" +
-                                                            "    \"media_url\": \"https://s3.amazonaws.com/.../image.jpg\",\n" +
-                                                            "    \"review_text\": \"오늘 경기는 정말 재미있었다!\"\n" +
-                                                            "  }\n" +
-                                                            "}"
+                                                    name = "seatView 연결됨",
+                                                    summary = "시야 정보가 연결된 경우",
+                                                    value = """
+                        {
+                          "code": "SUCCESS",
+                          "message": "요청이 정상적으로 처리되었습니다.",
+                          "data": {
+                            "jourDetail": {
+                              "journalId": 3,
+                              "gameDate": "2025-07-08T12:11:39.038",
+                              "supportTeamSC": "OB",
+                              "opponentTeamSC": "OB",
+                              "stadiumSC": "JAM",
+                              "emotion": "감동",
+                              "media_url": "https://s3.amazonaws.com/.../image.jpg",
+                              "review_text": "오늘 정말 재미있었다!"
+                            },
+                            "seatViewId": 3
+                          }
+                        }
+                        """
                                             )
                                     }
                             )
                     )
             }
     )
-    @GetMapping("/datail")
-    public ResponseEntity<SuccessResponse<JourDetailResDto>> getDetailJournal(
+    @GetMapping("/detail/{journalId}")
+    public ResponseEntity<SuccessResponse<JourUpdateResDto>> getDetailJournal(
             @AuthenticationPrincipal CustomUserDetails user,
-
-            @Parameter(description = "직관 일지 Id(예: journalId - 12). 이 값은 직관일지 목록 API(/summary, /schedule)에서 선택한 항목의 ID를 사용합니다.", required = true)
-            @RequestParam Long journalId
-    ){
-        JourDetailResDto resDto = journalService.getDetailJournal(user.getMember().getId(), journalId);
+            @Parameter(description = "직관 일지 ID. 목록 API에서 선택한 항목의 ID를 전달", required = true)
+            @PathVariable Long journalId
+    ) {
+        JourUpdateResDto resDto = journalService.getDetailJournal(user.getMember().getId(), journalId);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resDto));
 
+    }
+
+
+
+    @Operation(
+            summary = "직관 일지 수정",
+            description = """
+        기존에 작성된 직관 일지 내용을 수정합니다. 본인만 수정할 수 있으며, 
+        수정 시 감정 태그, 리뷰, 점수, 이미지 링크 등을 포함할 수 있습니다.
+        seatView는 별도 API로 연결되며 본 API에서 수정되지 않습니다.
+    """,
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "직관일지 수정 성공",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = JourUpdateResDto.class),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "수정 완료 예시",
+                                                    summary = "수정 완료된 직관일지와 seatViewId 반환",
+                                                    value = """
+                        {
+                          "code": "SUCCESS",
+                          "message": "요청이 정상적으로 처리되었습니다.",
+                          "data": {
+                            "jourDetail": {
+                              "journalId": 3,
+                              "gameDate": "2025-07-08T12:11:39.038",
+                              "supportTeamSC": "OB",
+                              "opponentTeamSC": "OB",
+                              "stadiumSC": "JAM",
+                              "emotion": "감동",
+                              "media_url": "https://s3.amazonaws.com/.../image.jpg",
+                              "review_text": "후기를 수정했어요!"
+                            },
+                            "seatViewId": 3
+                          }
+                        }
+                        """
+                                            )
+                                    }
+                            )
+                    )
+            }
+    )
+    @PatchMapping("/update/{journalId}")
+    @ErrorApiResponses.Common
+    public ResponseEntity<SuccessResponse<JourUpdateResDto>> updateJournal(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long journalId,
+            @RequestBody JourUpdateReqDto dto
+    ) {
+        JourUpdateResDto updatedJournal = journalService.updateJournal(user.getMember().getId(), journalId, dto);
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, updatedJournal));
     }
 }
 

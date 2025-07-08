@@ -56,21 +56,7 @@ public class SeatSearchService {
 
         // 결과 변환
         List<SeatViewDetailResult> results = seatViews.stream()
-                .map(sv -> {
-                    List<SeatViewEmotionTagDto> tags = emotionTagMap.getOrDefault(sv.getId(), new ArrayList<>());
-                    return SeatViewDetailResult.builder()
-                            .seatViewId(sv.getId())
-                            .viewMediaUrl(sv.getView_media_url())
-                            .seatInfo(SeatInfo.builder()
-                                    .zoneName(sv.getZone().getName())
-                                    .zoneShortCode(sv.getZone().getShortCode())
-                                    .section(sv.getSection())
-                                    .seatRow(sv.getSeatRow())
-                                    .stadiumName(sv.getStadium().getName())
-                                    .build())
-                            .emotionTags(tags)
-                            .build();
-                })
+                .map(sv -> SeatViewDetailResult.from(sv, emotionTagMap.getOrDefault(sv.getId(), new ArrayList<>())))
                 .toList();
 
         String searchSummary = generateSearchSummary(request, seatViews);

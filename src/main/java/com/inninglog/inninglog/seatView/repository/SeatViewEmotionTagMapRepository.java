@@ -15,4 +15,10 @@ public interface SeatViewEmotionTagMapRepository extends JpaRepository<SeatViewE
             "JOIN FETCH setm.seatViewEmotionTag " +
             "WHERE setm.seatView.id IN :seatViewIds")
     List<SeatViewEmotionTagMap> findBySeatViewIds(@Param("seatViewIds") List<Long> seatViewIds);
+
+
+    @Query("SELECT setm FROM SeatViewEmotionTagMap setm " +
+            "JOIN FETCH setm.seatViewEmotionTag " +
+            "WHERE setm.seatView.id = :seatViewId")
+    List<SeatViewEmotionTagMap> findBySeatViewId(@Param("seatViewId") Long seatViewId);
 }

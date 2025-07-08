@@ -11,6 +11,7 @@ public enum ErrorCode {
     DUPLICATE_NICKNAME("DUPLICATE_NICKNAME", HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다."),
     INVALID_NICKNAME("INVALID_NICKNAME", HttpStatus.BAD_REQUEST, "닉네임 형식이 올바르지 않습니다."),
     ALREADY_SET("ALREADY_SET", HttpStatus.CONFLICT, "이미 팀이 설정되었습니다."),
+    UNAUTHORIZED_ACCESS("UNAUTHORIZED_ACCESS",HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
 
     // 팀 / 구장 / 경기 관련
     TEAM_NOT_FOUND("TEAM_NOT_FOUND", HttpStatus.NOT_FOUND, "등록되지 않은 팀입니다."),
@@ -24,7 +25,7 @@ public enum ErrorCode {
     JOURNAL_NOT_FOUND("JOURNAL_NOT_FOUND", HttpStatus.NOT_FOUND, "작성하지 않은 일지입니다."),
     EMOTION_TAG_NOT_FOUND("EMOTION_TAG_NOT_FOUND", HttpStatus.NOT_FOUND, "감정 태그가 없습니다."),
     ZONE_NOT_FOUND("ZONE_NOT_FOUND", HttpStatus.NOT_FOUND, "등록되지 않은 존입니다."),
-
+    SEATVIEW_NOT_FOUND("SEATVIEW_NOT_FOUND",HttpStatus.NOT_FOUND,"작성하지 않은 좌석 시야 후기입니다."),
     // 공통 예외
     VALIDATION_ERROR("VALIDATION_ERROR", HttpStatus.BAD_REQUEST, "요청값이 올바르지 않습니다."),
     TYPE_MISMATCH("TYPE_MISMATCH", HttpStatus.BAD_REQUEST, "요청 파라미터 타입이 올바르지 않습니다."),
