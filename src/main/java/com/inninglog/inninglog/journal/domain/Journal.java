@@ -2,11 +2,12 @@ package com.inninglog.inninglog.journal.domain;
 
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
 import com.inninglog.inninglog.journal.dto.req.JourCreateReqDto;
+import com.inninglog.inninglog.journal.dto.req.JourUpdateReqDto;
+import com.inninglog.inninglog.journal.dto.res.JourUpdateResDto;
 import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.seatView.domain.SeatView;
 import com.inninglog.inninglog.stadium.domain.Stadium;
 import com.inninglog.inninglog.team.domain.Team;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -66,14 +67,7 @@ public class Journal extends BaseTimeEntity {
     private SeatView seatView;
 
     public static Journal from(JourCreateReqDto dto, Member member, Team team, Stadium stadium) {
-        ResultScore resultScore;
-        if (dto.getOurScore() > dto.getTheirScore()) {
-            resultScore = ResultScore.WIN;
-        } else if (dto.getOurScore() < dto.getTheirScore()) {
-            resultScore = ResultScore.LOSE;
-        } else {
-            resultScore = ResultScore.DRAW;
-        }
+        ResultScore resultScore = ResultScore.of(dto.getOurScore(), dto.getTheirScore());
 
         return Journal.builder()
                 .member(member)
@@ -87,6 +81,15 @@ public class Journal extends BaseTimeEntity {
                 .review_text(dto.getReview_text())
                 .media_url(dto.getMedia_url())
                 .build();
+    }
+
+    public void updateFrom(JourUpdateReqDto dto) {
+        this.ourScore = dto.getOurScore();
+        this.theirScore = dto.getTheirScore();
+        this.resultScore = ResultScore.of(dto.getOurScore(), dto.getTheirScore()); // 기존 방식 유지
+        this.media_url = dto.getMedia_url();
+        this.emotion = dto.getEmotion();
+        this.review_text = dto.getReview_text();
     }
 
 }

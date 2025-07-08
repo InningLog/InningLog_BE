@@ -11,6 +11,7 @@ public enum ErrorCode {
     DUPLICATE_NICKNAME("DUPLICATE_NICKNAME", HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다."),
     INVALID_NICKNAME("INVALID_NICKNAME", HttpStatus.BAD_REQUEST, "닉네임 형식이 올바르지 않습니다."),
     ALREADY_SET("ALREADY_SET", HttpStatus.CONFLICT, "이미 팀이 설정되었습니다."),
+    UNAUTHORIZED_ACCESS("UNAUTHORIZED_ACCESS",HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
 
     // 팀 / 구장 / 경기 관련
     TEAM_NOT_FOUND("TEAM_NOT_FOUND", HttpStatus.NOT_FOUND, "등록되지 않은 팀입니다."),

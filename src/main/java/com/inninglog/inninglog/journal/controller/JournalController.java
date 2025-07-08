@@ -5,13 +5,12 @@ import com.inninglog.inninglog.global.exception.ErrorApiResponses;
 import com.inninglog.inninglog.global.response.SuccessApiResponses;
 import com.inninglog.inninglog.global.response.SuccessResponse;
 import com.inninglog.inninglog.global.response.SuccessCode;
-import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
 import com.inninglog.inninglog.journal.dto.req.JourCreateReqDto;
+import com.inninglog.inninglog.journal.dto.req.JourUpdateReqDto;
 import com.inninglog.inninglog.journal.dto.res.*;
 import com.inninglog.inninglog.journal.service.JournalService;
 import com.inninglog.inninglog.kbo.dto.gameSchdule.GameSchResDto;
-import com.inninglog.inninglog.kbo.service.GameReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -290,15 +289,31 @@ public class JournalController {
                     )
             }
     )
-    @GetMapping("/datail")
+    @GetMapping("/datail/{journalId}")
     public ResponseEntity<SuccessResponse<JourDetailResDto>> getDetailJournal(
             @AuthenticationPrincipal CustomUserDetails user,
 
             @Parameter(description = "직관 일지 Id(예: journalId - 12). 이 값은 직관일지 목록 API(/summary, /schedule)에서 선택한 항목의 ID를 사용합니다.", required = true)
-            @RequestParam Long journalId
+            @PathVariable Long journalId
     ){
         JourDetailResDto resDto = journalService.getDetailJournal(user.getMember().getId(), journalId);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resDto));
+    }
+
+
+    @Operation(
+            summary = "직관 일지 수정",
+            description = "기존에 작성된 직관 일지 내용을 수정합니다. 본인만 수정 가능합니다."
+    )
+    @PatchMapping("/{journalId}")
+    @ErrorApiResponses.Common
+    public ResponseEntity<SuccessResponse<JourUpdateResDto>> updateJournal(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long journalId,
+            @RequestBody JourUpdateReqDto dto) {
+
+        JourUpdateResDto updatedJournal = journalService.updateJournal(user.getMember().getId(), journalId, dto);
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, updatedJournal));
     }
 }
 

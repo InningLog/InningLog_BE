@@ -6,6 +6,7 @@ import com.inninglog.inninglog.global.s3.S3Uploader;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
 import com.inninglog.inninglog.journal.dto.req.JourCreateReqDto;
+import com.inninglog.inninglog.journal.dto.req.JourUpdateReqDto;
 import com.inninglog.inninglog.journal.dto.res.*;
 import com.inninglog.inninglog.journal.repository.JournalRepository;
 import com.inninglog.inninglog.kbo.domain.Game;
@@ -186,6 +187,26 @@ public class JournalService {
                 .orElseThrow(() -> new CustomException(ErrorCode.JOURNAL_NOT_FOUND));
 
         return JourDetailResDto.from(member, journal);
+    }
+
+    //특정 직관 일지 수정
+    @Transactional
+    public JourUpdateResDto updateJournal(Long memberId, Long journalId, JourUpdateReqDto dto) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        Journal journal = journalRepository.findById(journalId)
+                .orElseThrow(() -> new CustomException(ErrorCode.JOURNAL_NOT_FOUND));
+
+        if (!journal.getMember().getId().equals(memberId)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+
+        journal.updateFrom(dto);
+
+        JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal);
+
+        return JourUpdateResDto.from(jourDetailResDto, journal.getSeatView().getId());
     }
 
 }
