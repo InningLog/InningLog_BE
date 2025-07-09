@@ -1,6 +1,5 @@
 package com.inninglog.inninglog.seatView.dto.req;
 
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,29 +12,27 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Schema(description = "좌석 후기 등록 요청 DTO")
 public class SeatCreateReqDto {
 
-    //직관 일지 id
-    @Schema(description = "매핑 되는 직관 일지의 id")
+    @Schema(description = "매핑되는 직관 일지의 ID", example = "12")
     private Long journalId;
 
-
-    //경기장 숏코드
+    @Schema(description = "경기장 숏코드 (ex. JAMS, DAE)", example = "JAM")
     private String stadiumShortCode;
 
-    //존 숏코드
+    @Schema(description = "존 숏코드 (ex. 1루지정석A, 외야잔디석)", example = "Z1")
     private String zoneShortCode;
 
-    //구역
+    @Schema(description = "좌석의 구역 정보", example = "101")
     private String Section;
 
-    //열
+    @Schema(description = "좌석의 열(Row) 정보", example = "3열")
     private String seatRow;
 
-    // 감정 태그 코드 리스트만 받음
+    @Schema(description = "감정 태그 코드 리스트", example = "[\"VIEW_OPEN\", \"SUN_STRONG\"]")
     private List<String> emotionTagCodes;
 
-    //이미지 업로드 URl
+    @Schema(description = "S3에 업로드된 좌석 이미지 URL", example = "https://s3.ap-northeast-2.amazonaws.com/inninglog/seat/abc123.jpg")
     private String media_url;
-
 }

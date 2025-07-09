@@ -81,142 +81,8 @@ public @interface SuccessApiResponses {
     public @interface Login {
     }
 
-    // 사용자 관련 성공 응답
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.RUNTIME)
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "사용자 정보 업데이트 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = SuccessResponse.class),
-                            examples = {
-                                    @ExampleObject(name = "닉네임 수정", value = """
-                                            {
-                                              "code": "NICKNAME_UPDATED",
-                                              "message": "닉네임이 성공적으로 수정되었습니다.",
-                                              "data": {
-                                                null
-                                              }
-                                            }
-                                            """),
-                                    @ExampleObject(name = "팀 설정", value = """
-                                            {
-                                              "code": "TEAM_SET",
-                                              "message": "응원 팀이 성공적으로 설정되었습니다.",
-                                              "data": {
-                                                null
-                                              }
-                                            }
-                                            """)
-                            }))
-    })
-    public @interface UserUpdate {
-    }
 
-    // 일지 생성 성공 응답
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.RUNTIME)
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "일지 생성 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = JourCreateResDto.class),
-                            examples = @ExampleObject(name = "일지 생성", value = """
-                                    {
-                                      "code": "JOURNAL_CREATED",
-                                      "message": "직관 일지가 등록되었습니다.",
-                                      "data": {
-                                        "journalId": 123
-                                      }
-                                    }
-                                    """)
-                    ))
-    })
-    public @interface JournalCreate {
-    }
 
-    // 일지 조회 성공 응답
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.RUNTIME)
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "일지 조회 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = SuccessResponse.class),
-                            examples = {
-                                    @ExampleObject(name = "일지 목록 있음", value = """
-                                            {
-                                                "code": "JOURNAL_LIST_FETCHED",
-                                                "message": "직관 일지 리스트 조회 성공",
-                                                "data": {
-                                                  "content": [
-                                                    {
-                                                      "journalId": 3,
-                                                      "media_url": "",
-                                                      "resultScore": "승",
-                                                      "emotion": "감동",
-                                                      "date": "2025-06-30T13:06:40.457",
-                                                      "opponentTeamName": "두산",
-                                                      "stadiumName": "잠실"
-                                                    },
-                                                    {
-                                                      "journalId": 4,
-                                                      "media_url": "",
-                                                      "resultScore": "승",
-                                                      "emotion": "감동",
-                                                      "date": "2025-06-30T13:06:40.457",
-                                                      "opponentTeamName": "두산",
-                                                      "stadiumName": "잠실"
-                                                    },
-                                                    {
-                                                      "journalId": 2,
-                                                      "media_url": "https://s3.amazonaws.com/.../image.jpg",
-                                                      "resultScore": "승",
-                                                      "emotion": "감동",
-                                                      "date": "2025-06-27T12:15:06.535",
-                                                      "opponentTeamName": "두산",
-                                                      "stadiumName": "잠실"
-                                                    }
-                                                  ],
-                                                  "pageable": {
-                                                    "pageNumber": 0,
-                                                    "pageSize": 10,
-                                                    "sort": {
-                                                      "empty": false,
-                                                      "unsorted": false,
-                                                      "sorted": true
-                                                    },
-                                                    "offset": 0,
-                                                    "paged": true,
-                                                    "unpaged": false
-                                                  },
-                                                  "last": true,
-                                                  "totalElements": 3,
-                                                  "totalPages": 1,
-                                                  "first": true,
-                                                  "size": 10,
-                                                  "number": 0,
-                                                  "sort": {
-                                                    "empty": false,
-                                                    "unsorted": false,
-                                                    "sorted": true
-                                                  },
-                                                  "numberOfElements": 3,
-                                                  "empty": false
-                                                }
-                                              }
-                                            """),
-                                    @ExampleObject(name = "일지 목록 없음", value = """
-                                            {
-                                              "code": "JOURNAL_EMPTY",
-                                              "message": "해당 조건에 해당하는 직관 일지가 없습니다.",
-                                              "data": []
-                                            }
-                                            """)
-                            }))
-    })
-    public @interface JournalList {
-    }
 
     // 파일 업로드 성공 응답
     @Target(ElementType.METHOD)
@@ -242,35 +108,8 @@ public @interface SuccessApiResponses {
     })
     public @interface FileUpload {}
 
-    // 리포트 생성 성공 응답
-    @Target(ElementType.METHOD)
-    @Retention(RetentionPolicy.RUNTIME)
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "리포트 생성 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = SuccessResponse.class),
-                            examples = @ExampleObject(value = """
-                                    {
-                                      "code": "REPORT_GENERATED",
-                                      "message": "리포트가 생성되었습니다.",
-                                      "data": {
-                                        "reportId": "REPORT_2024_06",
-                                        "totalGames": 15,
-                                        "favoriteStadium": "잠실야구장",
-                                        "winRate": 0.73,
-                                        "generatedAt": "2024-06-27T10:30:00"
-                                      }
-                                    }
-                                    """)
-                    ))
 
 
-    })
-    public @interface ReportGenerate {
-    }
-
-    // 조합형 어노테이션들
 
     // 사용자 API (로그인 + 업데이트)
     @Target(ElementType.METHOD)

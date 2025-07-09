@@ -51,7 +51,7 @@ public class HashtagSearchController {
                     description = "해시태그 검색 완료",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = SuccessResponse.class),
+                            schema = @Schema(implementation = HashtagSearchRes.class),
                             examples = {
                                     @ExampleObject(
                                             name = "OR 조건 검색 결과",
@@ -207,7 +207,7 @@ public class HashtagSearchController {
                     description = "해시태그 상세 검색 완료",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = SuccessResponse.class),
+                            schema = @Schema(implementation = SeatViewDetailResult.class),
                             examples = {
                                     @ExampleObject(
                                             name = "상세 검색 결과 있음",

@@ -35,7 +35,7 @@ public class SeatSearchController {
                     description = "좌석 시야 검색 완료",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = SuccessResponse.class),
+                            schema = @Schema(implementation = SeatSearchRes.class),
                             examples = {
                                     @ExampleObject(
                                             name = "검색 결과 있음",
