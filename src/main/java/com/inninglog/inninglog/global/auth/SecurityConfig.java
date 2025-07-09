@@ -59,7 +59,12 @@ public class SecurityConfig {
                 "http://localhost:8000",
                 "http://127.0.0.1:8000",
                 "http://inninglog.shop",
-                "https://inninglog.shop"
+                "https://inninglog.shop",
+                "https://api.inninglog.shop",
+                "http://api.inninglog.shop",
+                "http://localhost:62378"
+
+
         ));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(Arrays.asList("*"));

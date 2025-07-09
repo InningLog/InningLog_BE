@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -48,7 +49,7 @@ public class JournalController {
 
     //직관 일지 이미지 업로드
     @Operation(
-            summary = "직관 일지 이미지 업로드",
+            summary = "직관 일지 작성 페이지 - 직관 일지 이미지 업로드(presignedURL 반영하여 수정할듯 후순위로 매핑바람)",
             description = """
                 JWT 토큰에서 유저 정보를 추출하고, S3에 이미지를 업로드합니다.  
                 이후 반환된 URL을 JSON 생성 API에 사용합니다.
@@ -56,8 +57,25 @@ public class JournalController {
     )
     @ErrorApiResponses.Common
     @ErrorApiResponses.S3Failed
-    @SuccessApiResponses.FileUpload
-    @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "파일 업로드 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = @ExampleObject(
+                                    value = """
+                {
+                  "code": "S3_UPLOAD_SUCCESS",
+                  "message": "이미지 업로드가 성공적으로 완료되었습니다.",
+                  "data": {
+                    "url": "https://s3.amazonaws.com/bucket/images/journal_123.jpg"
+                  }
+                }
+                """
+                            )
+                    )
+            )
+    })    @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<SuccessResponse<String>> uploadImage(
             @Parameter(description = "업로드할 이미지 파일", required = true)
             @RequestPart("file") MultipartFile file
@@ -69,7 +87,7 @@ public class JournalController {
 
     //직관 일지 콘텐츠 업로드
     @Operation(
-            summary = "직관 일지 콘텐츠 업로드",
+            summary = "직관 일지 작성 페이지 - 직관 일지 콘텐츠 업로드(presignedURL 반영하여 수정할듯 후순위로 매핑바람)",
             description = """
         직관 일지 본문 데이터를 업로드하는 API입니다. 
         
@@ -88,7 +106,26 @@ public class JournalController {
     )
     @ErrorApiResponses.Common
     @ErrorApiResponses.Game
-    @SuccessApiResponses.JournalCreate
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "일지 생성 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = JourCreateResDto.class),
+                            examples = @ExampleObject(
+                                    name = "일지 생성",
+                                    value = """
+                                    {
+                                      "code": "JOURNAL_CREATED",
+                                      "message": "직관 일지가 등록되었습니다.",
+                                      "data": {
+                                        "journalId": 123
+                                      }
+                                    }
+                                    """)
+                    ))
+    })
     @PostMapping("/contents")
     public ResponseEntity<SuccessResponse<JourCreateResDto>> createContents(
             @Parameter(hidden = true)
@@ -112,7 +149,7 @@ public class JournalController {
 
     //본인 직관일지 목록 조회(캘린더)
     @Operation(
-            summary = "본인 직관 일지 목록 조회 - 캘린더",
+            summary = "본인 직관 일지 목록 페이지 - 캘린더",
             description = """
                 JWT 토큰에서 유저 정보를 추출하여 본인의 직관 일지를 조회합니다.
 
@@ -130,7 +167,26 @@ public class JournalController {
                 """
     )
     @ErrorApiResponses.Common
-    @SuccessApiResponses.JournalList
+    @ApiResponse(responseCode = "200", description = "조회 성공",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = JournalCalListResDto.class),
+                    examples = {
+                            @ExampleObject(name = "일지 목록", value = """
+                                            {
+                                              "code": "JOURNAL_LIST_FETCHED",
+                                              "message": "직관 일지 리스트 조회 성공",
+                                              "data": []
+                                            }
+                                            """),
+                            @ExampleObject(name = "일지 없음", value = """
+                                            {
+                                              "code": "JOURNAL_EMPTY",
+                                              "message": "해당 조건에 해당하는 직관 일지가 없습니다.",
+                                              "data": []
+                                            }
+                                            """)
+                    }))
     @GetMapping("/calendar")
     public ResponseEntity<SuccessResponse<List<JournalCalListResDto>>> getCalendarJournals(
             @AuthenticationPrincipal CustomUserDetails user,
@@ -151,7 +207,7 @@ public class JournalController {
 
     //본인 직관일지 목록 조회(모아보기)
     @Operation(
-            summary = "본인 직관 일지 목록 조회 - 모아보기",
+            summary = "본인 직관 일지 목록 페이지 - 모아보기",
             description = """
         로그인한 유저의 직관 일지를 목록 형식으로 조회합니다.
 
@@ -165,8 +221,81 @@ public class JournalController {
         """
     )
     @ErrorApiResponses.Common
-    @SuccessApiResponses.JournalList
-    @GetMapping("/summary")
+    @ApiResponse(responseCode = "200", description = "일지 조회 성공",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = JournalSumListResDto.class),
+                    examples = {
+                            @ExampleObject(name = "일지 목록 있음", value = """
+                                            {
+                                                "code": "JOURNAL_LIST_FETCHED",
+                                                "message": "직관 일지 리스트 조회 성공",
+                                                "data": {
+                                                  "content": [
+                                                    {
+                                                      "journalId": 3,
+                                                      "media_url": "",
+                                                      "resultScore": "승",
+                                                      "emotion": "감동",
+                                                      "date": "2025-06-30T13:06:40.457",
+                                                      "opponentTeamName": "두산",
+                                                      "stadiumName": "잠실"
+                                                    },
+                                                    {
+                                                      "journalId": 4,
+                                                      "media_url": "",
+                                                      "resultScore": "승",
+                                                      "emotion": "감동",
+                                                      "date": "2025-06-30T13:06:40.457",
+                                                      "opponentTeamName": "두산",
+                                                      "stadiumName": "잠실"
+                                                    },
+                                                    {
+                                                      "journalId": 2,
+                                                      "media_url": "https://s3.amazonaws.com/.../image.jpg",
+                                                      "resultScore": "승",
+                                                      "emotion": "감동",
+                                                      "date": "2025-06-27T12:15:06.535",
+                                                      "opponentTeamName": "두산",
+                                                      "stadiumName": "잠실"
+                                                    }
+                                                  ],
+                                                  "pageable": {
+                                                    "pageNumber": 0,
+                                                    "pageSize": 10,
+                                                    "sort": {
+                                                      "empty": false,
+                                                      "unsorted": false,
+                                                      "sorted": true
+                                                    },
+                                                    "offset": 0,
+                                                    "paged": true,
+                                                    "unpaged": false
+                                                  },
+                                                  "last": true,
+                                                  "totalElements": 3,
+                                                  "totalPages": 1,
+                                                  "first": true,
+                                                  "size": 10,
+                                                  "number": 0,
+                                                  "sort": {
+                                                    "empty": false,
+                                                    "unsorted": false,
+                                                    "sorted": true
+                                                  },
+                                                  "numberOfElements": 3,
+                                                  "empty": false
+                                                }
+                                              }
+                                            """),
+                            @ExampleObject(name = "일지 목록 없음", value = """
+                                            {
+                                              "code": "JOURNAL_EMPTY",
+                                              "message": "해당 조건에 해당하는 직관 일지가 없습니다.",
+                                              "data": []
+                                            }
+                                            """)
+                    }))    @GetMapping("/summary")
     public ResponseEntity<SuccessResponse<Page<JournalSumListResDto>>> getMyJournalsSum(
             @AuthenticationPrincipal CustomUserDetails user,
 
@@ -184,19 +313,42 @@ public class JournalController {
 
 
     @Operation(
-            summary = "직관 일지 콘텐츠 사전 정보 조회",
+            summary = "직관 일지 작성 페이지 - 직관 일지 콘텐츠 사전 정보 조회",
             description = """
     해당 경기 ID(gameId)를 기반으로, 현재 로그인한 사용자의 응원 팀과 상대 팀 정보를 조회합니다.
       
-    - 이 API는 직관 일지 작성을 시작하기 전, 필요한 기본 정보를 제공합니다.  
+    - 이 API는 직관 일지 작성을 시작하기 전, 작성 페이지에 필요한 정보를 제공합니다.  
     - 반환되는 데이터는 사용자의 응원 팀, 상대 팀, 경기장 정보, 경기 일시 등을 포함합니다.  
     - 유저의 응원 팀은 미리 설정되어 있어야 하며, gameId는 유효한 경기여야 합니다.
     """
     )
     @ErrorApiResponses.Common
     @ErrorApiResponses.Game
-    @SuccessApiResponses.JournalInfo
-    @GetMapping("/contents")
+    @ApiResponse(
+            responseCode = "200",
+            description = "요청이 정상적으로 처리되었습니다.",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = JourGameResDto.class),
+                    examples = @ExampleObject(
+                            name = "직관 콘텐츠 사전 정보 응답 예시",
+                            summary = "성공 응답",
+                            value = """
+                                {
+                                  "code": "SUCCESS",
+                                  "message": "요청이 정상적으로 처리되었습니다.",
+                                  "data": {
+                                    "gameId": "20250625OBLG0",
+                                    "gameDate": "2025-06-25T18:30:00",
+                                    "supportTeamSC": "LG",
+                                    "opponentTeamSC": "OB",
+                                    "stadiumSC": "JAM"
+                                  }
+                                }
+                                """
+                    )
+            )
+    )    @GetMapping("/contents")
     public ResponseEntity<SuccessResponse<JourGameResDto>> getGameInfo(
             @AuthenticationPrincipal CustomUserDetails user,
 
@@ -210,7 +362,7 @@ public class JournalController {
 
     //특정 날짜 경기 일정 조회 - 유저의 응원팀 기준
     @Operation(
-            summary = "유저 응원팀의 특정 날짜 경기 일정 조회",
+            summary = "본인 직관 일지 캘린더 페이지 - 유저 응원팀의 특정 날짜 경기 일정 조회[팝업 형태]",
             description = """
             로그인한 유저의 **응원팀 기준으로**, 특정 날짜의 경기 일정을 조회합니다.  
             
@@ -224,7 +376,43 @@ public class JournalController {
     )
     @ErrorApiResponses.Common
     @ErrorApiResponses.Game
-    @SuccessApiResponses.GameSchedule
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "경기 일정 조회 성공 (또는 해당일에 경기 없음)",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = GameSchResDto.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "경기 있음 예시",
+                                            value = """
+                    {
+                      "code": "SUCCESS",
+                      "status": 200,
+                      "message": "요청이 정상적으로 처리되었습니다.",
+                      "data": {
+                        "gameId": "20250701OBLT0",
+                        "gameDate": "2025-07-01T18:30:00",
+                        "opponentSC": "LT",
+                        "stadiumSC": "JAM"
+                      }
+                    }
+                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "경기 없음 예시",
+                                            value = """
+                    {
+                      "code": "SUCCESS",
+                      "status": 200,
+                      "message": "요청이 정상적으로 처리되었습니다.",
+                      "data": null
+                    }
+                    """
+                                    )
+                            }
+                    )
+            )
+    })
     @GetMapping("/schedule")
     public ResponseEntity<SuccessResponse<GameSchResDto>> getSchedule(
             @AuthenticationPrincipal CustomUserDetails user,
@@ -240,8 +428,10 @@ public class JournalController {
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resDto));
     }
 
+
+
     @Operation(
-            summary = "특정 직관일지 상세 조회",
+            summary = "특정 직관 일지 조회",
             description = "journalId는 직관일지 목록 API(/summary, /schedule)를 통해 확인된 값을 전달해야 합니다. seatViewId는 시야 정보가 연결된 경우에만 포함됩니다.",
             responses = {
                     @ApiResponse(
@@ -316,7 +506,7 @@ public class JournalController {
 
 
     @Operation(
-            summary = "직관 일지 수정",
+            summary = "특정 직관 일지 수정",
             description = """
         기존에 작성된 직관 일지 내용을 수정합니다. 본인만 수정할 수 있으며, 
         수정 시 감정 태그, 리뷰, 점수, 이미지 링크 등을 포함할 수 있습니다.

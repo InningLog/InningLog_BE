@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @OpenAPIDefinition(
 		info = @Info(title = "이닝로그 API", version = "v1", description = "이닝로그 백엔드 API 문서"),
 		servers = {
-				@Server(url = "https://inninglog.shop", description = "Production server"),
+				@Server(url = "https://api.inninglog.shop", description = "Production server"),
 				@Server(url = "http://localhost:8080", description = "Local server")
 		}
 )
