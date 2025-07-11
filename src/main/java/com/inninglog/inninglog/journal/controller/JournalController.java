@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -299,12 +300,25 @@ public class JournalController {
     public ResponseEntity<SuccessResponse<Page<JournalSumListResDto>>> getMyJournalsSum(
             @AuthenticationPrincipal CustomUserDetails user,
 
-            @Parameter(description = "페이징 정보 (page: 0부터 시작, size: 페이지당 아이템 수)", example = "0")
-            @PageableDefault(size = 10, sort = "date", direction = Sort.Direction.DESC) Pageable pageable,
-
             @Parameter(description = "경기 결과 필터 (WIN, LOSE, DRAW)", example = "WIN")
-            @RequestParam(required = false) ResultScore resultScore
+            @RequestParam(required = false) ResultScore resultScore,
+
+            @Parameter(
+                    description = "페이지 번호 (0부터 시작)",
+                    example = "0",
+                    schema = @Schema(type = "integer", minimum = "0")
+            )
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(
+                    description = "페이지 크기 (한 페이지당 항목 수)",
+                    example = "10",
+                    schema = @Schema(type = "integer", minimum = "1", maximum = "100")
+            )
+            @RequestParam(defaultValue = "10") int size
     ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "date"));
+
         Page<JournalSumListResDto> result = journalService.getJournalsByMemberSum(user.getMember().getId(), pageable, resultScore);
 
         SuccessCode code = result.isEmpty() ? SuccessCode.JOURNAL_EMPTY : SuccessCode.JOURNAL_LIST_FETCHED;
