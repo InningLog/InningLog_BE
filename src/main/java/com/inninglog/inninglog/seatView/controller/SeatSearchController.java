@@ -54,18 +54,18 @@ public class SeatSearchController {
                                 "seatInfo": {
                                   "zoneName": "블루석",
                                   "zoneShortCode": "JAM_BLUE",
-                                  "section": "13구역",
-                                  "seatRow": "3열",
+                                  "section": "13",
+                                  "seatRow": "3",
                                   "stadiumName": "잠실"
                                 },
                                 "emotionTags": [
                                   {
-                                    "code": "VIEW_OPEN",
-                                    "label": "시야_탁_트였어요"
+                                    "code": "SUN_NONE",
+                                    "label": "햇빛 - 없음"
                                   },
                                   {
-                                    "code": "SUN_STRONG",
-                                    "label": "햇빛이_강해서_모자는_필수"
+                                    "code": "VIEW_OBSTRUCT_NET",
+                                    "label": "시야 방해 - 그물"
                                   }
                                 ]
                               }

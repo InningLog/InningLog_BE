@@ -11,6 +11,7 @@ import com.inninglog.inninglog.member.repository.MemberRepository;
 import com.inninglog.inninglog.seatView.domain.*;
 import com.inninglog.inninglog.seatView.dto.req.SeatCreateReqDto;
 import com.inninglog.inninglog.seatView.dto.req.SeatViewEmotionTagDto;
+import com.inninglog.inninglog.seatView.dto.res.SeatCreateResDto;
 import com.inninglog.inninglog.seatView.dto.res.SeatViewDetailResult;
 import com.inninglog.inninglog.seatView.repository.*;
 import com.inninglog.inninglog.stadium.domain.Stadium;
@@ -60,7 +61,7 @@ public class SeatViewService {
 
     //좌석 시야 정보 작성
     @Transactional
-    public SeatView createSeatView(Long memberId, SeatCreateReqDto dto) {
+    public SeatCreateResDto createSeatView(Long memberId, SeatCreateReqDto dto) {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -100,7 +101,7 @@ public class SeatViewService {
                 seatViewEmotionTagMapRepository.save(map);
             }
 
-        return seatView;
+        return SeatCreateResDto.from(seatView);
     }
 
 

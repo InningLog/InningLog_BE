@@ -6,7 +6,6 @@ import com.inninglog.inninglog.seatView.domain.SeatViewEmotionTagMap;
 import com.inninglog.inninglog.seatView.dto.req.HashtagSearchReq;
 import com.inninglog.inninglog.seatView.dto.req.SeatViewEmotionTagDto;
 import com.inninglog.inninglog.seatView.dto.res.HashtagSearchRes;
-import com.inninglog.inninglog.seatView.dto.res.SeatInfo;
 import com.inninglog.inninglog.seatView.dto.res.SeatViewDetailResult;
 import com.inninglog.inninglog.seatView.dto.res.SeatViewImageResult;
 import com.inninglog.inninglog.seatView.repository.SeatViewEmotionTagMapRepository;
@@ -31,33 +30,17 @@ public class HashtagSearchService {
     private final SeatViewEmotionTagMapRepository emotionTagMapRepository;
 
     // 모아보기 형태 검색 (사진만)
-    public HashtagSearchRes searchSeatViewsByHashtagsGallery(
-            String stadiumShortCode,
-            List<String> hashtagCodes,
-            Boolean isAndCondition
-    ) {
-        HashtagSearchReq request = HashtagSearchReq.from(
-                stadiumShortCode, hashtagCodes, isAndCondition
-        );
-
-        // 검증
-        if (!request.isValidRequest()) {
-            throw new IllegalArgumentException("해시태그는 최소 1개, 최대 2개까지 선택할 수 있습니다.");
+    public HashtagSearchRes searchSeatViewsByHashtagsGallery(String stadiumShortCode, List<String> hashtagCodes) {
+        if (hashtagCodes == null || hashtagCodes.isEmpty() || hashtagCodes.size() > 5) {
+            throw new IllegalArgumentException("해시태그는 최소 1개, 최대 5개까지 선택할 수 있습니다.");
         }
 
-        // 조회 분기
-        List<SeatView> seatViews = request.isAndCondition()
-                ? seatViewRepository.findSeatViewsByHashtagsAnd(
-                request.getStadiumShortCode(),
-                request.getHashtagCodes(),
-                request.getHashtagCodes().size()
-        )
-                : seatViewRepository.findSeatViewsByHashtagsOr(
-                request.getStadiumShortCode(),
-                request.getHashtagCodes()
+        List<SeatView> seatViews = seatViewRepository.findSeatViewsByHashtagsAnd(
+                stadiumShortCode,
+                hashtagCodes,
+                hashtagCodes.size()
         );
 
-        // 변환
         List<SeatViewImageResult> results = seatViews.stream()
                 .map(sv -> SeatViewImageResult.builder()
                         .seatViewId(sv.getId())
@@ -65,7 +48,7 @@ public class HashtagSearchService {
                         .build())
                 .collect(Collectors.toList());
 
-        String searchSummary = generateHashtagSearchSummary(request, seatViews);
+        String searchSummary = generateHashtagSearchSummary(stadiumShortCode, hashtagCodes, seatViews);
 
         return HashtagSearchRes.builder()
                 .searchSummary(searchSummary)
@@ -76,40 +59,23 @@ public class HashtagSearchService {
     }
 
     // 게시물 형태 검색 (상세 정보 포함)
-    public List<SeatViewDetailResult> searchSeatViewsByHashtagsDetail(
-            String stadiumShortCode,
-            List<String> hashtagCodes,
-            Boolean isAndCondition
-    ) {
-        HashtagSearchReq request = HashtagSearchReq.from(
-                stadiumShortCode, hashtagCodes, isAndCondition
-        );
-
-        // 요청 검증
-        if (!request.isValidRequest()) {
-            throw new IllegalArgumentException("해시태그는 최소 1개, 최대 2개까지 선택할 수 있습니다.");
+    public List<SeatViewDetailResult> searchSeatViewsByHashtagsDetail(String stadiumShortCode, List<String> hashtagCodes) {
+        if (hashtagCodes == null || hashtagCodes.isEmpty() || hashtagCodes.size() > 5) {
+            throw new IllegalArgumentException("해시태그는 최소 1개, 최대 5개까지 선택할 수 있습니다.");
         }
 
-        // 좌석 시야 데이터 조회 (상세 정보 포함, AND/OR 조건에 따라 분기)
-        List<SeatView> seatViews = request.isAndCondition()
-                ? seatViewRepository.findSeatViewsByHashtagsWithDetailsAnd(
-                request.getStadiumShortCode(),
-                request.getHashtagCodes(),
-                request.getHashtagCodes().size()
-        )
-                : seatViewRepository.findSeatViewsByHashtagsWithDetailsOr(
-                request.getStadiumShortCode(),
-                request.getHashtagCodes()
+        List<SeatView> seatViews = seatViewRepository.findSeatViewsByHashtagsWithDetailsAnd(
+                stadiumShortCode,
+                hashtagCodes,
+                hashtagCodes.size()
         );
 
-        // 감정 태그 데이터 조회
         List<Long> seatViewIds = seatViews.stream()
                 .map(SeatView::getId)
                 .collect(Collectors.toList());
 
         Map<Long, List<SeatViewEmotionTagDto>> emotionTagMap = getEmotionTagMap(seatViewIds);
 
-        // 게시물 형태 결과 변환
         return seatViews.stream()
                 .map(sv -> SeatViewDetailResult.from(sv, emotionTagMap.getOrDefault(sv.getId(), new ArrayList<>())))
                 .collect(Collectors.toList());
@@ -135,31 +101,22 @@ public class HashtagSearchService {
                 ));
     }
 
-    private String generateHashtagSearchSummary(HashtagSearchReq request, List<SeatView> seatViews) {
+    private String generateHashtagSearchSummary(String stadiumShortCode, List<String> hashtagCodes, List<SeatView> seatViews) {
         StringBuilder summary = new StringBuilder();
 
-        // 구장 정보
         if (!seatViews.isEmpty()) {
             summary.append(seatViews.get(0).getStadium().getName()).append(" ");
         }
 
-        // 해시태그 정보
-        List<SeatViewEmotionTag> tags = emotionTagRepository.findByCodeIn(request.getHashtagCodes());
+        List<SeatViewEmotionTag> tags = emotionTagRepository.findByCodeIn(hashtagCodes);
         List<String> tagLabels = tags.stream()
                 .map(SeatViewEmotionTag::getLabel)
                 .collect(Collectors.toList());
 
         summary.append("'").append(String.join(", ", tagLabels)).append("'");
-
-        // AND/OR 조건 표시
-        if (request.getHashtagCodes().size() > 1) {
-            if (request.isAndCondition()) {
-                summary.append(" (모든 태그 포함)");
-            } else {
-                summary.append(" (태그 중 하나 이상 포함)");
-            }
+        if (tagLabels.size() > 1) {
+            summary.append(" (모든 태그 포함)");
         }
-
         summary.append(" 해시태그 검색 결과");
 
         return summary.toString();

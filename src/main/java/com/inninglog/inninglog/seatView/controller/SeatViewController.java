@@ -7,6 +7,7 @@ import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.response.SuccessResponse;
 import com.inninglog.inninglog.seatView.domain.SeatView;
 import com.inninglog.inninglog.seatView.dto.req.SeatCreateReqDto;
+import com.inninglog.inninglog.seatView.dto.res.SeatCreateResDto;
 import com.inninglog.inninglog.seatView.dto.res.SeatViewDetailResult;
 import com.inninglog.inninglog.seatView.service.SeatViewService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,20 +61,12 @@ public class SeatViewController {
             )
     })
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> uploadImage(
-
+    public ResponseEntity<SuccessResponse<?>> uploadImage(
             @Parameter(description = "업로드할 이미지 파일")
             @RequestPart(value = "file", required = false) MultipartFile file
-    ){
-        if(file == null || file.isEmpty()) {
-            return ResponseEntity.badRequest().body("파일이 없습니다.");
-        }
-        try{
-            String media_url = seatViewService.UploadImage(file);
-            return ResponseEntity.ok().body(media_url);
-        }catch (Exception e){
-            return ResponseEntity.internalServerError().body("이미지 업로드 실패 " + e.getMessage());
-        }
+    ) {
+        String url = seatViewService.UploadImage(file);
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.S3_UPLOAD_SUCCESS, url));
     }
 
 
@@ -83,15 +76,33 @@ public class SeatViewController {
             description = "JWT 토큰에서 유저 정보를 추출하고, S3에 이미지 업로드 후 좌석 시야를 생성합니다."
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "좌석 시야 생성 성공",
-                    content = @Content(schema = @Schema(implementation = SeatCreateReqDto.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청(JSON 형식 오류)",
-                    content = @Content),
-            @ApiResponse(responseCode = "404", description = "회원 또는 경기장 정보 없음",
-                    content = @Content)
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "좌석 시야 생성 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = @ExampleObject(
+                                    name = "좌석 시야 생성 성공 응답",
+                                    summary = "정상 생성 시 응답 구조",
+                                    description = "좌석 시야 생성이 완료되면 시야 ID와 연동된 일지 ID가 반환됩니다.",
+                                    value = """
+                {
+                  "code": "SUCCESS",
+                  "message": "요청이 정상적으로 처리되었습니다.",
+                  "data": {
+                    "seatViewId": 12,
+                    "journalId": 7
+                  }
+                }
+                """
+                            )
+                    )
+            )
     })
+    @ErrorApiResponses.Common
     @PostMapping(value = "/contents")
-    public ResponseEntity<?> createSeatView(
+    public ResponseEntity<SuccessResponse<?>> createSeatView(
             @Parameter(hidden = true)
             @AuthenticationPrincipal CustomUserDetails user,
 
@@ -104,11 +115,11 @@ public class SeatViewController {
                   "journalId": 1,
                   "stadiumShortCode": "JAM",
                   "zoneShortCode": "JAM_BLUE",
-                  "section": "13구역",
-                  "seatRow": "3열",
+                  "section": "13",
+                  "seatRow": "3",
                   "emotionTagCodes": [
-                    "VIEW_OPEN",
-                    "SUN_STRONG"
+                    "CHEERING_MOSTLY_STANDING",
+                    "SUN_NONE"
                   ],
                   "media_url": "https://your-s3-bucket-url/image.jpg"
                 }
@@ -119,8 +130,9 @@ public class SeatViewController {
             )
             @RequestBody SeatCreateReqDto request)
     {
-        SeatView seatView = seatViewService.createSeatView(user.getMember().getId(), request);
-        return ResponseEntity.ok(seatView.getId());
+        SeatCreateResDto resDto = seatViewService.createSeatView(user.getMember().getId(), request);
+        return ResponseEntity.ok(
+                SuccessResponse.success(SuccessCode.OK, resDto));
     }
 
     @Operation(
@@ -147,18 +159,18 @@ public class SeatViewController {
                                                 "seatInfo": {
                                                   "zoneName": "블루석",
                                                   "zoneShortCode": "JAM_BLUE",
-                                                  "section": "13구역",
-                                                  "seatRow": "3열",
+                                                  "section": "13",
+                                                  "seatRow": "3",
                                                   "stadiumName": "잠실"
                                                 },
                                                 "emotionTags": [
                                                   {
-                                                    "code": "VIEW_OPEN",
-                                                    "label": "시야_탁_트임"
+                                                    "code": "VIEW_OBSTRUCT_NET",
+                                                    "label": "시야 방해 - 그물"
                                                   },
                                                   {
                                                     "code": "SUN_STRONG",
-                                                    "label": "햇빛이_강함"
+                                                    "label": "햇빛 - 강함"
                                                   }
                                                 ]
                                               }
@@ -166,10 +178,9 @@ public class SeatViewController {
                                             """
                             )
                     )
-            ),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 seatViewId"),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 접근")
+            )
     })
+    @ErrorApiResponses.Common
     @GetMapping("/{seatViewId}")
     public SuccessResponse<SeatViewDetailResult> getSeatView(
             @AuthenticationPrincipal CustomUserDetails user,

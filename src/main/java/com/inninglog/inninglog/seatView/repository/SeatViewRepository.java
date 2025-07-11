@@ -52,19 +52,6 @@ public interface SeatViewRepository extends JpaRepository<SeatView, Long> {
             @Param("hashtagCount") long hashtagCount
     );
 
-    // 해시태그 기반 검색 - 게시물 형태용 (상세 정보 포함) - OR 조건
-    @Query("SELECT DISTINCT sv FROM SeatView sv " +
-            "JOIN FETCH sv.zone z " +
-            "JOIN FETCH sv.stadium s " +
-            "JOIN SeatViewEmotionTagMap setm ON setm.seatView.id = sv.id " +
-            "JOIN setm.seatViewEmotionTag tag " +
-            "WHERE s.shortCode = :stadiumShortCode " +
-            "AND tag.code IN :hashtagCodes")
-    List<SeatView> findSeatViewsByHashtagsWithDetailsOr(
-            @Param("stadiumShortCode") String stadiumShortCode,
-            @Param("hashtagCodes") List<String> hashtagCodes
-    );
-
     // 해시태그 기반 검색 - 게시물 형태용 (상세 정보 포함) - AND 조건
     @Query("SELECT sv FROM SeatView sv " +
             "JOIN FETCH sv.zone z " +
@@ -79,5 +66,7 @@ public interface SeatViewRepository extends JpaRepository<SeatView, Long> {
             @Param("hashtagCodes") List<String> hashtagCodes,
             @Param("hashtagCount") long hashtagCount
     );
+
+
 
 }

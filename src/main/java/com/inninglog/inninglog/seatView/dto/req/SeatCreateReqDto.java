@@ -21,16 +21,16 @@ public class SeatCreateReqDto {
     @Schema(description = "경기장 숏코드 (ex. JAMS, DAE)", example = "JAM")
     private String stadiumShortCode;
 
-    @Schema(description = "존 숏코드 (ex. 1루지정석A, 외야잔디석)", example = "Z1")
+    @Schema(description = "존 숏코드 (ex. JAM_BLUE )", example = "JAM_BLUE")
     private String zoneShortCode;
 
     @Schema(description = "좌석의 구역 정보", example = "101")
-    private String Section;
+    private String section;
 
-    @Schema(description = "좌석의 열(Row) 정보", example = "3열")
+    @Schema(description = "좌석의 열(Row) 정보", example = "3")
     private String seatRow;
 
-    @Schema(description = "감정 태그 코드 리스트", example = "[\"VIEW_OPEN\", \"SUN_STRONG\"]")
+    @Schema(description = "감정 태그 코드 리스트", example = "[    \"CHEERING_MOSTLY_STANDING\", \"SUN_NONE\"]")
     private List<String> emotionTagCodes;
 
     @Schema(description = "S3에 업로드된 좌석 이미지 URL", example = "https://s3.ap-northeast-2.amazonaws.com/inninglog/seat/abc123.jpg")
