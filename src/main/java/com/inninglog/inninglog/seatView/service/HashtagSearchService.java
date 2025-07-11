@@ -3,7 +3,6 @@ package com.inninglog.inninglog.seatView.service;
 import com.inninglog.inninglog.seatView.domain.SeatView;
 import com.inninglog.inninglog.seatView.domain.SeatViewEmotionTag;
 import com.inninglog.inninglog.seatView.domain.SeatViewEmotionTagMap;
-import com.inninglog.inninglog.seatView.dto.req.HashtagSearchReq;
 import com.inninglog.inninglog.seatView.dto.req.SeatViewEmotionTagDto;
 import com.inninglog.inninglog.seatView.dto.res.HashtagSearchRes;
 import com.inninglog.inninglog.seatView.dto.res.SeatViewDetailResult;
@@ -12,6 +11,8 @@ import com.inninglog.inninglog.seatView.repository.SeatViewEmotionTagMapReposito
 import com.inninglog.inninglog.seatView.repository.SeatViewEmotionTagRepository;
 import com.inninglog.inninglog.seatView.repository.SeatViewRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,55 +31,48 @@ public class HashtagSearchService {
     private final SeatViewEmotionTagMapRepository emotionTagMapRepository;
 
     // 모아보기 형태 검색 (사진만)
-    public HashtagSearchRes searchSeatViewsByHashtagsGallery(String stadiumShortCode, List<String> hashtagCodes) {
+    public Page<SeatViewImageResult> searchSeatViewsByHashtagsGallery(String stadiumShortCode, List<String> hashtagCodes, Pageable pageable) {
         if (hashtagCodes == null || hashtagCodes.isEmpty() || hashtagCodes.size() > 5) {
             throw new IllegalArgumentException("해시태그는 최소 1개, 최대 5개까지 선택할 수 있습니다.");
         }
 
-        List<SeatView> seatViews = seatViewRepository.findSeatViewsByHashtagsAnd(
+        Page<SeatView> seatViewPage = seatViewRepository.findSeatViewsByHashtagsAndPaged(
                 stadiumShortCode,
                 hashtagCodes,
-                hashtagCodes.size()
+                hashtagCodes.size(),
+                pageable
         );
 
-        List<SeatViewImageResult> results = seatViews.stream()
-                .map(sv -> SeatViewImageResult.builder()
-                        .seatViewId(sv.getId())
-                        .viewMediaUrl(sv.getView_media_url())
-                        .build())
-                .collect(Collectors.toList());
-
-        String searchSummary = generateHashtagSearchSummary(stadiumShortCode, hashtagCodes, seatViews);
-
-        return HashtagSearchRes.builder()
-                .searchSummary(searchSummary)
-                .seatViews(results)
-                .totalCount(results.size())
-                .isGalleryView(true)
-                .build();
+        return seatViewPage.map(sv -> SeatViewImageResult.builder()
+                .seatViewId(sv.getId())
+                .viewMediaUrl(sv.getView_media_url())
+                .build());
     }
 
     // 게시물 형태 검색 (상세 정보 포함)
-    public List<SeatViewDetailResult> searchSeatViewsByHashtagsDetail(String stadiumShortCode, List<String> hashtagCodes) {
+    public Page<SeatViewDetailResult> searchSeatViewsByHashtagsDetail(String stadiumShortCode, List<String> hashtagCodes, Pageable pageable) {
         if (hashtagCodes == null || hashtagCodes.isEmpty() || hashtagCodes.size() > 5) {
             throw new IllegalArgumentException("해시태그는 최소 1개, 최대 5개까지 선택할 수 있습니다.");
         }
 
-        List<SeatView> seatViews = seatViewRepository.findSeatViewsByHashtagsWithDetailsAnd(
+        Page<SeatView> seatViewPage = seatViewRepository.findSeatViewsByHashtagsWithDetailsAndPaged(
                 stadiumShortCode,
                 hashtagCodes,
-                hashtagCodes.size()
+                hashtagCodes.size(),
+                pageable
         );
 
-        List<Long> seatViewIds = seatViews.stream()
+        List<Long> seatViewIds = seatViewPage.getContent().stream()
                 .map(SeatView::getId)
                 .collect(Collectors.toList());
 
         Map<Long, List<SeatViewEmotionTagDto>> emotionTagMap = getEmotionTagMap(seatViewIds);
 
-        return seatViews.stream()
-                .map(sv -> SeatViewDetailResult.from(sv, emotionTagMap.getOrDefault(sv.getId(), new ArrayList<>())))
-                .collect(Collectors.toList());
+        Page<SeatViewDetailResult> resultPage = seatViewPage.map(sv ->
+                SeatViewDetailResult.from(sv, emotionTagMap.getOrDefault(sv.getId(), new ArrayList<>()))
+        );
+
+        return resultPage;
     }
 
     private Map<Long, List<SeatViewEmotionTagDto>> getEmotionTagMap(List<Long> seatViewIds) {

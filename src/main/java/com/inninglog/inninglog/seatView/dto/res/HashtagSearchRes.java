@@ -21,7 +21,7 @@ public class HashtagSearchRes {
     @Schema(description = "해당 조건을 만족하는 좌석 이미지 리스트")
     private List<SeatViewImageResult> seatViews;
 
-    @Schema(description = "총 검색 결과 수", example = "24")
+    @Schema(description = "총 검색 결과 수", example = "1")
     private int totalCount;
 
     @Schema(description = "모아보기 형태로 조회 중인지 여부", example = "true")
