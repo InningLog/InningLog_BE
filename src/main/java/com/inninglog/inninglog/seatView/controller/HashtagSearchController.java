@@ -15,9 +15,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +37,8 @@ public class HashtagSearchController {
                     선택한 감정 태그를 기준으로 좌석 시야 후기를 검색합니다.  
                     최대 **5개까지 태그 선택**이 가능하며, **선택한 모든 태그를 포함한 좌석만 조회**됩니다.  
                     해당 API는 **모아보기(사진만 제공)** 형태로 결과를 반환합니다.
+                    
+                    ※ 결과는 **최신순으로 정렬**됩니다.
                     """
     )
     @ApiResponses({
@@ -61,23 +63,18 @@ public class HashtagSearchController {
                                                 ],
                                                 "pageable": {
                                                   "pageNumber": 0,
-                                                  "pageSize": 1,
-                                                  "sort": {
-                                                    "empty": false,
-                                                    "sorted": true,
-                                                    "unsorted": false
-                                                  },
+                                                  "pageSize": 10,
                                                   "offset": 0,
                                                   "paged": true,
                                                   "unpaged": false
                                                 },
                                                 "last": false,
                                                 "totalElements": 3,
-                                                "totalPages": 3,
+                                                "totalPages": 1,
                                                 "first": true,
-                                                "size": 1,
+                                                "size": 10,
                                                 "number": 0,
-                                                "numberOfElements": 1,
+                                                "numberOfElements": 3,
                                                 "empty": false
                                               }
                                             }
@@ -93,12 +90,7 @@ public class HashtagSearchController {
                                                 "content": [],
                                                 "pageable": {
                                                   "pageNumber": 0,
-                                                  "pageSize": 1,
-                                                  "sort": {
-                                                    "empty": false,
-                                                    "sorted": true,
-                                                    "unsorted": false
-                                                  },
+                                                  "pageSize": 10,
                                                   "offset": 0,
                                                   "unpaged": false,
                                                   "paged": true
@@ -107,13 +99,8 @@ public class HashtagSearchController {
                                                 "totalElements": 0,
                                                 "totalPages": 0,
                                                 "first": true,
-                                                "size": 1,
+                                                "size": 10,
                                                 "number": 0,
-                                                "sort": {
-                                                  "empty": false,
-                                                  "sorted": true,
-                                                  "unsorted": false
-                                                },
                                                 "numberOfElements": 0,
                                                 "empty": true
                                               }
@@ -142,7 +129,14 @@ public class HashtagSearchController {
     })
     @GetMapping("/gallery")
     public ResponseEntity<SuccessResponse<Page<SeatViewImageResult>>> searchSeatViewsGallery(
-            @Parameter(description = "구장 단축코드", required = true, example = "JAM")
+            @Parameter(
+                    description = "구장 단축코드",
+                    required = true,
+                    example = "JAM",
+                    schema = @Schema(type = "string", allowableValues = {
+                            "JAM", "GOC", "ICN", "SUW", "DJN", "DAE", "BUS", "GWJ", "CHW"
+                    })
+            )
             @RequestParam String stadiumShortCode,
 
             @Parameter(
@@ -153,8 +147,22 @@ public class HashtagSearchController {
             )
             @RequestParam List<String> hashtagCodes,
 
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+            @Parameter(
+                    description = "페이지 번호 (0부터 시작)",
+                    example = "0",
+                    schema = @Schema(type = "integer", minimum = "0")
+            )
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(
+                    description = "페이지 크기 (한 페이지당 항목 수)",
+                    example = "10",
+                    schema = @Schema(type = "integer", minimum = "1", maximum = "100")
+            )
+            @RequestParam(defaultValue = "10") int size
     ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
         Page<SeatViewImageResult> resultPage = hashtagSearchService.searchSeatViewsByHashtagsGallery(
                 stadiumShortCode, hashtagCodes, pageable
         );
@@ -171,6 +179,8 @@ public class HashtagSearchController {
                     선택한 감정 태그를 기준으로 좌석 시야 후기를 **게시물 형태**로 검색합니다.  
                     사진, 좌석 정보, 감정 태그 등 **상세한 정보를 모두 포함**하여 반환합니다.  
                     최대 **5개까지 태그 선택**이 가능하며, **모든 태그를 포함한 좌석만 조회**됩니다.
+                    
+                    ※ 결과는 **최신순으로 정렬**됩니다.
                     """
     )
     @ApiResponses({
@@ -212,21 +222,16 @@ public class HashtagSearchController {
                                                 ],
                                                 "pageable": {
                                                   "pageNumber": 0,
-                                                  "pageSize": 1,
-                                                  "sort": {
-                                                    "empty": false,
-                                                    "sorted": true,
-                                                    "unsorted": false
-                                                  },
+                                                  "pageSize": 10,
                                                   "offset": 0,
                                                   "paged": true,
                                                   "unpaged": false
                                                 },
                                                 "last": false,
-                                                "totalPages": 3,
+                                                "totalPages": 1,
                                                 "totalElements": 3,
                                                 "first": true,
-                                                "size": 1,
+                                                "size": 10,
                                                 "number": 0,
                                                 "numberOfElements": 1,
                                                 "empty": false
@@ -244,12 +249,7 @@ public class HashtagSearchController {
                                                 "content": [],
                                                 "pageable": {
                                                   "pageNumber": 0,
-                                                  "pageSize": 1,
-                                                  "sort": {
-                                                    "empty": false,
-                                                    "sorted": true,
-                                                    "unsorted": false
-                                                  },
+                                                  "pageSize": 10,
                                                   "offset": 0,
                                                   "unpaged": false,
                                                   "paged": true
@@ -258,13 +258,8 @@ public class HashtagSearchController {
                                                 "totalElements": 0,
                                                 "totalPages": 0,
                                                 "first": true,
-                                                "size": 1,
+                                                "size": 10,
                                                 "number": 0,
-                                                "sort": {
-                                                  "empty": false,
-                                                  "sorted": true,
-                                                  "unsorted": false
-                                                },
                                                 "numberOfElements": 0,
                                                 "empty": true
                                               }
@@ -293,7 +288,14 @@ public class HashtagSearchController {
     })
     @GetMapping("/feed")
     public ResponseEntity<SuccessResponse<Page<SeatViewDetailResult>>> searchSeatViewsDetail(
-            @Parameter(description = "구장 단축코드", required = true, example = "JAM")
+            @Parameter(
+                    description = "구장 단축코드",
+                    required = true,
+                    example = "JAM",
+                    schema = @Schema(type = "string", allowableValues = {
+                            "JAM", "GOC", "ICN", "SUW", "DJN", "DAE", "BUS", "GWJ", "CHW"
+                    })
+            )
             @RequestParam String stadiumShortCode,
 
             @Parameter(
@@ -304,8 +306,22 @@ public class HashtagSearchController {
             )
             @RequestParam List<String> hashtagCodes,
 
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+            @Parameter(
+                    description = "페이지 번호 (0부터 시작)",
+                    example = "0",
+                    schema = @Schema(type = "integer", minimum = "0")
+            )
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(
+                    description = "페이지 크기 (한 페이지당 항목 수)",
+                    example = "10",
+                    schema = @Schema(type = "integer", minimum = "1", maximum = "100")
+            )
+            @RequestParam(defaultValue = "10") int size
     ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
         Page<SeatViewDetailResult> response = hashtagSearchService.searchSeatViewsByHashtagsDetail(
                 stadiumShortCode, hashtagCodes, pageable
         );
