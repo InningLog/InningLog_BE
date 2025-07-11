@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,6 +86,7 @@ public class GameScheduleService {
 
                 gameRepository.save(game);
                 savedCount++;
+                log.info("🕒 파싱된 경기 시간 확인: gameId={}, 파싱된 시간={}", gameDto.getGameId(), gameDateTime);
 
                 log.debug("일정 저장 성공: {} vs {} - 날짜시간: {}",
                         awayTeam.getName(), homeTeam.getName(), gameDateTime);
@@ -173,8 +175,8 @@ public class GameScheduleService {
 
                     gameRepository.save(newGame);
                     savedCount++;
-
-                    log.debug("새 경기 결과 저장: {} {}:{} {} - 날짜시간: {}",
+                    log.info("🕒 파싱된 경기 시간 확인: gameId={}, 파싱된 시간={}", gameDto.getGameId(), newGame.getLocalDateTime());
+                    log.info("새 경기 결과 저장: {} {}:{} {} - 날짜시간: {}",
                             awayTeam.getName(),
                             gameDto.getAwayScore(),
                             gameDto.getHomeScore(),
@@ -305,7 +307,9 @@ public class GameScheduleService {
             log.warn("gameId에서 날짜 추출 실패, 현재 날짜 사용: {}", gameDate);
         }
 
-        return parseTime(gameDto.getGameDateTime(), gameDate);
+        LocalDateTime gameDateTime = parseTime(gameDto.getGameDateTime(), gameDate);
+        log.info("[일정용] Parsed LocalDateTime for gameId {}: {}", gameDto.getGameId(), gameDateTime);
+        return gameDateTime;
     }
 
     /**
@@ -356,19 +360,28 @@ public class GameScheduleService {
     /**
      * 시간 파싱: "14:00" + LocalDate → LocalDateTime
      */
+
     private LocalDateTime parseTime(String timeStr, LocalDate date) {
         try {
+            // ISO-8601 포맷 처리: ex) "2025-07-30T18:30:00+09:00"
+            if (timeStr.contains("T") && timeStr.contains("+")) {
+                OffsetDateTime offsetDateTime = OffsetDateTime.parse(timeStr);
+                LocalDateTime result = offsetDateTime.toLocalDateTime();
+                log.info("[결과용] ISO 시간 파싱 성공: {}", result);
+                return result;
+            }
+
             String[] timeParts = timeStr.split(":");
             int hour = Integer.parseInt(timeParts[0]);
             int minute = Integer.parseInt(timeParts[1]);
 
             LocalDateTime result = date.atTime(hour, minute);
-            log.debug("시간 파싱 완료: {} + {} → {}", date, timeStr, result);
+            log.info("[결과용] Parsed LocalDateTime: {}", result);
             return result;
 
         } catch (Exception e) {
             log.warn("시간 파싱 실패: {}, 기본값(14:00) 사용", timeStr);
-            return date.atTime(14, 0); // 기본값: 오후 2시
+            return date.atTime(14, 0);
         }
     }
 }

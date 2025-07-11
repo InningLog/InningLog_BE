@@ -45,18 +45,18 @@ public class GameReportResDto {
     private List<PlayerRankingDto> bottomPitchers;
 
 
-    public static GameReportResDto from(GameReportService.WinningRateResult winningRateResult, double teamWinRate, GameReportService.PlayerRankingResult rankingResult) {
+    public static GameReportResDto from(WinningRateResult winningRateResult, double teamWinRate, PlayerRankingResult rankingResult) {
         return GameReportResDto.builder()
-                .totalVisitedGames(winningRateResult.totalVisitedGames())
-                .winGames(winningRateResult.winGames())
-                .loseGames(winningRateResult.loseGames())
-                .drawGames(winningRateResult.drawGames())
-                .myWeaningRate(winningRateResult.winningRateHalPoongRi())
+                .totalVisitedGames(winningRateResult.getTotalVisitedGames())
+                .winGames(winningRateResult.getWinGames())
+                .loseGames(winningRateResult.getLoseGames())
+                .drawGames(winningRateResult.getDrawGames())
+                .myWeaningRate(winningRateResult.getWinningRateHalPoongRi())
                 .teamWinRate(teamWinRate)
-                .topBatters(rankingResult.topBatters())
-                .topPitchers(rankingResult.topPitchers())
-                .bottomBatters(rankingResult.bottomBatters())
-                .bottomPitchers(rankingResult.bottomPitchers())
+                .topBatters(rankingResult.getTopBatters())
+                .topPitchers(rankingResult.getTopPitchers())
+                .bottomBatters(rankingResult.getBottomBatters())
+                .bottomPitchers(rankingResult.getBottomPitchers())
                 .build();
     }
 }
