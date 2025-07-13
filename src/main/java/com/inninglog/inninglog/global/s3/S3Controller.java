@@ -1,6 +1,8 @@
 package com.inninglog.inninglog.global.s3;
 
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
+import com.inninglog.inninglog.global.response.SuccessCode;
+import com.inninglog.inninglog.global.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +21,26 @@ public class S3Controller {
     private final S3Service s3Service;
 
     @GetMapping("/journal/presigned")
-    public ResponseEntity<String> generatePresignedUrl(
+    public ResponseEntity<SuccessResponse<String>> generateJourPresignedUrl(
             @RequestParam String fileName,
             @RequestParam String contentType,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
 
-       String url =  s3Service.generateUrl(user.getMember().getId(), fileName,contentType);
+       String url =  s3Service.journalGeneratePreUrl(user.getMember().getId(), fileName,contentType);
 
-        return ResponseEntity.ok(url);
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, url));
     }
+
+
+    @GetMapping("/seatView/presigned")
+    public ResponseEntity<SuccessResponse<String>> generateSeatPresignedUrl(
+            @RequestParam String fileName,
+            @RequestParam String contentType,
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
+
+        String url =  s3Service.journalGeneratePreUrl(user.getMember().getId(), fileName,contentType);
+
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, url));}
 }
