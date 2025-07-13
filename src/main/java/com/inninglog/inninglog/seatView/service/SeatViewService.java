@@ -38,25 +38,6 @@ public class SeatViewService {
 
     private final SeatViewEmotionTagRepository seatViewEmotionTagRepository;
     private final SeatViewEmotionTagMapRepository seatViewEmotionTagMapRepository;
-    private final S3Uploader s3Uploader;
-
-    //좌석 시야 사진 업로드
-    @Transactional
-    public String UploadImage(MultipartFile file) {
-
-        String media_url = null;
-        if (file != null && !file.isEmpty()) {
-            try {
-                media_url = s3Uploader.uploadFile(file, "seatView");
-            } catch (IOException e) {
-                throw new RuntimeException("S3 업로드 실패", e);
-            }
-        }
-
-        //S3에 업로드한 url 반환
-        return media_url;
-    }
-
 
 
     //좌석 시야 정보 작성

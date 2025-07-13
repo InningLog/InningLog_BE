@@ -38,25 +38,6 @@ public class S3Uploader {
 
     private final Region region = Region.AP_NORTHEAST_2;
 
-    public String uploadFile(MultipartFile file, String dirName) throws IOException {
-        String fileName = dirName + "/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
-
-        S3Client s3Client = S3Client.builder()
-                .region(region)
-                .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(accessKey, secretKey)))
-                .build();
-
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(bucket)
-                .key(fileName)
-                .contentType(file.getContentType())
-                .build();
-
-        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
-
-        return "https://" + bucket + ".s3." + region + ".amazonaws.com/" + fileName;
-    }
 
     public String generatePresignedUrl(String key, String contentType) {
         AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(accessKey, secretKey);

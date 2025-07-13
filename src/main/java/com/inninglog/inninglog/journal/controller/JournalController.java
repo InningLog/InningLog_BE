@@ -48,44 +48,6 @@ public class JournalController {
 
     private final JournalService journalService;
 
-    //직관 일지 이미지 업로드
-    @Operation(
-            summary = "직관 일지 작성 페이지 - 직관 일지 이미지 업로드(presignedURL 반영하여 수정할듯 후순위로 매핑바람)",
-            description = """
-                JWT 토큰에서 유저 정보를 추출하고, S3에 이미지를 업로드합니다.  
-                이후 반환된 URL을 JSON 생성 API에 사용합니다.
-                """
-    )
-    @ErrorApiResponses.Common
-    @ErrorApiResponses.S3Failed
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "파일 업로드 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = SuccessResponse.class),
-                            examples = @ExampleObject(
-                                    value = """
-                {
-                  "code": "S3_UPLOAD_SUCCESS",
-                  "message": "이미지 업로드가 성공적으로 완료되었습니다.",
-                  "data": {
-                    "url": "https://s3.amazonaws.com/bucket/images/journal_123.jpg"
-                  }
-                }
-                """
-                            )
-                    )
-            )
-    })    @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<SuccessResponse<String>> uploadImage(
-            @Parameter(description = "업로드할 이미지 파일", required = true)
-            @RequestPart("file") MultipartFile file
-    ) {
-        String url = journalService.uploadImage(file);
-        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.S3_UPLOAD_SUCCESS, url));
-    }
-
-
     //직관 일지 콘텐츠 업로드
     @Operation(
             summary = "직관 일지 작성 페이지 - 직관 일지 콘텐츠 업로드(presignedURL 반영하여 수정할듯 후순위로 매핑바람)",

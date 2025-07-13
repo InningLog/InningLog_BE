@@ -43,23 +43,6 @@ public class JournalService {
     private final StadiumRepository stadiumRepository;
     private final TeamRepository teamRepository;
     private final GameRepository gameRepository;
-    private final S3Uploader s3Uploader;
-
-
-    //S3 업로드
-    @Transactional
-    public String uploadImage(MultipartFile file) {
-        if (file == null || file.isEmpty()) {
-            throw new CustomException(ErrorCode.FILE_IS_EMPTY);
-        }
-
-        try {
-            return s3Uploader.uploadFile(file, "journal");
-        } catch (IOException e) {
-            throw new CustomException(ErrorCode.S3_UPLOAD_FAILED);
-        }
-    }
-
 
     //직관 일지 내용 업로드
     @Transactional

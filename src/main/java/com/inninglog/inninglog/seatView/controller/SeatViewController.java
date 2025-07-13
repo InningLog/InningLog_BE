@@ -34,42 +34,6 @@ public class SeatViewController {
     private final SeatViewService seatViewService;
 
 
-    //좌석 시야 이미지 업로드
-    @Operation(
-            summary = "좌석 시야 이미지 업로드",
-            description = "JWT 토큰에서 유저 정보를 추출하고, S3에 이미지를 업로드합니다. 이후 URL을 반환하며, 이후 JSON 생성 API에서 이 URL을 사용합니다."
-    )
-    @ErrorApiResponses.Common
-    @ErrorApiResponses.S3Failed
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "파일 업로드 성공",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = SuccessResponse.class),
-                            examples = @ExampleObject(
-                                    value = """
-                {
-                  "code": "S3_UPLOAD_SUCCESS",
-                  "message": "이미지 업로드가 성공적으로 완료되었습니다.",
-                  "data": {
-                    "url": "https://s3.amazonaws.com/bucket/images/journal_123.jpg"
-                  }
-                }
-                """
-                            )
-                    )
-            )
-    })
-    @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<SuccessResponse<?>> uploadImage(
-            @Parameter(description = "업로드할 이미지 파일")
-            @RequestPart(value = "file", required = false) MultipartFile file
-    ) {
-        String url = seatViewService.UploadImage(file);
-        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.S3_UPLOAD_SUCCESS, url));
-    }
-
-
     //좌석 시야 생성
     @Operation(
             summary = "좌석 시야 생성",
