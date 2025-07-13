@@ -3,6 +3,7 @@ package com.inninglog.inninglog.seatView.controller;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.response.SuccessResponse;
 import com.inninglog.inninglog.seatView.dto.res.SeatSearchRes;
+import com.inninglog.inninglog.seatView.dto.res.SeatViewDetailResult;
 import com.inninglog.inninglog.seatView.service.SeatSearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,6 +14,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,8 +31,12 @@ public class SeatSearchController {
 
     @Operation(
             summary = "일반 좌석 검색 (게시물 형태)",
-            description = "구장, 존, 구역, 열 정보를 통해 좌석 시야 후기를 검색합니다. " +
-                    "모든 조건은 선택사항이지만, 열 정보만으로는 검색할 수 없습니다 (최소 존 정보 필요)."
+            description = """
+                    구장, 존, 구역, 열 정보를 통해 좌석 시야 후기를 검색합니다.  
+                    모든 조건은 선택사항이지만, 열 정보만으로는 검색할 수 없습니다 (최소 존 정보 필요).
+                    
+                    ※ 결과는 **최신순으로 정렬**됩니다.
+                    """
     )
     @ApiResponses({
             @ApiResponse(
@@ -42,54 +51,80 @@ public class SeatSearchController {
                                             summary = "시야 사진 조회 성공",
                                             description = "검색 조건에 맞는 시야 사진이 존재하는 경우",
                                             value = """
-                        {
-                          "code": "SEATVIEW_LIST_FETCHED",
-                          "message": "시야 사진 조회 성공",
-                          "data": {
-                            "searchSummary": "잠실 블루석 검색 결과",
-                            "seatViews": [
-                              {
-                                "seatViewId": 1,
-                                "viewMediaUrl": "https://your-s3-bucket-url/image.jpg",
-                                "seatInfo": {
-                                  "zoneName": "블루석",
-                                  "zoneShortCode": "JAM_BLUE",
-                                  "section": "13구역",
-                                  "seatRow": "3열",
-                                  "stadiumName": "잠실"
-                                },
-                                "emotionTags": [
-                                  {
-                                    "code": "VIEW_OPEN",
-                                    "label": "시야_탁_트였어요"
-                                  },
-                                  {
-                                    "code": "SUN_STRONG",
-                                    "label": "햇빛이_강해서_모자는_필수"
-                                  }
-                                ]
-                              }
-                            ],
-                            "totalCount": 1
-                          }
-                        }
-                        """
+                                                                                {
+                                                                                  "code": "SEATVIEW_LIST_FETCHED",
+                                                                                  "message": "시야 사진 조회 성공",
+                                                                                  "data": {
+                                                                                    "content": [
+                                                                                      {
+                                                                                        "seatViewId": 3,
+                                                                                        "viewMediaUrl": "https://your-s3-bucket-url/image.jpg",
+                                                                                        "seatInfo": {
+                                                                                          "zoneName": "블루석",
+                                                                                          "zoneShortCode": "JAM_BLUE",
+                                                                                          "section": "13",
+                                                                                          "seatRow": "3",
+                                                                                          "stadiumName": "잠실"
+                                                                                        },
+                                                                                        "emotionTags": [
+                                                                                          {
+                                                                                            "code": "CHEERING_MOSTLY_STANDING",
+                                                                                            "label": "응원 - 일어날 사람은 일어남"
+                                                                                          },
+                                                                                          {
+                                                                                            "code": "SUN_NONE",
+                                                                                            "label": "햇빛 - 없음"
+                                                                                          }
+                                                                                        ]
+                                                                                      }
+                                                                                    ],
+                                                                                    "pageable": {
+                                                                                      "pageNumber": 0,
+                                                                                      "pageSize": 10,
+                                                                                      "offset": 0,
+                                                                                      "paged": true,
+                                                                                      "unpaged": false
+                                                                                    },
+                                                                                    "last": false,
+                                                                                    "totalElements": 3,
+                                                                                    "totalPages": 1,
+                                                                                    "first": true,
+                                                                                    "size": 10,
+                                                                                    "number": 0,
+                                                                                    "numberOfElements": 3,
+                                                                                    "empty": false
+                                                                                  }
+                                                                                }
+                                                    """
                                     ),
                                     @ExampleObject(
                                             name = "검색 결과 없음",
                                             summary = "해당 조건에 해당하는 시야 사진이 없음",
                                             description = "검색 조건에 맞는 시야 사진이 존재하지 않는 경우",
                                             value = """
-                        {
-                          "code": "SEAT_VIEW_EMPTY",
-                          "message": "해당 조건에 해당하는 시야 사진이 없습니다.",
-                          "data": {
-                            "searchSummary": "잠실 블루석 15구역 검색 결과",
-                            "seatViews": [],
-                            "totalCount": 0
-                          }
-                        }
-                        """
+                                                    {
+                                                      "code": "SEAT_VIEW_EMPTY",
+                                                      "message": "해당 조건에 해당하는 시야 사진이 없습니다.",
+                                                      "data": {
+                                                        "content": [],
+                                                        "pageable": {
+                                                          "pageNumber": 0,
+                                                          "pageSize": 10,
+                                                          "offset": 0,
+                                                          "unpaged": false,
+                                                          "paged": true
+                                                        },
+                                                        "last": true,
+                                                        "totalElements": 0,
+                                                        "totalPages": 0,
+                                                        "first": true,
+                                                        "size": 10,
+                                                        "number": 0,
+                                                        "numberOfElements": 0,
+                                                        "empty": true
+                                                      }
+                                                    }
+                                                    """
                                     )
                             }
                     )
@@ -102,11 +137,11 @@ public class SeatSearchController {
                             examples = @ExampleObject(
                                     name = "에러 응답 예시",
                                     value = """
-                    {
-                      "code": "BAD_REQUEST",
-                      "message": "열 정보만으로는 검색할 수 없습니다. 최소 존 정보가 필요합니다."
-                    }
-                    """
+                                            {
+                                              "code": "BAD_REQUEST",
+                                              "message": "열 정보만으로는 검색할 수 없습니다. 최소 존 정보가 필요합니다."
+                                            }
+                                            """
                             )
                     )
             ),
@@ -116,7 +151,7 @@ public class SeatSearchController {
             )
     })
     @GetMapping("/feed")
-    public ResponseEntity<SuccessResponse<SeatSearchRes>> searchSeats(
+    public ResponseEntity<SuccessResponse<Page<SeatViewDetailResult>>> searchSeats(
             @Parameter(
                     description = "구장 단축코드",
                     required = true,
@@ -146,13 +181,30 @@ public class SeatSearchController {
                     required = false,
                     example = "3"
             )
-            @RequestParam(required = false) String seatRow
+            @RequestParam(required = false) String seatRow,
+
+            @Parameter(
+                    description = "페이지 번호 (0부터 시작)",
+                    example = "0",
+                    schema = @Schema(type = "integer", minimum = "0")
+            )
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(
+                    description = "페이지 크기 (한 페이지당 항목 수)",
+                    example = "10",
+                    schema = @Schema(type = "integer", minimum = "1", maximum = "100")
+            )
+            @RequestParam(defaultValue = "10") int size
+
     ) {
-        SeatSearchRes response = seatSearchService.searchSeats(
-                stadiumShortCode, zoneShortCode, section, seatRow
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<SeatViewDetailResult> response = seatSearchService.searchSeats(
+                stadiumShortCode, zoneShortCode, section, seatRow, pageable
         );
 
-        SuccessCode code = (response.getTotalCount() == 0) ? SuccessCode.SEATVIEW_EMPTY
+        SuccessCode code = (response.isEmpty()) ? SuccessCode.SEATVIEW_EMPTY
                 : SuccessCode.SEATVIEW_LIST_FETCHED;
 
         return ResponseEntity.ok(SuccessResponse.success(code, response));

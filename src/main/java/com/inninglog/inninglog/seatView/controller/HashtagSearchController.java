@@ -2,9 +2,8 @@ package com.inninglog.inninglog.seatView.controller;
 
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.response.SuccessResponse;
-import com.inninglog.inninglog.seatView.dto.req.HashtagSearchReq;
-import com.inninglog.inninglog.seatView.dto.res.HashtagSearchRes;
 import com.inninglog.inninglog.seatView.dto.res.SeatViewDetailResult;
+import com.inninglog.inninglog.seatView.dto.res.SeatViewImageResult;
 import com.inninglog.inninglog.seatView.service.HashtagSearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,6 +14,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,19 +34,12 @@ public class HashtagSearchController {
     @Operation(
             summary = "해시태그 기반 좌석 검색 (모아보기)",
             description = """
-        선택한 감정 태그를 기준으로 좌석 시야 후기를 검색합니다.  
-        최대 **2개까지 태그 선택**이 가능하며, **AND / OR 조건** 중 선택하여 검색할 수 있습니다.  
-        해당 API는 **모아보기(사진만 제공)** 형태로 결과를 반환합니다.
-        
-        ---
-        ✅ **사용 가능한 태그 코드**
-        - `VIEW_OPEN`     : **#시야_탁_트였어요**
-        - `SUN_STRONG`    : **#햇빛이_강해서_모자는_필수**
-        - `CHEERING_BEST`  : **#응원_분위기_최고**
-        - `CHEER_STAGE_NEAR`: **#응원단상이_가까워요**
-        - `GOOD_VALUE`    : **#가성비_좌석인듯**
-        - `ROOF_SHELTER`   : **#지붕_있어서_비와도_안심**
-        """
+                    선택한 감정 태그를 기준으로 좌석 시야 후기를 검색합니다.  
+                    최대 **5개까지 태그 선택**이 가능하며, **선택한 모든 태그를 포함한 좌석만 조회**됩니다.  
+                    해당 API는 **모아보기(사진만 제공)** 형태로 결과를 반환합니다.
+                    
+                    ※ 결과는 **최신순으로 정렬**됩니다.
+                    """
     )
     @ApiResponses({
             @ApiResponse(
@@ -51,72 +47,65 @@ public class HashtagSearchController {
                     description = "해시태그 검색 완료",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = HashtagSearchRes.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "OR 조건 검색 결과",
-                                            summary = "해시태그 OR 검색 성공",
-                                            description = "선택한 태그 중 하나라도 포함된 결과",
+                                            name = "성공 응답 예시",
                                             value = """
-                        {
-                          "code": "SEATVIEW_LIST_FETCHED",
-                          "message": "시야 사진 조회 성공",
-                          "data": {
-                            "searchSummary": "잠실 '시야_탁_트임, 햇빛이_강함' (태그 중 하나 이상 포함) 해시태그 검색 결과",
-                            "seatViews": [
-                              {
-                                "seatViewId": 1,
-                                "viewMediaUrl": "https://your-s3-bucket-url/image1.jpg"
-                              },
-                              {
-                                "seatViewId": 3,
-                                "viewMediaUrl": "https://your-s3-bucket-url/image2.jpg"
-                              }
-                            ],
-                            "totalCount": 2,
-                            "isGalleryView": true
-                          }
-                        }
-                        """
-                                    ),
-                                    @ExampleObject(
-                                            name = "AND 조건 검색 결과",
-                                            summary = "해시태그 AND 검색 성공",
-                                            description = "선택한 모든 태그를 포함한 결과",
-                                            value = """
-                        {
-                          "code": "SEATVIEW_LIST_FETCHED",
-                          "message": "시야 사진 조회 성공",
-                          "data": {
-                            "searchSummary": "잠실 '시야_탁_트임, 햇빛이_강함' (모든 태그 포함) 해시태그 검색 결과",
-                            "seatViews": [
-                              {
-                                "seatViewId": 1,
-                                "viewMediaUrl": "https://your-s3-bucket-url/image1.jpg"
-                              }
-                            ],
-                            "totalCount": 1,
-                            "isGalleryView": true
-                          }
-                        }
-                        """
+                                            {
+                                              "code": "SEATVIEW_LIST_FETCHED",
+                                              "message": "시야 사진 조회 성공",
+                                              "data": {
+                                                "content": [
+                                                  {
+                                                    "seatViewId": 3,
+                                                    "viewMediaUrl": "https://your-s3-bucket-url/image.jpg"
+                                                  }
+                                                ],
+                                                "pageable": {
+                                                  "pageNumber": 0,
+                                                  "pageSize": 10,
+                                                  "offset": 0,
+                                                  "paged": true,
+                                                  "unpaged": false
+                                                },
+                                                "last": false,
+                                                "totalElements": 3,
+                                                "totalPages": 1,
+                                                "first": true,
+                                                "size": 10,
+                                                "number": 0,
+                                                "numberOfElements": 3,
+                                                "empty": false
+                                              }
+                                            }
+                                            """
                                     ),
                                     @ExampleObject(
                                             name = "검색 결과 없음",
-                                            summary = "해당 해시태그에 해당하는 시야 사진이 없음",
-                                            description = "검색 조건에 맞는 시야 사진이 존재하지 않는 경우",
                                             value = """
-                        {
-                          "code": "SEAT_VIEW_EMPTY",
-                          "message": "해당 조건에 해당하는 시야 사진이 없습니다.",
-                          "data": {
-                            "searchSummary": "잠실 '가성비_최고' 해시태그 검색 결과",
-                            "seatViews": [],
-                            "totalCount": 0,
-                            "isGalleryView": true
-                          }
-                        }
-                        """
+                                            {
+                                              "code": "SEAT_VIEW_EMPTY",
+                                              "message": "해당 조건에 해당하는 시야 사진이 없습니다.",
+                                              "data": {
+                                                "content": [],
+                                                "pageable": {
+                                                  "pageNumber": 0,
+                                                  "pageSize": 10,
+                                                  "offset": 0,
+                                                  "unpaged": false,
+                                                  "paged": true
+                                                },
+                                                "last": true,
+                                                "totalElements": 0,
+                                                "totalPages": 0,
+                                                "first": true,
+                                                "size": 10,
+                                                "number": 0,
+                                                "numberOfElements": 0,
+                                                "empty": true
+                                              }
+                                            }
+                                            """
                                     )
                             }
                     )
@@ -129,77 +118,70 @@ public class HashtagSearchController {
                             examples = @ExampleObject(
                                     name = "에러 응답 예시",
                                     value = """
-                    {
-                      "code": "BAD_REQUEST",
-                      "message": "해시태그는 최소 1개, 최대 2개까지 선택할 수 있습니다."
-                    }
-                    """
+                                            {
+                                              "code": "BAD_REQUEST",
+                                              "message": "해시태그는 최소 1개, 최대 5개까지 선택할 수 있습니다."
+                                            }
+                                            """
                             )
                     )
             )
     })
     @GetMapping("/gallery")
-    public ResponseEntity<SuccessResponse<HashtagSearchRes>> searchSeatViewsGallery(
+    public ResponseEntity<SuccessResponse<Page<SeatViewImageResult>>> searchSeatViewsGallery(
             @Parameter(
                     description = "구장 단축코드",
                     required = true,
-                    example = "JAM"
+                    example = "JAM",
+                    schema = @Schema(type = "string", allowableValues = {
+                            "JAM", "GOC", "ICN", "SUW", "DJN", "DAE", "BUS", "GWJ", "CHW"
+                    })
             )
             @RequestParam String stadiumShortCode,
 
             @Parameter(
-                    description = """
-            해시태그 코드 목록 (최대 2개 선택 가능)
-            """,
+                    description = "해시태그 코드 목록 (최대 5개 선택 가능)",
                     required = true,
-                    example = "VIEW_OPEN,SUN_STRONG",
-                    schema = @Schema(
-                            type = "array",
-                            allowableValues = {
-                                    "VIEW_OPEN", "SUN_STRONG", "CHEERING_BEST",
-                                    "CHEER_STAGE_NEAR", "GOOD_VALUE", "ROOF_SHELTER"
-                            },
-                            description = "해시태그 코드 배열 (최대 2개)"
-                    )
+                    example = "VIEW_OPEN,SUN_STRONG,CHEERING_BEST",
+                    schema = @Schema(type = "array")
             )
             @RequestParam List<String> hashtagCodes,
 
             @Parameter(
-                    description = "AND 조건 여부 (true: 모든 태그 포함, false: 태그 중 하나 이상 포함)",
-                    required = false,
-                    example = "false"
+                    description = "페이지 번호 (0부터 시작)",
+                    example = "0",
+                    schema = @Schema(type = "integer", minimum = "0")
             )
-            @RequestParam(required = false, defaultValue = "false") Boolean isAndCondition
-    ) {
+            @RequestParam(defaultValue = "0") int page,
 
-        HashtagSearchRes response = hashtagSearchService.searchSeatViewsByHashtagsGallery(
-                stadiumShortCode, hashtagCodes, isAndCondition
+            @Parameter(
+                    description = "페이지 크기 (한 페이지당 항목 수)",
+                    example = "10",
+                    schema = @Schema(type = "integer", minimum = "1", maximum = "100")
+            )
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<SeatViewImageResult> resultPage = hashtagSearchService.searchSeatViewsByHashtagsGallery(
+                stadiumShortCode, hashtagCodes, pageable
         );
 
-        SuccessCode code = (response.getTotalCount() == 0) ? SuccessCode.SEATVIEW_EMPTY
+        SuccessCode code = (resultPage.isEmpty()) ? SuccessCode.SEATVIEW_EMPTY
                 : SuccessCode.SEATVIEW_LIST_FETCHED;
 
-        return ResponseEntity.ok(SuccessResponse.success(code, response));
+        return ResponseEntity.ok(SuccessResponse.success(code, resultPage));
     }
-
-
-
 
     @Operation(
             summary = "해시태그 기반 좌석 검색 (게시물 형태)",
             description = """
-        선택한 감정 태그를 기준으로 좌석 시야 후기를 **게시물 형태**로 검색합니다.  
-        사진, 좌석 정보, 감정 태그 등 **상세한 정보를 모두 포함**하여 반환합니다.
-        
-        ---
-        ✅ **사용 가능한 태그 코드**
-        - `VIEW_OPEN`     : **#시야_탁_트였어요**
-        - `SUN_STRONG`    : **#햇빛이_강해서_모자는_필수**
-        - `CHEERING_BEST`  : **#응원_분위기_최고**
-        - `CHEER_STAGE_NEAR`: **#응원단상이_가까워요**
-        - `GOOD_VALUE`    : **#가성비_좌석인듯**
-        - `ROOF_SHELTER`   : **#지붕_있어서_비와도_안심**
-        """
+                    선택한 감정 태그를 기준으로 좌석 시야 후기를 **게시물 형태**로 검색합니다.  
+                    사진, 좌석 정보, 감정 태그 등 **상세한 정보를 모두 포함**하여 반환합니다.  
+                    최대 **5개까지 태그 선택**이 가능하며, **모든 태그를 포함한 좌석만 조회**됩니다.
+                    
+                    ※ 결과는 **최신순으로 정렬**됩니다.
+                    """
     )
     @ApiResponses({
             @ApiResponse(
@@ -207,74 +189,82 @@ public class HashtagSearchController {
                     description = "해시태그 상세 검색 완료",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = SeatViewDetailResult.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "상세 검색 결과 있음",
-                                            summary = "해시태그 상세 검색 성공",
-                                            description = "검색 조건에 맞는 상세 정보를 포함한 좌석 시야 결과",
+                                            name = "페이징된 시야 사진 검색 결과",
                                             value = """
-                        {
-                          "code": "SEATVIEW_LIST_FETCHED",
-                          "message": "시야 사진 조회 성공",
-                          "data": [
-                            {
-                              "seatViewId": 1,
-                              "viewMediaUrl": "https://your-s3-bucket-url/image1.jpg",
-                              "seatInfo": {
-                                "zoneName": "블루석",
-                                "zoneShortCode": "JAM_BLUE",
-                                "section": "13구역",
-                                "seatRow": "3열",
-                                "stadiumName": "잠실"
-                              },
-                              "emotionTags": [
-                                {
-                                  "code": "VIEW_OPEN",
-                                  "label": "시야_탁_트임"
-                                },
-                                {
-                                  "code": "CHEERING_BEST",
-                                  "label": "응원_분위기_최고"
-                                }
-                              ]
-                            },
-                            {
-                              "seatViewId": 3,
-                              "viewMediaUrl": "https://your-s3-bucket-url/image2.jpg",
-                              "seatInfo": {
-                                "zoneName": "오렌지석",
-                                "zoneShortCode": "JAM_ORANGE",
-                                "section": "7구역",
-                                "seatRow": "5열",
-                                "stadiumName": "잠실"
-                              },
-                              "emotionTags": [
-                                {
-                                  "code": "VIEW_OPEN",
-                                  "label": "시야_탁_트임"
-                                },
-                                {
-                                  "code": "GOOD_VALUE",
-                                  "label": "가성비_최고"
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                        """
+                                            {
+                                              "code": "SEATVIEW_LIST_FETCHED",
+                                              "message": "시야 사진 조회 성공",
+                                              "data": {
+                                                "content": [
+                                                  {
+                                                    "seatViewId": 3,
+                                                    "viewMediaUrl": "https://your-s3-bucket-url/image.jpg",
+                                                    "seatInfo": {
+                                                      "zoneName": "블루석",
+                                                      "zoneShortCode": "JAM_BLUE",
+                                                      "section": "13",
+                                                      "seatRow": "3",
+                                                      "stadiumName": "잠실"
+                                                    },
+                                                    "emotionTags": [
+                                                      {
+                                                        "code": "CHEERING_MOSTLY_STANDING",
+                                                        "label": "응원 - 일어날 사람은 일어남"
+                                                      },
+                                                      {
+                                                        "code": "SUN_NONE",
+                                                        "label": "햇빛 - 없음"
+                                                      }
+                                                    ]
+                                                  }
+                                                ],
+                                                "pageable": {
+                                                  "pageNumber": 0,
+                                                  "pageSize": 10,
+                                                  "offset": 0,
+                                                  "paged": true,
+                                                  "unpaged": false
+                                                },
+                                                "last": false,
+                                                "totalPages": 1,
+                                                "totalElements": 3,
+                                                "first": true,
+                                                "size": 10,
+                                                "number": 0,
+                                                "numberOfElements": 1,
+                                                "empty": false
+                                              }
+                                            }
+                                            """
                                     ),
                                     @ExampleObject(
-                                            name = "상세 검색 결과 없음",
-                                            summary = "해당 해시태그에 해당하는 상세 정보가 없음",
-                                            description = "검색 조건에 맞는 좌석 시야가 존재하지 않는 경우",
+                                            name = "검색 결과 없음",
                                             value = """
-                        {
-                          "code": "SEAT_VIEW_EMPTY",
-                          "message": "해당 조건에 해당하는 시야 사진이 없습니다.",
-                          "data": []
-                        }
-                        """
+                                            {
+                                              "code": "SEAT_VIEW_EMPTY",
+                                              "message": "해당 조건에 해당하는 시야 사진이 없습니다.",
+                                              "data": {
+                                                "content": [],
+                                                "pageable": {
+                                                  "pageNumber": 0,
+                                                  "pageSize": 10,
+                                                  "offset": 0,
+                                                  "unpaged": false,
+                                                  "paged": true
+                                                },
+                                                "last": true,
+                                                "totalElements": 0,
+                                                "totalPages": 0,
+                                                "first": true,
+                                                "size": 10,
+                                                "number": 0,
+                                                "numberOfElements": 0,
+                                                "empty": true
+                                              }
+                                            }
+                                            """
                                     )
                             }
                     )
@@ -287,50 +277,53 @@ public class HashtagSearchController {
                             examples = @ExampleObject(
                                     name = "에러 응답 예시",
                                     value = """
-                    {
-                      "code": "BAD_REQUEST",
-                      "message": "해시태그는 최소 1개, 최대 2개까지 선택할 수 있습니다."
-                    }
-                    """
+                                            {
+                                              "code": "BAD_REQUEST",
+                                              "message": "해시태그는 최소 1개, 최대 5개까지 선택할 수 있습니다."
+                                            }
+                                            """
                             )
                     )
             )
     })
     @GetMapping("/feed")
-    public ResponseEntity<SuccessResponse<List<SeatViewDetailResult>>> searchSeatViewsDetail(
+    public ResponseEntity<SuccessResponse<Page<SeatViewDetailResult>>> searchSeatViewsDetail(
             @Parameter(
                     description = "구장 단축코드",
                     required = true,
-                    example = "JAM"
+                    example = "JAM",
+                    schema = @Schema(type = "string", allowableValues = {
+                            "JAM", "GOC", "ICN", "SUW", "DJN", "DAE", "BUS", "GWJ", "CHW"
+                    })
             )
             @RequestParam String stadiumShortCode,
 
             @Parameter(
-                    description = """
-            해시태그 코드 목록 (최대 2개 선택 가능)
-            """,
+                    description = "해시태그 코드 목록 (최대 5개 선택 가능)",
                     required = true,
-                    example = "VIEW_OPEN,SUN_STRONG",
-                    schema = @Schema(
-                            type = "array",
-                            allowableValues = {
-                                    "VIEW_OPEN", "SUN_STRONG", "CHEERING_BEST",
-                                    "CHEER_STAGE_NEAR", "GOOD_VALUE", "ROOF_SHELTER"
-                            },
-                            description = "해시태그 코드 배열 (최대 2개)"
-                    )
+                    example = "VIEW_OPEN,SUN_STRONG,CHEERING_BEST",
+                    schema = @Schema(type = "array")
             )
             @RequestParam List<String> hashtagCodes,
 
             @Parameter(
-                    description = "AND 조건 여부 (true: 모든 태그 포함, false: 태그 중 하나 이상 포함)",
-                    required = false,
-                    example = "false"
+                    description = "페이지 번호 (0부터 시작)",
+                    example = "0",
+                    schema = @Schema(type = "integer", minimum = "0")
             )
-            @RequestParam(required = false, defaultValue = "false") Boolean isAndCondition
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(
+                    description = "페이지 크기 (한 페이지당 항목 수)",
+                    example = "10",
+                    schema = @Schema(type = "integer", minimum = "1", maximum = "100")
+            )
+            @RequestParam(defaultValue = "10") int size
     ) {
-        List<SeatViewDetailResult> response = hashtagSearchService.searchSeatViewsByHashtagsDetail(
-                stadiumShortCode, hashtagCodes, isAndCondition
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<SeatViewDetailResult> response = hashtagSearchService.searchSeatViewsByHashtagsDetail(
+                stadiumShortCode, hashtagCodes, pageable
         );
 
         SuccessCode code = (response.isEmpty()) ? SuccessCode.SEATVIEW_EMPTY

@@ -10,6 +10,8 @@ import com.inninglog.inninglog.seatView.dto.res.SeatViewDetailResult;
 import com.inninglog.inninglog.seatView.repository.SeatViewEmotionTagMapRepository;
 import com.inninglog.inninglog.seatView.repository.SeatViewRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,47 +28,38 @@ public class SeatSearchService {
     private final SeatViewRepository seatViewRepository;
     private final SeatViewEmotionTagMapRepository emotionTagMapRepository;
 
-    public SeatSearchRes searchSeats(
+    public Page<SeatViewDetailResult> searchSeats(
             String stadiumShortCode,
             String zoneShortCode,
             String section,
-            String seatRow
+            String seatRow,
+            Pageable pageable
     ) {
         SeatSearchReq request = SeatSearchReq.from(stadiumShortCode, zoneShortCode, section, seatRow);
 
-        // 요청 검증
         if (!request.isValidRequest()) {
             throw new IllegalArgumentException("열 정보만으로는 검색할 수 없습니다. 최소 존 정보가 필요합니다.");
         }
 
-        // 좌석 시야 데이터 조회
-        List<SeatView> seatViews = seatViewRepository.findSeatViewsBySearchCriteria(
+        Page<SeatView> seatViews = seatViewRepository.findSeatViewsBySearchCriteriaPageable(
                 request.getStadiumShortCode(),
                 request.getZoneShortCode(),
                 request.getSection(),
-                request.getSeatRow()
+                request.getSeatRow(),
+                pageable
         );
 
-        // 감정 태그 조회
         List<Long> seatViewIds = seatViews.stream()
                 .map(SeatView::getId)
                 .toList();
 
         Map<Long, List<SeatViewEmotionTagDto>> emotionTagMap = getEmotionTagMap(seatViewIds);
 
-        // 결과 변환
-        List<SeatViewDetailResult> results = seatViews.stream()
-                .map(sv -> SeatViewDetailResult.from(sv, emotionTagMap.getOrDefault(sv.getId(), new ArrayList<>())))
-                .toList();
-
-        String searchSummary = generateSearchSummary(request, seatViews);
-
-        return SeatSearchRes.builder()
-                .searchSummary(searchSummary)
-                .seatViews(results)
-                .totalCount(results.size())
-                .build();
+        return seatViews.map(sv ->
+                SeatViewDetailResult.from(sv, emotionTagMap.getOrDefault(sv.getId(), List.of()))
+        );
     }
+
 
     private Map<Long, List<SeatViewEmotionTagDto>> getEmotionTagMap(List<Long> seatViewIds) {
         if (seatViewIds.isEmpty()) {

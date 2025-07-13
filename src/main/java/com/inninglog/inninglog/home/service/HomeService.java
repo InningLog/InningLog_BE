@@ -5,6 +5,7 @@ import com.inninglog.inninglog.global.exception.ErrorCode;
 import com.inninglog.inninglog.home.dto.HomeResDto;
 import com.inninglog.inninglog.kbo.domain.Game;
 import com.inninglog.inninglog.kbo.dto.gameReport.GameHomeResDto;
+import com.inninglog.inninglog.kbo.dto.gameReport.WinningRateResult;
 import com.inninglog.inninglog.kbo.repository.GameRepository;
 import com.inninglog.inninglog.kbo.service.GameReportService;
 import com.inninglog.inninglog.member.domain.Member;
@@ -27,12 +28,11 @@ public class HomeService {
     public HomeResDto homeView(Long memberId){
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        GameReportService.WinningRateResult winningRateResult = gameReportService.caculateWin(member);
+       WinningRateResult winningRateResult = gameReportService.forHomeCaculateWin(member);
 
         List<GameHomeResDto> myTeamSchedule = getThisMonthGamesForTeam(member.getTeam().getId());
 
-        return HomeResDto.from(winningRateResult.winningRateHalPoongRi(), myTeamSchedule);
-    }
+        return HomeResDto.from(winningRateResult.getWinningRateHalPoongRi(), myTeamSchedule);    }
 
     //유저의 응원팀 이번달 경기 조회
     public List<GameHomeResDto> getThisMonthGamesForTeam(Long teamId) {

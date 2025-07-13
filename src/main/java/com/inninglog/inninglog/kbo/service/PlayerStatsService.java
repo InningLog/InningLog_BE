@@ -148,7 +148,6 @@ public class PlayerStatsService {
 
             Player savedPlayer = playerRepository.save(newPlayer);
             newPlayerIds.add(savedPlayer.getId()); // 새 선수 ID 추적
-            log.info("새 선수 등록: {} ({}, {})", playerName, teamName, playerType);
             return savedPlayer;
         }
     }

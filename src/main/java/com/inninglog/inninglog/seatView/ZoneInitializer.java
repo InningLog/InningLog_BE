@@ -166,7 +166,7 @@ public class ZoneInitializer implements ApplicationRunner {
                 Zone.builder().name("외야테이블석").shortCode("GWJ_OUTFIELD_TABLE").stadium(s.get("GWJ")).build(),
 
                 // NC 다이노스 (CHW - 창원NC파크)
-                Zone.builder().name("내야석").shortCode("CHW_INFIELD").stadium(s.get("CHW")).build(),
+                Zone.builder().name("내야석").shortCode("√").stadium(s.get("CHW")).build(),
                 Zone.builder().name("테이블석").shortCode("CHW_TABLE").stadium(s.get("CHW")).build(),
                 Zone.builder().name("라운드 테이블석").shortCode("CHW_ROUND_TABLE").stadium(s.get("CHW")).build(),
                 Zone.builder().name("외야잔디석").shortCode("CHW_OUTFIELD_GRASS").stadium(s.get("CHW")).build(),
