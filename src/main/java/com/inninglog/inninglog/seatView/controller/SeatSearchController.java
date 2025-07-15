@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.seatView.controller;
 
+import com.inninglog.inninglog.global.pageable.SimplePageResponse;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.response.SuccessResponse;
 import com.inninglog.inninglog.seatView.dto.res.SeatSearchRes;
@@ -48,80 +49,56 @@ public class SeatSearchController {
                             examples = {
                                     @ExampleObject(
                                             name = "검색 결과 있음",
-                                            summary = "시야 사진 조회 성공",
-                                            description = "검색 조건에 맞는 시야 사진이 존재하는 경우",
                                             value = """
-                                                                                {
-                                                                                  "code": "SEATVIEW_LIST_FETCHED",
-                                                                                  "message": "시야 사진 조회 성공",
-                                                                                  "data": {
-                                                                                    "content": [
-                                                                                      {
-                                                                                        "seatViewId": 3,
-                                                                                        "viewMediaUrl": "https://your-s3-bucket-url/image.jpg",
-                                                                                        "seatInfo": {
-                                                                                          "zoneName": "블루석",
-                                                                                          "zoneShortCode": "JAM_BLUE",
-                                                                                          "section": "13",
-                                                                                          "seatRow": "3",
-                                                                                          "stadiumName": "잠실"
-                                                                                        },
-                                                                                        "emotionTags": [
-                                                                                          {
-                                                                                            "code": "CHEERING_MOSTLY_STANDING",
-                                                                                            "label": "응원 - 일어날 사람은 일어남"
-                                                                                          },
-                                                                                          {
-                                                                                            "code": "SUN_NONE",
-                                                                                            "label": "햇빛 - 없음"
-                                                                                          }
-                                                                                        ]
-                                                                                      }
-                                                                                    ],
-                                                                                    "pageable": {
-                                                                                      "pageNumber": 0,
-                                                                                      "pageSize": 10,
-                                                                                      "offset": 0,
-                                                                                      "paged": true,
-                                                                                      "unpaged": false
-                                                                                    },
-                                                                                    "last": false,
-                                                                                    "totalElements": 3,
-                                                                                    "totalPages": 1,
-                                                                                    "first": true,
-                                                                                    "size": 10,
-                                                                                    "number": 0,
-                                                                                    "numberOfElements": 3,
-                                                                                    "empty": false
-                                                                                  }
-                                                                                }
+                                                    {
+                                                      "code": "SEATVIEW_LIST_FETCHED",
+                                                      "message": "시야 사진 조회 성공",
+                                                      "data": {
+                                                        "content": [
+                                                          {
+                                                            "seatViewId": 3,
+                                                            "viewMediaUrl": "https://your-s3-bucket-url/image.jpg",
+                                                            "seatInfo": {
+                                                              "zoneName": "블루석",
+                                                              "zoneShortCode": "JAM_BLUE",
+                                                              "section": "13",
+                                                              "seatRow": "3",
+                                                              "stadiumName": "잠실"
+                                                            },
+                                                            "emotionTags": [
+                                                              {
+                                                                "code": "CHEERING_MOSTLY_STANDING",
+                                                                "label": "응원 - 일어날 사람은 일어남"
+                                                              },
+                                                              {
+                                                                "code": "SUN_NONE",
+                                                                "label": "햇빛 - 없음"
+                                                              }
+                                                            ]
+                                                          }
+                                                        ],
+                                                        "pageNumber": 0,
+                                                        "pageSize": 10,
+                                                        "totalElements": 3,
+                                                        "totalPages": 1,
+                                                        "last": false
+                                                      }
+                                                    }
                                                     """
                                     ),
                                     @ExampleObject(
                                             name = "검색 결과 없음",
-                                            summary = "해당 조건에 해당하는 시야 사진이 없음",
-                                            description = "검색 조건에 맞는 시야 사진이 존재하지 않는 경우",
                                             value = """
                                                     {
                                                       "code": "SEAT_VIEW_EMPTY",
                                                       "message": "해당 조건에 해당하는 시야 사진이 없습니다.",
                                                       "data": {
                                                         "content": [],
-                                                        "pageable": {
-                                                          "pageNumber": 0,
-                                                          "pageSize": 10,
-                                                          "offset": 0,
-                                                          "unpaged": false,
-                                                          "paged": true
-                                                        },
-                                                        "last": true,
+                                                        "pageNumber": 0,
+                                                        "pageSize": 10,
                                                         "totalElements": 0,
                                                         "totalPages": 0,
-                                                        "first": true,
-                                                        "size": 10,
-                                                        "number": 0,
-                                                        "numberOfElements": 0,
-                                                        "empty": true
+                                                        "last": true
                                                       }
                                                     }
                                                     """
@@ -151,7 +128,7 @@ public class SeatSearchController {
             )
     })
     @GetMapping("/feed")
-    public ResponseEntity<SuccessResponse<Page<SeatViewDetailResult>>> searchSeats(
+    public ResponseEntity<SuccessResponse<SimplePageResponse<SeatViewDetailResult>>> searchSeats(
             @Parameter(
                     description = "구장 단축코드",
                     required = true,
@@ -185,18 +162,15 @@ public class SeatSearchController {
 
             @Parameter(
                     description = "페이지 번호 (0부터 시작)",
-                    example = "0",
-                    schema = @Schema(type = "integer", minimum = "0")
+                    example = "0"
             )
             @RequestParam(defaultValue = "0") int page,
 
             @Parameter(
                     description = "페이지 크기 (한 페이지당 항목 수)",
-                    example = "10",
-                    schema = @Schema(type = "integer", minimum = "1", maximum = "100")
+                    example = "10"
             )
             @RequestParam(defaultValue = "10") int size
-
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
@@ -204,9 +178,17 @@ public class SeatSearchController {
                 stadiumShortCode, zoneShortCode, section, seatRow, pageable
         );
 
-        SuccessCode code = (response.isEmpty()) ? SuccessCode.SEATVIEW_EMPTY
-                : SuccessCode.SEATVIEW_LIST_FETCHED;
+        SuccessCode code = response.isEmpty() ? SuccessCode.SEATVIEW_EMPTY : SuccessCode.SEATVIEW_LIST_FETCHED;
 
-        return ResponseEntity.ok(SuccessResponse.success(code, response));
+        SimplePageResponse<SeatViewDetailResult> simplePage = SimplePageResponse.<SeatViewDetailResult>builder()
+                .content(response.getContent())
+                .pageNumber(response.getNumber())
+                .pageSize(response.getSize())
+                .totalElements(response.getTotalElements())
+                .totalPages(response.getTotalPages())
+                .isLast(response.isLast())
+                .build();
+
+        return ResponseEntity.ok(SuccessResponse.success(code, simplePage));
     }
 }

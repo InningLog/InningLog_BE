@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.seatView.controller;
 
+import com.inninglog.inninglog.global.pageable.SimplePageResponse;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.response.SuccessResponse;
 import com.inninglog.inninglog.seatView.dto.res.SeatViewDetailResult;
@@ -47,10 +48,9 @@ public class HashtagSearchController {
                     description = "해시태그 검색 완료",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "성공 응답 예시",
-                                            value = """
+                            examples = @ExampleObject(
+                                    name = "성공 응답 예시",
+                                    value = """
                                             {
                                               "code": "SEATVIEW_LIST_FETCHED",
                                               "message": "시야 사진 조회 성공",
@@ -61,53 +61,15 @@ public class HashtagSearchController {
                                                     "viewMediaUrl": "https://your-s3-bucket-url/image.jpg"
                                                   }
                                                 ],
-                                                "pageable": {
-                                                  "pageNumber": 0,
-                                                  "pageSize": 10,
-                                                  "offset": 0,
-                                                  "paged": true,
-                                                  "unpaged": false
-                                                },
-                                                "last": false,
+                                                "pageNumber": 0,
+                                                "pageSize": 10,
                                                 "totalElements": 3,
                                                 "totalPages": 1,
-                                                "first": true,
-                                                "size": 10,
-                                                "number": 0,
-                                                "numberOfElements": 3,
-                                                "empty": false
+                                                "last": false
                                               }
                                             }
                                             """
-                                    ),
-                                    @ExampleObject(
-                                            name = "검색 결과 없음",
-                                            value = """
-                                            {
-                                              "code": "SEAT_VIEW_EMPTY",
-                                              "message": "해당 조건에 해당하는 시야 사진이 없습니다.",
-                                              "data": {
-                                                "content": [],
-                                                "pageable": {
-                                                  "pageNumber": 0,
-                                                  "pageSize": 10,
-                                                  "offset": 0,
-                                                  "unpaged": false,
-                                                  "paged": true
-                                                },
-                                                "last": true,
-                                                "totalElements": 0,
-                                                "totalPages": 0,
-                                                "first": true,
-                                                "size": 10,
-                                                "number": 0,
-                                                "numberOfElements": 0,
-                                                "empty": true
-                                              }
-                                            }
-                                            """
-                                    )
-                            }
+                            )
                     )
             ),
             @ApiResponse(
@@ -128,37 +90,17 @@ public class HashtagSearchController {
             )
     })
     @GetMapping("/gallery")
-    public ResponseEntity<SuccessResponse<Page<SeatViewImageResult>>> searchSeatViewsGallery(
-            @Parameter(
-                    description = "구장 단축코드",
-                    required = true,
-                    example = "JAM",
-                    schema = @Schema(type = "string", allowableValues = {
-                            "JAM", "GOC", "ICN", "SUW", "DJN", "DAE", "BUS", "GWJ", "CHW"
-                    })
-            )
+    public ResponseEntity<SuccessResponse<SimplePageResponse<SeatViewImageResult>>> searchSeatViewsGallery(
+            @Parameter(description = "구장 단축코드", required = true, example = "JAM")
             @RequestParam String stadiumShortCode,
 
-            @Parameter(
-                    description = "해시태그 코드 목록 (최대 5개 선택 가능)",
-                    required = true,
-                    example = "VIEW_OPEN,SUN_STRONG,CHEERING_BEST",
-                    schema = @Schema(type = "array")
-            )
+            @Parameter(description = "해시태그 코드 목록 (최대 5개 선택 가능)", required = true)
             @RequestParam List<String> hashtagCodes,
 
-            @Parameter(
-                    description = "페이지 번호 (0부터 시작)",
-                    example = "0",
-                    schema = @Schema(type = "integer", minimum = "0")
-            )
+            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
             @RequestParam(defaultValue = "0") int page,
 
-            @Parameter(
-                    description = "페이지 크기 (한 페이지당 항목 수)",
-                    example = "10",
-                    schema = @Schema(type = "integer", minimum = "1", maximum = "100")
-            )
+            @Parameter(description = "페이지 크기 (한 페이지당 항목 수)", example = "10")
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -167,10 +109,18 @@ public class HashtagSearchController {
                 stadiumShortCode, hashtagCodes, pageable
         );
 
-        SuccessCode code = (resultPage.isEmpty()) ? SuccessCode.SEATVIEW_EMPTY
-                : SuccessCode.SEATVIEW_LIST_FETCHED;
+        SuccessCode code = resultPage.isEmpty() ? SuccessCode.SEATVIEW_EMPTY : SuccessCode.SEATVIEW_LIST_FETCHED;
 
-        return ResponseEntity.ok(SuccessResponse.success(code, resultPage));
+        SimplePageResponse<SeatViewImageResult> simplePage = SimplePageResponse.<SeatViewImageResult>builder()
+                .content(resultPage.getContent())
+                .pageNumber(resultPage.getNumber())
+                .pageSize(resultPage.getSize())
+                .totalElements(resultPage.getTotalElements())
+                .totalPages(resultPage.getTotalPages())
+                .isLast(resultPage.isLast())
+                .build();
+
+        return ResponseEntity.ok(SuccessResponse.success(code, simplePage));
     }
 
     @Operation(
@@ -189,10 +139,9 @@ public class HashtagSearchController {
                     description = "해시태그 상세 검색 완료",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "페이징된 시야 사진 검색 결과",
-                                            value = """
+                            examples = @ExampleObject(
+                                    name = "페이징된 시야 사진 검색 결과",
+                                    value = """
                                             {
                                               "code": "SEATVIEW_LIST_FETCHED",
                                               "message": "시야 사진 조회 성공",
@@ -220,66 +169,12 @@ public class HashtagSearchController {
                                                     ]
                                                   }
                                                 ],
-                                                "pageable": {
-                                                  "pageNumber": 0,
-                                                  "pageSize": 10,
-                                                  "offset": 0,
-                                                  "paged": true,
-                                                  "unpaged": false
-                                                },
-                                                "last": false,
-                                                "totalPages": 1,
+                                                "pageNumber": 0,
+                                                "pageSize": 10,
                                                 "totalElements": 3,
-                                                "first": true,
-                                                "size": 10,
-                                                "number": 0,
-                                                "numberOfElements": 1,
-                                                "empty": false
+                                                "totalPages": 1,
+                                                "last": false
                                               }
-                                            }
-                                            """
-                                    ),
-                                    @ExampleObject(
-                                            name = "검색 결과 없음",
-                                            value = """
-                                            {
-                                              "code": "SEAT_VIEW_EMPTY",
-                                              "message": "해당 조건에 해당하는 시야 사진이 없습니다.",
-                                              "data": {
-                                                "content": [],
-                                                "pageable": {
-                                                  "pageNumber": 0,
-                                                  "pageSize": 10,
-                                                  "offset": 0,
-                                                  "unpaged": false,
-                                                  "paged": true
-                                                },
-                                                "last": true,
-                                                "totalElements": 0,
-                                                "totalPages": 0,
-                                                "first": true,
-                                                "size": 10,
-                                                "number": 0,
-                                                "numberOfElements": 0,
-                                                "empty": true
-                                              }
-                                            }
-                                            """
-                                    )
-                            }
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "잘못된 요청 (해시태그 개수 초과 등)",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(
-                                    name = "에러 응답 예시",
-                                    value = """
-                                            {
-                                              "code": "BAD_REQUEST",
-                                              "message": "해시태그는 최소 1개, 최대 5개까지 선택할 수 있습니다."
                                             }
                                             """
                             )
@@ -287,37 +182,17 @@ public class HashtagSearchController {
             )
     })
     @GetMapping("/feed")
-    public ResponseEntity<SuccessResponse<Page<SeatViewDetailResult>>> searchSeatViewsDetail(
-            @Parameter(
-                    description = "구장 단축코드",
-                    required = true,
-                    example = "JAM",
-                    schema = @Schema(type = "string", allowableValues = {
-                            "JAM", "GOC", "ICN", "SUW", "DJN", "DAE", "BUS", "GWJ", "CHW"
-                    })
-            )
+    public ResponseEntity<SuccessResponse<SimplePageResponse<SeatViewDetailResult>>> searchSeatViewsDetail(
+            @Parameter(description = "구장 단축코드", required = true, example = "JAM")
             @RequestParam String stadiumShortCode,
 
-            @Parameter(
-                    description = "해시태그 코드 목록 (최대 5개 선택 가능)",
-                    required = true,
-                    example = "VIEW_OPEN,SUN_STRONG,CHEERING_BEST",
-                    schema = @Schema(type = "array")
-            )
+            @Parameter(description = "해시태그 코드 목록 (최대 5개 선택 가능)", required = true)
             @RequestParam List<String> hashtagCodes,
 
-            @Parameter(
-                    description = "페이지 번호 (0부터 시작)",
-                    example = "0",
-                    schema = @Schema(type = "integer", minimum = "0")
-            )
+            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
             @RequestParam(defaultValue = "0") int page,
 
-            @Parameter(
-                    description = "페이지 크기 (한 페이지당 항목 수)",
-                    example = "10",
-                    schema = @Schema(type = "integer", minimum = "1", maximum = "100")
-            )
+            @Parameter(description = "페이지 크기 (한 페이지당 항목 수)", example = "10")
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -326,9 +201,17 @@ public class HashtagSearchController {
                 stadiumShortCode, hashtagCodes, pageable
         );
 
-        SuccessCode code = (response.isEmpty()) ? SuccessCode.SEATVIEW_EMPTY
-                : SuccessCode.SEATVIEW_LIST_FETCHED;
+        SuccessCode code = response.isEmpty() ? SuccessCode.SEATVIEW_EMPTY : SuccessCode.SEATVIEW_LIST_FETCHED;
 
-        return ResponseEntity.ok(SuccessResponse.success(code, response));
+        SimplePageResponse<SeatViewDetailResult> simplePage = SimplePageResponse.<SeatViewDetailResult>builder()
+                .content(response.getContent())
+                .pageNumber(response.getNumber())
+                .pageSize(response.getSize())
+                .totalElements(response.getTotalElements())
+                .totalPages(response.getTotalPages())
+                .isLast(response.isLast())
+                .build();
+
+        return ResponseEntity.ok(SuccessResponse.success(code, simplePage));
     }
 }
