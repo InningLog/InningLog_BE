@@ -52,6 +52,10 @@ public class SeatViewService {
         Journal journal = journalRepository.findById(dto.getJournalId())
                 .orElseThrow(() -> new CustomException(ErrorCode.JOURNAL_NOT_FOUND));
 
+        if(journal.getSeatView()!=null) {
+            throw new CustomException(ErrorCode.SEATVIEW_ALREADY_EXISTS);
+        }
+
         Stadium stadium = stadiumRepository.findByShortCode(dto.getStadiumShortCode())
                 .orElseThrow(() -> new CustomException(ErrorCode.STADIUM_NOT_FOUND));
 
