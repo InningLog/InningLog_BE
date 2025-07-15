@@ -39,6 +39,8 @@ public class SeatViewService {
     private final SeatViewEmotionTagRepository seatViewEmotionTagRepository;
     private final SeatViewEmotionTagMapRepository seatViewEmotionTagMapRepository;
 
+    private final S3Uploader s3Uploader;
+
 
     //좌석 시야 정보 작성
     @Transactional
@@ -86,7 +88,6 @@ public class SeatViewService {
         SeatView seatView = seatViewRepository.findById(seatViewId)
                 .orElseThrow(() -> new CustomException(ErrorCode.SEATVIEW_NOT_FOUND));
 
-        // 감정 태그 매핑 조회
         List<SeatViewEmotionTagDto> tags = seatViewEmotionTagMapRepository.findBySeatViewId(seatViewId).stream()
                 .map(tagMap -> SeatViewEmotionTagDto.builder()
                         .code(tagMap.getSeatViewEmotionTag().getCode())
@@ -94,8 +95,10 @@ public class SeatViewService {
                         .build())
                 .collect(Collectors.toList());
 
+        String presignedUrl = s3Uploader.generatePresignedGetUrl(seatView.getView_media_url());
+
         // 결과 생성
-        return SeatViewDetailResult.from(seatView, tags);
+        return SeatViewDetailResult.from(seatView, tags, presignedUrl);
     }
 
 

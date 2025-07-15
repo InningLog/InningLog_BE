@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.seatView.service;
 
+import com.inninglog.inninglog.global.s3.S3Uploader;
 import com.inninglog.inninglog.seatView.domain.SeatView;
 import com.inninglog.inninglog.seatView.domain.SeatViewEmotionTag;
 import com.inninglog.inninglog.seatView.domain.SeatViewEmotionTagMap;
@@ -27,8 +28,9 @@ import java.util.stream.Collectors;
 public class HashtagSearchService {
 
     private final SeatViewRepository seatViewRepository;
-    private final SeatViewEmotionTagRepository emotionTagRepository;
     private final SeatViewEmotionTagMapRepository emotionTagMapRepository;
+    private final S3Uploader s3Uploader;
+
 
     // 모아보기 형태 검색 (사진만)
     public Page<SeatViewImageResult> searchSeatViewsByHashtagsGallery(String stadiumShortCode, List<String> hashtagCodes, Pageable pageable) {
@@ -45,7 +47,7 @@ public class HashtagSearchService {
 
         return seatViewPage.map(sv -> SeatViewImageResult.builder()
                 .seatViewId(sv.getId())
-                .viewMediaUrl(sv.getView_media_url())
+                .viewMediaUrl(s3Uploader.generatePresignedGetUrl(sv.getView_media_url()))
                 .build());
     }
 
@@ -69,7 +71,11 @@ public class HashtagSearchService {
         Map<Long, List<SeatViewEmotionTagDto>> emotionTagMap = getEmotionTagMap(seatViewIds);
 
         Page<SeatViewDetailResult> resultPage = seatViewPage.map(sv ->
-                SeatViewDetailResult.from(sv, emotionTagMap.getOrDefault(sv.getId(), new ArrayList<>()))
+                SeatViewDetailResult.from(
+                        sv,
+                        emotionTagMap.getOrDefault(sv.getId(), new ArrayList<>()),
+                        s3Uploader.generatePresignedGetUrl(sv.getView_media_url())
+                )
         );
 
         return resultPage;
@@ -93,26 +99,5 @@ public class HashtagSearchService {
                                 Collectors.toList()
                         )
                 ));
-    }
-
-    private String generateHashtagSearchSummary(String stadiumShortCode, List<String> hashtagCodes, List<SeatView> seatViews) {
-        StringBuilder summary = new StringBuilder();
-
-        if (!seatViews.isEmpty()) {
-            summary.append(seatViews.get(0).getStadium().getName()).append(" ");
-        }
-
-        List<SeatViewEmotionTag> tags = emotionTagRepository.findByCodeIn(hashtagCodes);
-        List<String> tagLabels = tags.stream()
-                .map(SeatViewEmotionTag::getLabel)
-                .collect(Collectors.toList());
-
-        summary.append("'").append(String.join(", ", tagLabels)).append("'");
-        if (tagLabels.size() > 1) {
-            summary.append(" (모든 태그 포함)");
-        }
-        summary.append(" 해시태그 검색 결과");
-
-        return summary.toString();
     }
 }

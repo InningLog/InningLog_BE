@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.seatView.service;
 
+import com.inninglog.inninglog.global.s3.S3Uploader;
 import com.inninglog.inninglog.seatView.domain.SeatView;
 import com.inninglog.inninglog.seatView.domain.SeatViewEmotionTagMap;
 import com.inninglog.inninglog.seatView.dto.req.SeatSearchReq;
@@ -27,6 +28,7 @@ public class SeatSearchService {
 
     private final SeatViewRepository seatViewRepository;
     private final SeatViewEmotionTagMapRepository emotionTagMapRepository;
+    private final S3Uploader s3Uploader;
 
     public Page<SeatViewDetailResult> searchSeats(
             String stadiumShortCode,
@@ -55,9 +57,10 @@ public class SeatSearchService {
 
         Map<Long, List<SeatViewEmotionTagDto>> emotionTagMap = getEmotionTagMap(seatViewIds);
 
-        return seatViews.map(sv ->
-                SeatViewDetailResult.from(sv, emotionTagMap.getOrDefault(sv.getId(), List.of()))
-        );
+        return seatViews.map(sv -> {
+            String presignedUrl = s3Uploader.generatePresignedGetUrl(sv.getView_media_url());
+            return SeatViewDetailResult.from(sv, emotionTagMap.getOrDefault(sv.getId(), List.of()), presignedUrl);
+        });
     }
 
 

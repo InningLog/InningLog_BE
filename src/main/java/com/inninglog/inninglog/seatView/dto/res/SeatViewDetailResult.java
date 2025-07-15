@@ -29,10 +29,10 @@ public class SeatViewDetailResult {
     @Schema(description = "해당 좌석에 등록된 감정 태그 리스트")
     private List<SeatViewEmotionTagDto> emotionTags;
 
-    public static SeatViewDetailResult from(SeatView seatView, List<SeatViewEmotionTagDto> tags) {
+    public static SeatViewDetailResult from(SeatView seatView, List<SeatViewEmotionTagDto> tags, String presignedUrl) {
         return SeatViewDetailResult.builder()
                 .seatViewId(seatView.getId())
-                .viewMediaUrl(seatView.getView_media_url())
+                .viewMediaUrl(presignedUrl)
                 .seatInfo(SeatInfo.from(seatView))
                 .emotionTags(tags)
                 .build();
