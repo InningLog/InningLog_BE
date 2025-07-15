@@ -7,11 +7,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class S3Service {
+public class PreSginedPutService {
 
     private final S3Uploader  s3Uploader;
 
-    public String journalGeneratePreUrl(Long memebrId, String fileName, String contentType){
+    public String journalPutPreUrl(Long memebrId, String fileName, String contentType){
 
         if (fileName.contains("..") || fileName.contains("/")) {
             throw new CustomException(ErrorCode.INVALID_FILE_NAME);
@@ -23,7 +23,7 @@ public class S3Service {
         return url;
     }
 
-    public String seatViewGeneratePreUrl(Long memebrId, String fileName, String contentType){
+    public String seatViewPutPreUrl(Long memebrId, String fileName, String contentType){
 
         if (fileName.contains("..") || fileName.contains("/")) {
             throw new CustomException(ErrorCode.INVALID_FILE_NAME);

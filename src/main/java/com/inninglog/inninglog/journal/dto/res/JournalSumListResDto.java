@@ -1,6 +1,7 @@
 package com.inninglog.inninglog.journal.dto.res;
 
 
+import com.inninglog.inninglog.global.s3.S3Uploader;
 import com.inninglog.inninglog.journal.domain.EmotionTag;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
@@ -39,10 +40,10 @@ public class JournalSumListResDto {
     @Schema(description = "경기장 이름", example = "잠실")
     private String stadiumName;
 
-    public static JournalSumListResDto from(Journal journal) {
+    public static JournalSumListResDto from(Journal journal, String presignedUrl) {
         return new JournalSumListResDto(
                 journal.getId(),
-                journal.getMedia_url(),
+                presignedUrl,
                 journal.getResultScore(),
                 journal.getEmotion(),
                 journal.getDate(),

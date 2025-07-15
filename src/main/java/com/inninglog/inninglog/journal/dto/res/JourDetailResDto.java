@@ -36,14 +36,14 @@ public class JourDetailResDto {
     @Schema(description = "감정 태그 (감동/짜릿함/답답함/아쉬움/분노 중 하나)", example = "감동")
     private EmotionTag emotion;
 
-    @Schema(description = "경기 결과 이미지 URL (S3 업로드 후 응답받은 링크)", example = "https://s3.amazonaws.com/.../image.jpg", nullable = true)
+    @Schema(description = "업로드한 이미지 파일명 (확장자 포함)", example = "photo123.jpeg")
     private String media_url; // optional
 
     @Schema(description = "후기글", example = "오늘 경기는 정말 재미있었다!", nullable = true)
     private String review_text; // optional
 
 
-    public static JourDetailResDto from(Member member, Journal journal) {
+    public static JourDetailResDto from(Member member, Journal journal, String presignedUrl) {
         return JourDetailResDto.builder()
                 .journalId(journal.getId())
                 .gameDate(journal.getDate())
@@ -51,7 +51,7 @@ public class JourDetailResDto {
                 .opponentTeamSC(journal.getOpponentTeam().getShortCode())
                 .stadiumSC(journal.getStadium().getShortCode())
                 .emotion(journal.getEmotion())
-                .media_url(journal.getMedia_url())
+                .media_url(presignedUrl)
                 .review_text(journal.getReview_text())
                 .build();
     }

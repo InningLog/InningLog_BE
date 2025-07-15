@@ -43,6 +43,7 @@ public class JournalService {
     private final StadiumRepository stadiumRepository;
     private final TeamRepository teamRepository;
     private final GameRepository gameRepository;
+    private final S3Uploader s3Uploader;
 
     //직관 일지 내용 업로드
     @Transactional
@@ -97,7 +98,12 @@ public class JournalService {
             journals = journalRepository.findAllByMember(member, pageable);
         }
 
-        return journals.map(JournalSumListResDto::from);
+
+        Page<JournalSumListResDto> dtoPage = journals.map(
+                journal -> JournalSumListResDto.from(journal, s3Uploader.generatePresignedGetUrl(journal.getMedia_url()))
+        );
+
+        return dtoPage;
     }
 
 
@@ -171,7 +177,16 @@ public class JournalService {
         Journal journal = journalRepository.findById(journalId)
                 .orElseThrow(() -> new CustomException(ErrorCode.JOURNAL_NOT_FOUND));
 
-        JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal);
+        // 프리사인드 URL 생성
+        String presignedUrl = s3Uploader.generatePresignedGetUrl(journal.getMedia_url());
+
+        // Presigned URL을 포함해 DTO 생성
+        JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal, presignedUrl);
+
+        if(journal.getSeatView() == null){
+            return JourUpdateResDto.from(jourDetailResDto, null);
+        }
+
         return JourUpdateResDto.from(jourDetailResDto, journal.getSeatView().getId());
     }
 
@@ -190,10 +205,15 @@ public class JournalService {
 
         journal.updateFrom(dto);
 
-        JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal);
+        // 프리사인드 URL 생성
+        String presignedUrl = s3Uploader.generatePresignedGetUrl(journal.getMedia_url());
+
+        // Presigned URL을 포함해 DTO 생성
+        JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal, presignedUrl);
 
         return JourUpdateResDto.from(jourDetailResDto, journal.getSeatView().getId());
 
     }
+
 
 }

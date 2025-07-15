@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "사진 업로드", description = "S3 Presigned URL 관련 API")
 public class S3Controller {
 
-    private final S3Service s3Service;
+    private final PreSginedPutService preSginedPutService;
 
     @Operation(
             summary = "직관 일지용 Presigned URL 발급",
@@ -60,7 +60,7 @@ public class S3Controller {
             @RequestParam String contentType,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
-        String url = s3Service.journalGeneratePreUrl(user.getMember().getId(), fileName, contentType);
+        String url = preSginedPutService.journalPutPreUrl(user.getMember().getId(), fileName, contentType);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, url));
     }
 
@@ -98,7 +98,7 @@ public class S3Controller {
             @RequestParam String contentType,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
-        String url = s3Service.seatViewGeneratePreUrl(user.getMember().getId(), fileName, contentType);
+        String url = preSginedPutService.seatViewPutPreUrl(user.getMember().getId(), fileName, contentType);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, url));
     }
 }
