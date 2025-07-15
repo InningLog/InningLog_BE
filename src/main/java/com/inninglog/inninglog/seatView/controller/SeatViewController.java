@@ -37,7 +37,20 @@ public class SeatViewController {
     //좌석 시야 생성
     @Operation(
             summary = "좌석 시야 생성",
-            description = "JWT 토큰에서 유저 정보를 추출하고, S3에 이미지 업로드 후 좌석 시야를 생성합니다."
+            description = """
+    JWT 토큰에서 유저 정보를 추출하고, S3에 이미지 업로드 후 좌석 시야를 생성합니다.
+            좌석 시야 작성 요청 JSON 예시입니다. S3에 이미지를 업로드한 후,
+        업로드된 파일명을 'fileName' 필드에 포함하여 요청해야 합니다.
+
+        ✅ 필수 입력 필드:
+        - `journalId`: 연결된 직관 일지 ID
+        - `stadiumShortCode`, `zoneShortCode`, `section`, `seatRow`: 좌석 정보
+        - `emotionTagCodes`: 감정 태그 코드 배열 (문자열 리스트)
+        - `fileName`: 업로드한 이미지 파일명 (확장자 포함)
+
+        📌 Presigned URL을 통해 업로드된 파일명만 저장하며, 실제 S3 경로는 서버에서 조립됩니다.
+
+    """
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -71,24 +84,6 @@ public class SeatViewController {
             @AuthenticationPrincipal CustomUserDetails user,
 
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = """
-                좌석 시야 작성 요청 JSON 예시입니다. 이 값을 복사해 'request' 필드에 붙여넣으세요.
-
-                ```json
-                {
-                  "journalId": 1,
-                  "stadiumShortCode": "JAM",
-                  "zoneShortCode": "JAM_BLUE",
-                  "section": "13",
-                  "seatRow": "3",
-                  "emotionTagCodes": [
-                    "CHEERING_MOSTLY_STANDING",
-                    "SUN_NONE"
-                  ],
-                  "media_url": "https://your-s3-bucket-url/image.jpg"
-                }
-                ```
-                """,
                     required = true,
                     content = @Content(schema = @Schema(implementation = SeatCreateReqDto.class))
             )

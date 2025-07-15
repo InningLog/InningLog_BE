@@ -56,15 +56,7 @@ public class SeatViewService {
         Zone zone = zoneRepository.findByShortCode(dto.getZoneShortCode())
                 .orElseThrow(()-> new CustomException(ErrorCode.ZONE_NOT_FOUND));
 
-        SeatView seatView = SeatView.builder()
-                .member(member)
-                .journal(journal)
-                .stadium(stadium)
-                .view_media_url(dto.getMedia_url())
-                .zone(zone)
-                .section(dto.getSection())
-                .seatRow(dto.getSeatRow())
-                .build();
+        SeatView seatView = SeatView.from(dto, member,journal, stadium, zone);
 
         journal.setSeatView(seatView);
         seatViewRepository.save(seatView);

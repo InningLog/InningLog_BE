@@ -33,6 +33,6 @@ public class SeatCreateReqDto {
     @Schema(description = "감정 태그 코드 리스트", example = "[    \"CHEERING_MOSTLY_STANDING\", \"SUN_NONE\"]")
     private List<String> emotionTagCodes;
 
-    @Schema(description = "S3에 업로드된 좌석 이미지 URL", example = "https://s3.ap-northeast-2.amazonaws.com/inninglog/seat/abc123.jpg")
-    private String media_url;
+    @Schema(description = "업로드할 이미지 파일명 (확장자 포함)", example = "photo123.jpeg")
+    private String fileName;
 }
