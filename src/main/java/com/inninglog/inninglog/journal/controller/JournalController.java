@@ -50,22 +50,25 @@ public class JournalController {
 
     //직관 일지 콘텐츠 업로드
     @Operation(
-            summary = "직관 일지 작성 페이지 - 직관 일지 콘텐츠 업로드(presignedURL 반영하여 수정할듯 후순위로 매핑바람)",
+            summary = "직관 일지 작성 페이지 - 직관 일지 콘텐츠 업로드",
             description = """
-        직관 일지 본문 데이터를 업로드하는 API입니다. 
-        
-        사용자는 사전에 이미지 파일을 S3 업로드 API를 통해 업로드하고,  
-        응답받은 media URL을 포함한 JSON 데이터를 본 API에 전달합니다.
-        
-        이 API는 전달받은 정보로 새로운 Journal 객체를 생성합니다.
+    직관 일지 본문 데이터를 업로드하는 API입니다. 
 
-        ✅ 필수 필드:
-        - `gameId`: 경기 게임 Id
-        - `media_url`: 이미지 S3 URL
-        - `ourScore`, `theirScore`: 점수 정보
-        - `opponentTeamShortCode`, `stadiumShortCode`
-        - `date`, `emotion`
-        """
+    사용자는 사전에 Presigned URL 발급 API(`/s3/journal/presigned`)를 통해
+    S3에 이미지를 직접 업로드한 뒤, 업로드 경로에 해당하는 `fileName`을 포함하여
+    본 API를 호출해야 합니다.
+
+    이 API는 전달받은 정보를 바탕으로 새로운 Journal 객체를 생성합니다.
+
+    ✅ 필수 필드:
+    - `gameId`: 경기 고유 ID (예: 20250622OBLG0)
+    - `fileName`: 업로드한 이미지 파일명 (확장자 포함, ex. photo123.jpeg)
+    - `ourScore`, `theirScore`: 점수 정보
+    - `opponentTeamShortCode`, `stadiumShortCode`: 상대팀 및 경기장 숏코드
+    - `gameDateTime`: 경기 일시 (`yyyy-MM-dd'T'HH:mm:ss` 형식)
+    - `emotion`: 감정 태그 (감동, 짜릿함, 답답함, 아쉬움, 분노 중 하나)
+    - `review_text`: 후기 내용
+    """
     )
     @ErrorApiResponses.Common
     @ErrorApiResponses.Game

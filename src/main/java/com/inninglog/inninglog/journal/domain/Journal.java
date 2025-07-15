@@ -79,7 +79,7 @@ public class Journal extends BaseTimeEntity {
                 .theirScore(dto.getTheirScore())
                 .emotion(dto.getEmotion())
                 .review_text(dto.getReview_text())
-                .media_url(dto.getMedia_url())
+                .media_url("journal/" + member.getId() + "/" + dto.getFileName())
                 .build();
     }
 

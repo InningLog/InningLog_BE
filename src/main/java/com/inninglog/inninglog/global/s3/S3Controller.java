@@ -98,7 +98,7 @@ public class S3Controller {
             @RequestParam String contentType,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
-        String url = s3Service.journalGeneratePreUrl(user.getMember().getId(), fileName, contentType);
+        String url = s3Service.seatViewGeneratePreUrl(user.getMember().getId(), fileName, contentType);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, url));
     }
 }

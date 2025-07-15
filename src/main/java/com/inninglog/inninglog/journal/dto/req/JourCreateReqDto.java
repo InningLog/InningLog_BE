@@ -32,8 +32,8 @@ public class JourCreateReqDto {
     @Schema(description = "상대팀 점수", example = "1")
     private int theirScore;
 
-    @Schema(description = "경기 결과 이미지 URL (S3 업로드 후 응답받은 링크)", example = "https://s3.amazonaws.com/.../image.jpg")
-    private String media_url;
+    @Schema(description = "업로드할 이미지 파일명 (확장자 포함)", example = "photo123.jpeg")
+    private String fileName;
 
     @Schema(description = "감정 태그 (감동/짜릿함/답답함/아쉬움/분노 중 하나)", example = "감동")
     private EmotionTag emotion;
