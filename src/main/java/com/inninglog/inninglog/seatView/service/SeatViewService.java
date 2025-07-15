@@ -86,7 +86,7 @@ public class SeatViewService {
 
     //특정 좌석 시야 조회
     public SeatViewDetailResult getSeatView(Long memberId, Long seatViewId) {
-        Member member = memberRepository.findById(memberId)
+        memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         SeatView seatView = seatViewRepository.findById(seatViewId)

@@ -2,6 +2,7 @@ package com.inninglog.inninglog.journal.controller;
 
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.global.exception.ErrorApiResponses;
+import com.inninglog.inninglog.global.pageable.SimplePageResponse;
 import com.inninglog.inninglog.global.response.SuccessApiResponses;
 import com.inninglog.inninglog.global.response.SuccessResponse;
 import com.inninglog.inninglog.global.response.SuccessCode;
@@ -193,76 +194,55 @@ public class JournalController {
                     schema = @Schema(implementation = JournalSumListResDto.class),
                     examples = {
                             @ExampleObject(name = "일지 목록 있음", value = """
-                                            {
-                                                "code": "JOURNAL_LIST_FETCHED",
-                                                "message": "직관 일지 리스트 조회 성공",
-                                                "data": {
-                                                  "content": [
-                                                    {
-                                                      "journalId": 3,
-                                                      "media_url": "",
-                                                      "resultScore": "승",
-                                                      "emotion": "감동",
-                                                      "date": "2025-06-30T13:06:40.457",
-                                                      "opponentTeamName": "두산",
-                                                      "stadiumName": "잠실"
-                                                    },
-                                                    {
-                                                      "journalId": 4,
-                                                      "media_url": "",
-                                                      "resultScore": "승",
-                                                      "emotion": "감동",
-                                                      "date": "2025-06-30T13:06:40.457",
-                                                      "opponentTeamName": "두산",
-                                                      "stadiumName": "잠실"
-                                                    },
-                                                    {
-                                                      "journalId": 2,
-                                                      "media_url": "https://s3.amazonaws.com/.../image.jpg",
-                                                      "resultScore": "승",
-                                                      "emotion": "감동",
-                                                      "date": "2025-06-27T12:15:06.535",
-                                                      "opponentTeamName": "두산",
-                                                      "stadiumName": "잠실"
-                                                    }
-                                                  ],
-                                                  "pageable": {
-                                                    "pageNumber": 0,
-                                                    "pageSize": 10,
-                                                    "sort": {
-                                                      "empty": false,
-                                                      "unsorted": false,
-                                                      "sorted": true
-                                                    },
-                                                    "offset": 0,
-                                                    "paged": true,
-                                                    "unpaged": false
-                                                  },
-                                                  "last": true,
-                                                  "totalElements": 3,
-                                                  "totalPages": 1,
-                                                  "first": true,
-                                                  "size": 10,
-                                                  "number": 0,
-                                                  "sort": {
-                                                    "empty": false,
-                                                    "unsorted": false,
-                                                    "sorted": true
-                                                  },
-                                                  "numberOfElements": 3,
-                                                  "empty": false
-                                                }
-                                              }
-                                            """),
+{
+  "code": "JOURNAL_LIST_FETCHED",
+  "message": "직관 일지 리스트 조회 성공",
+  "data": {
+    "content": [
+      {
+        "journalId": 7,
+        "media_url": "https://inninglog-bucket.s3.ap-northeast-2.amazonaws.com/journal/1/photo123.jpeg?X-Amz-Expires=600&X-Amz-Signature=...",
+        "resultScore": "승",
+        "emotion": "감동",
+        "date": "2025-07-15T15:09:05.278",
+        "opponentTeamName": "두산",
+        "stadiumName": "잠실"
+      },
+      {
+        "journalId": 6,
+        "media_url": "https://inninglog-bucket.s3.ap-northeast-2.amazonaws.com/journal/1/아르르르.drawio.png?X-Amz-Expires=600&X-Amz-Signature=...",
+        "resultScore": "승",
+        "emotion": "감동",
+        "date": "2025-07-15T14:18:08.821",
+        "opponentTeamName": "두산",
+        "stadiumName": "잠실"
+      }
+    ],
+    "pageNumber": 0,
+    "pageSize": 10,
+    "totalElements": 6,
+    "totalPages": 1,
+    "last": true
+  }
+}
+"""),
                             @ExampleObject(name = "일지 목록 없음", value = """
-                                            {
-                                              "code": "JOURNAL_EMPTY",
-                                              "message": "해당 조건에 해당하는 직관 일지가 없습니다.",
-                                              "data": []
-                                            }
-                                            """)
+{
+  "code": "JOURNAL_EMPTY",
+  "message": "해당 조건에 해당하는 직관 일지가 없습니다.",
+  "data": {
+    "content": [],
+    "pageNumber": 0,
+    "pageSize": 10,
+    "totalElements": 0,
+    "totalPages": 0,
+    "last": true
+  }
+}
+""")
                     }))    @GetMapping("/summary")
-    public ResponseEntity<SuccessResponse<Page<JournalSumListResDto>>> getMyJournalsSum(
+    public ResponseEntity
+            <SuccessResponse<SimplePageResponse<JournalSumListResDto>>> getMyJournalsSum(
             @AuthenticationPrincipal CustomUserDetails user,
 
             @Parameter(description = "경기 결과 필터 (WIN, LOSE, DRAW)", example = "WIN")
@@ -287,7 +267,17 @@ public class JournalController {
         Page<JournalSumListResDto> result = journalService.getJournalsByMemberSum(user.getMember().getId(), pageable, resultScore);
 
         SuccessCode code = result.isEmpty() ? SuccessCode.JOURNAL_EMPTY : SuccessCode.JOURNAL_LIST_FETCHED;
-        return ResponseEntity.ok(SuccessResponse.success(code, result));
+
+        SimplePageResponse<JournalSumListResDto> simplePage = SimplePageResponse.<JournalSumListResDto>builder()
+                .content(result.getContent())
+                .pageNumber(result.getNumber())
+                .pageSize(result.getSize())
+                .isLast(result.isLast())
+                .totalElements(result.getTotalElements())
+                .totalPages(result.getTotalPages())
+                .build();
+
+        return ResponseEntity.ok(SuccessResponse.success(code, simplePage));
     }
 
 
