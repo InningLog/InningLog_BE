@@ -11,12 +11,15 @@ import com.inninglog.inninglog.kbo.service.GameReportService;
 import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HomeService {
@@ -25,10 +28,20 @@ public class HomeService {
     private final GameRepository gameRepository;
     private final GameReportService gameReportService;
 
+    @Transactional(readOnly = true)
     public HomeResDto homeView(Long memberId){
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.error("유저를 찾을 수 없습니다. memberId: {}", memberId);
+                    return new CustomException(ErrorCode.USER_NOT_FOUND);
+                });
+
        WinningRateResult winningRateResult = gameReportService.forHomeCaculateWin(member);
+
+        if (member.getTeam() == null) {
+            log.error("유저의 응원팀이 설정되지 않았습니다. memberId: {}", memberId);
+            throw new CustomException(ErrorCode.TEAM_NOT_FOUND);
+        }
 
         List<GameHomeResDto> myTeamSchedule = getThisMonthGamesForTeam(member.getTeam().getId());
 
@@ -41,6 +54,10 @@ public class HomeService {
         LocalDate endOfMonth = today.withDayOfMonth(today.lengthOfMonth());
 
         List<Game> games = gameRepository.findByTeamAndDateRange(teamId, startOfMonth, endOfMonth);
+
+        if (games.isEmpty()) {
+            log.error("이번 달 팀 경기 일정이 비어 있습니다. teamId: {}", teamId);
+        }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
