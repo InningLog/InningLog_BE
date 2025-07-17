@@ -28,6 +28,8 @@ public enum ErrorCode {
     ZONE_NOT_FOUND("ZONE_NOT_FOUND", HttpStatus.NOT_FOUND, "등록되지 않은 존입니다."),
     SEATVIEW_NOT_FOUND("SEATVIEW_NOT_FOUND",HttpStatus.NOT_FOUND,"작성하지 않은 좌석 시야 후기입니다."),
     SEATVIEW_ALREADY_EXISTS("SEATVIEW_ALREADY_EXISTS", HttpStatus.BAD_REQUEST, "이미 좌석 시야 글이 작성된 직관 일지입니다."),
+    INVALID_SEAT_SEARCH("INVALID_SEAT_SEARCH", HttpStatus.BAD_REQUEST,"존 정보 없이 열만으로는 검색할 수 없습니다."),
+    INVALID_HASHTAG_REQUEST("INVALID_HASHTAG_REQUEST",HttpStatus.BAD_REQUEST, "해시태그는 최소 1개, 최대 5개까지 선택할 수 있습니다."),
 
     // 공통 예외
     VALIDATION_ERROR("VALIDATION_ERROR", HttpStatus.BAD_REQUEST, "요청값이 올바르지 않습니다."),

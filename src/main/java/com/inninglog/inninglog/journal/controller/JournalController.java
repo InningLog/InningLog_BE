@@ -72,7 +72,6 @@ public class JournalController {
     """
     )
     @ErrorApiResponses.Common
-    @ErrorApiResponses.Game
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "201",
@@ -292,7 +291,6 @@ public class JournalController {
     """
     )
     @ErrorApiResponses.Common
-    @ErrorApiResponses.Game
     @ApiResponse(
             responseCode = "200",
             description = "요청이 정상적으로 처리되었습니다.",
@@ -344,7 +342,6 @@ public class JournalController {
         """
     )
     @ErrorApiResponses.Common
-    @ErrorApiResponses.Game
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "경기 일정 조회 성공 (또는 해당일에 경기 없음)",
                     content = @Content(

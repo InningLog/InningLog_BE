@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.seatView.controller;
 
+import com.inninglog.inninglog.global.exception.ErrorApiResponses;
 import com.inninglog.inninglog.global.pageable.SimplePageResponse;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.response.SuccessResponse;
@@ -89,6 +90,7 @@ public class HashtagSearchController {
                     )
             )
     })
+    @ErrorApiResponses.Common
     @GetMapping("/gallery")
     public ResponseEntity<SuccessResponse<SimplePageResponse<SeatViewImageResult>>> searchSeatViewsGallery(
             @Parameter(description = "구장 단축코드", required = true, example = "JAM")
@@ -181,6 +183,7 @@ public class HashtagSearchController {
                     )
             )
     })
+    @ErrorApiResponses.Common
     @GetMapping("/feed")
     public ResponseEntity<SuccessResponse<SimplePageResponse<SeatViewDetailResult>>> searchSeatViewsDetail(
             @Parameter(description = "구장 단축코드", required = true, example = "JAM")
