@@ -47,7 +47,7 @@ public class HomeService {
 
         List<GameHomeResDto> myTeamSchedule = getThisMonthGamesForTeam(member.getTeam().getId());
 
-        return HomeResDto.from(winningRateResult.getWinningRateHalPoongRi(), myTeamSchedule);
+        return HomeResDto.from(member,winningRateResult.getWinningRateHalPoongRi(), myTeamSchedule);
     }
 
     // 유저의 응원팀 이번달 경기 조회
