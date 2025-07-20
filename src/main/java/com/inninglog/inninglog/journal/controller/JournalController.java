@@ -139,12 +139,23 @@ public class JournalController {
                     schema = @Schema(implementation = JournalCalListResDto.class),
                     examples = {
                             @ExampleObject(name = "일지 목록", value = """
-                                            {
-                                              "code": "JOURNAL_LIST_FETCHED",
-                                              "message": "직관 일지 리스트 조회 성공",
-                                              "data": []
-                                            }
-                                            """),
+                                    {
+                                      "code": "JOURNAL_LIST_FETCHED",
+                                      "message": "직관 일지 리스트 조회 성공",
+                                      "data": [
+                                        {
+                                          "journalId": 5,
+                                          "ourScore": 3,
+                                          "theirScore": 1,
+                                          "resultScore": "승",
+                                          "date": "2025-07-15T13:43:51.383",
+                                          "supportTeamSC": "OB",
+                                          "opponentTeamName": "SS",
+                                          "stadiumName": "JAM"
+                                        }
+                                      ]
+                                    }
+                                    """),
                             @ExampleObject(name = "일지 없음", value = """
                                             {
                                               "code": "JOURNAL_EMPTY",
@@ -204,17 +215,9 @@ public class JournalController {
         "resultScore": "승",
         "emotion": "감동",
         "date": "2025-07-15T15:09:05.278",
-        "opponentTeamName": "두산",
-        "stadiumName": "잠실"
-      },
-      {
-        "journalId": 6,
-        "media_url": "https://inninglog-bucket.s3.ap-northeast-2.amazonaws.com/journal/1/아르르르.drawio.png?X-Amz-Expires=600&X-Amz-Signature=...",
-        "resultScore": "승",
-        "emotion": "감동",
-        "date": "2025-07-15T14:18:08.821",
-        "opponentTeamName": "두산",
-        "stadiumName": "잠실"
+        "supportTeamSC": "OB",
+        "opponentTeamName": "SS",
+        "stadiumName": "JAM"
       }
     ],
     "pageNumber": 0,
@@ -358,6 +361,7 @@ public class JournalController {
                       "data": {
                         "gameId": "20250701OBLT0",
                         "gameDate": "2025-07-01T18:30:00",
+                        "supportTeamSC": "OB",
                         "opponentSC": "LT",
                         "stadiumSC": "JAM"
                       }

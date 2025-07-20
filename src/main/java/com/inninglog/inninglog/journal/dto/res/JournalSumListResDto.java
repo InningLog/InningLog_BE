@@ -34,21 +34,25 @@ public class JournalSumListResDto {
     @Schema(description = "경기 날짜 및 시간", example = "2025-07-09T18:30:00")
     private LocalDateTime date;
 
-    @Schema(description = "경기 상대 팀 이름", example = "SSG 랜더스")
+    @Schema(description = "우리팀 숏코드", example = "OB")
+    private String supportTeamSC;
+
+    @Schema(description = "경기 상대 팀 숏코드", example = "SS")
     private String opponentTeamName;
 
-    @Schema(description = "경기장 이름", example = "잠실")
+    @Schema(description = "경기장 숏코드", example = "JAM")
     private String stadiumName;
 
-    public static JournalSumListResDto from(Journal journal, String presignedUrl) {
+    public static JournalSumListResDto from(Journal journal, String presignedUrl, String supportTeamSC) {
         return new JournalSumListResDto(
                 journal.getId(),
                 presignedUrl,
                 journal.getResultScore(),
                 journal.getEmotion(),
                 journal.getDate(),
-                journal.getOpponentTeam().getName(),
-                journal.getStadium().getName()
+                supportTeamSC,
+                journal.getOpponentTeam().getShortCode(),
+                journal.getStadium().getShortCode()
         );
     }
 }

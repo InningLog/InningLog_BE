@@ -100,7 +100,7 @@ public class JournalService {
 
 
         Page<JournalSumListResDto> dtoPage = journals.map(
-                journal -> JournalSumListResDto.from(journal, s3Uploader.generatePresignedGetUrl(journal.getMedia_url()))
+                journal -> JournalSumListResDto.from(journal, s3Uploader.generatePresignedGetUrl(journal.getMedia_url()), member.getTeam().getShortCode())
         );
 
         return dtoPage;
@@ -137,18 +137,6 @@ public class JournalService {
         return JourGameResDto.fromGame(member.getTeam().getShortCode(), team.getShortCode(), game );
     }
 
-    //유저의 응원팀 경기 일정 - 월기준 -홈에서 쓰기
-    @Transactional(readOnly = true)
-    public List<GameSchResDto> getGameSch(Long memberId, LocalDate startDate, LocalDate endDate) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        Long supportTeamId = member.getTeam().getId();
-
-        List<Game> games = gameRepository.findByTeamAndDateRange(supportTeamId, startDate, endDate);
-
-        return GameSchResDto.listFrom(games, supportTeamId);
-    }
 
     //해당 일자의 경기 가져오기
     @Transactional(readOnly = true)

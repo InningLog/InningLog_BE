@@ -22,6 +22,9 @@ public class GameSchResDto {
     @Schema(description = "경기 시작 날짜 및 시간", example = "2025-07-01T18:30:00")
     private LocalDateTime gameDate;
 
+    @Schema(description = "우리팀 숏코드", example = "OB")
+    private String supportTeamSC;
+
     @Schema(description = "상대 팀의 구단 식별자 (shortCode)", example = "SS")
     private String opponentSC;
 
@@ -30,24 +33,23 @@ public class GameSchResDto {
 
     public static GameSchResDto from(Game game, Long supportTeamId) {
         String opponentSC;
+        String supportTeamSC;
 
         if (!Objects.equals(game.getAwayTeam().getId(), supportTeamId)) {
             opponentSC = game.getAwayTeam().getShortCode();
+            supportTeamSC = game.getHomeTeam().getShortCode();
         } else {
             opponentSC = game.getHomeTeam().getShortCode();
+            supportTeamSC = game.getAwayTeam().getShortCode();
         }
 
         return GameSchResDto.builder()
                 .gameId(game.getGameId())
                 .gameDate(game.getLocalDateTime())
+                .supportTeamSC(supportTeamSC)
                 .opponentSC(opponentSC)
                 .stadiumSC(game.getStadium().getShortCode())
                 .build();
     }
 
-    public static List<GameSchResDto> listFrom(List<Game> games, Long supportTeamId) {
-        return games.stream()
-                .map(game -> from(game, supportTeamId))
-                .collect(Collectors.toList());
-    }
 }

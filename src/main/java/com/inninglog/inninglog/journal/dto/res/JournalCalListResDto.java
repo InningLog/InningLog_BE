@@ -27,8 +27,17 @@ public class JournalCalListResDto {
 
     @Schema(description = "경기 결과 승/무/패 중 하나", example = "WIN")
     private ResultScore resultScore;
+
+    @Schema(description = "경기 날짜 및 시간", example = "2025-07-09T18:30:00")
     private LocalDateTime date;
+
+    @Schema(description = "우리팀 숏코드", example = "OB")
+    private String supportTeamSC;
+
+    @Schema(description = "경기 상대 팀 이름", example = "SS")
     private String opponentTeamName;
+
+    @Schema(description = "경기장 이름", example = "JAM")
     private String stadiumName;
 
     public static JournalCalListResDto from(Journal journal) {
@@ -38,8 +47,9 @@ public class JournalCalListResDto {
                 journal.getTheirScore(),
                 journal.getResultScore(),
                 journal.getDate(),
-                journal.getOpponentTeam().getName(),
-                journal.getStadium().getName()
+                journal.getMember().getTeam().getShortCode(),
+                journal.getOpponentTeam().getShortCode(),
+                journal.getStadium().getShortCode()
         );
     }
 }
