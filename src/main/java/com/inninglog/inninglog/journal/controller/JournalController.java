@@ -66,7 +66,7 @@ public class JournalController {
     - `fileName`: 업로드한 이미지 파일명 (확장자 포함, ex. photo123.jpeg)
     - `ourScore`, `theirScore`: 점수 정보
     - `opponentTeamShortCode`, `stadiumShortCode`: 상대팀 및 경기장 숏코드
-    - `gameDateTime`: 경기 일시 (`yyyy-MM-dd'T'HH:mm:ss` 형식)
+    - `gameDateTime`: 경기 일시 (`yyyy-MM-dd HH:mm` 형식)
     - `emotion`: 감정 태그 (감동, 짜릿함, 답답함, 아쉬움, 분노, 흡족 중 하나)
     - `review_text`: 후기 내용
     """
@@ -148,10 +148,10 @@ public class JournalController {
                                           "ourScore": 3,
                                           "theirScore": 1,
                                           "resultScore": "승",
-                                          "date": "2025-07-15T13:43:51.383",
+                                          "gameDate": "2025-06-03 18:30",
                                           "supportTeamSC": "OB",
-                                          "opponentTeamName": "SS",
-                                          "stadiumName": "JAM"
+                                          "opponentTeamSC": "SS",
+                                          "stadiumSC": "JAM"
                                         }
                                       ]
                                     }
@@ -214,10 +214,10 @@ public class JournalController {
         "media_url": "https://inninglog-bucket.s3.ap-northeast-2.amazonaws.com/journal/1/photo123.jpeg?X-Amz-Expires=600&X-Amz-Signature=...",
         "resultScore": "승",
         "emotion": "감동",
-        "date": "2025-07-15T15:09:05.278",
+        "gameDate": "2025-06-03 18:30",
         "supportTeamSC": "OB",
-        "opponentTeamName": "SS",
-        "stadiumName": "JAM"
+        "opponentTeamSC": "SS",
+        "stadiumSC": "JAM"
       }
     ],
     "pageNumber": 0,
@@ -309,7 +309,7 @@ public class JournalController {
                                   "message": "요청이 정상적으로 처리되었습니다.",
                                   "data": {
                                     "gameId": "20250625OBLG0",
-                                    "gameDate": "2025-06-25T18:30:00",
+                                    "gameDate": "2025-06-03 18:30",
                                     "supportTeamSC": "LG",
                                     "opponentTeamSC": "OB",
                                     "stadiumSC": "JAM"
@@ -360,7 +360,7 @@ public class JournalController {
                       "message": "요청이 정상적으로 처리되었습니다.",
                       "data": {
                         "gameId": "20250701OBLT0",
-                        "gameDate": "2025-07-01T18:30:00",
+                        "gameDate": "2025-06-03 18:30",
                         "supportTeamSC": "OB",
                         "opponentSC": "LT",
                         "stadiumSC": "JAM"
@@ -421,7 +421,7 @@ public class JournalController {
                           "data": {
                             "jourDetail": {
                               "journalId": 4,
-                              "gameDate": "2025-06-30T13:06:40.457",
+                              "gameDate": "2025-06-03 18:30",
                               "supportTeamSC": "OB",
                               "opponentTeamSC": "OB",
                               "stadiumSC": "JAM",
@@ -444,7 +444,7 @@ public class JournalController {
                           "data": {
                             "jourDetail": {
                               "journalId": 3,
-                              "gameDate": "2025-07-08T12:11:39.038",
+                              "gameDate": "2025-06-03 18:30",
                               "supportTeamSC": "OB",
                               "opponentTeamSC": "OB",
                               "stadiumSC": "JAM",
@@ -500,7 +500,7 @@ public class JournalController {
                           "data": {
                             "jourDetail": {
                               "journalId": 3,
-                              "gameDate": "2025-07-08T12:11:39.038",
+                              "gameDate": "2025-06-03 18:30",
                               "supportTeamSC": "OB",
                               "opponentTeamSC": "OB",
                               "stadiumSC": "JAM",

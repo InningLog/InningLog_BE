@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Data
 @NoArgsConstructor
@@ -21,8 +22,8 @@ public class JourDetailResDto {
     @Schema(description = "직관일지 Id", example = "12")
     private Long journalId;
 
-    @Schema(description = "경기 날짜", example = "2025-06-25T18:30:00")
-    private LocalDateTime gameDate;
+    @Schema(description = "경기 날짜", example = "2025-06-25 18:30")
+    private String gameDate;
 
     @Schema(description = "우리팀 숏코드", example = "OB")
     private String supportTeamSC;
@@ -44,9 +45,12 @@ public class JourDetailResDto {
 
 
     public static JourDetailResDto from(Member member, Journal journal, String presignedUrl) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String formattedDate = journal.getDate().format(formatter);
+
         return JourDetailResDto.builder()
                 .journalId(journal.getId())
-                .gameDate(journal.getDate())
+                .gameDate(formattedDate)
                 .supportTeamSC(member.getTeam().getShortCode())
                 .opponentTeamSC(journal.getOpponentTeam().getShortCode())
                 .stadiumSC(journal.getStadium().getShortCode())

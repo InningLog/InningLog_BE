@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -19,8 +20,8 @@ public class GameSchResDto {
     @Schema(description = "경기 고유 ID", example = "20250701LGSS")
     private String gameId;
 
-    @Schema(description = "경기 시작 날짜 및 시간", example = "2025-07-01T18:30:00")
-    private LocalDateTime gameDate;
+    @Schema(description = "경기 시작 날짜 및 시간", example = "2025-07-01 18:30")
+    private String gameDate;
 
     @Schema(description = "우리팀 숏코드", example = "OB")
     private String supportTeamSC;
@@ -43,9 +44,13 @@ public class GameSchResDto {
             supportTeamSC = game.getAwayTeam().getShortCode();
         }
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String formattedDate = game.getLocalDateTime().format(formatter);
+
+
         return GameSchResDto.builder()
                 .gameId(game.getGameId())
-                .gameDate(game.getLocalDateTime())
+                .gameDate(formattedDate)
                 .supportTeamSC(supportTeamSC)
                 .opponentSC(opponentSC)
                 .stadiumSC(game.getStadium().getShortCode())

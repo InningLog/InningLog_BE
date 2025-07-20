@@ -52,10 +52,10 @@ public class JournalService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        Team opponentTeam = teamRepository.findByShortCode(dto.getOpponentTeamShortCode())
+        Team opponentTeam = teamRepository.findByShortCode(dto.getOpponentTeamSC())
                 .orElseThrow(() -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
-        Stadium stadium = stadiumRepository.findByShortCode(dto.getStadiumShortCode())
+        Stadium stadium = stadiumRepository.findByShortCode(dto.getStadiumSC())
                 .orElseThrow(() -> new CustomException(ErrorCode.STADIUM_NOT_FOUND));
 
         Journal journal = Journal.from(dto, member, opponentTeam, stadium);

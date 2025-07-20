@@ -1,7 +1,6 @@
 package com.inninglog.inninglog.journal.dto.res;
 
 
-import com.inninglog.inninglog.global.s3.S3Uploader;
 import com.inninglog.inninglog.journal.domain.EmotionTag;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.journal.domain.ResultScore;
@@ -11,7 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Data
 @NoArgsConstructor
@@ -31,25 +30,30 @@ public class JournalSumListResDto {
     @Schema(description = "기록 시 감정 태그 (감동, 짜릿함, ...)", example = "감동")
     private EmotionTag emotion;
 
-    @Schema(description = "경기 날짜 및 시간", example = "2025-07-09T18:30:00")
-    private LocalDateTime date;
+    @Schema(description = "경기 날짜 및 시간", example = "2025-07-09 18:30")
+    private String gameDate;
 
     @Schema(description = "우리팀 숏코드", example = "OB")
     private String supportTeamSC;
 
     @Schema(description = "경기 상대 팀 숏코드", example = "SS")
-    private String opponentTeamName;
+    private String opponentTeamSC;
 
     @Schema(description = "경기장 숏코드", example = "JAM")
-    private String stadiumName;
+    private String stadiumSC;
 
     public static JournalSumListResDto from(Journal journal, String presignedUrl, String supportTeamSC) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String formattedDate = journal.getDate().format(formatter);
+
+
         return new JournalSumListResDto(
                 journal.getId(),
                 presignedUrl,
                 journal.getResultScore(),
                 journal.getEmotion(),
-                journal.getDate(),
+                formattedDate,
                 supportTeamSC,
                 journal.getOpponentTeam().getShortCode(),
                 journal.getStadium().getShortCode()

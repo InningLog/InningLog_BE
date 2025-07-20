@@ -3,7 +3,6 @@ package com.inninglog.inninglog.journal.domain;
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
 import com.inninglog.inninglog.journal.dto.req.JourCreateReqDto;
 import com.inninglog.inninglog.journal.dto.req.JourUpdateReqDto;
-import com.inninglog.inninglog.journal.dto.res.JourUpdateResDto;
 import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.seatView.domain.SeatView;
 import com.inninglog.inninglog.stadium.domain.Stadium;
@@ -12,6 +11,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Builder
@@ -66,12 +66,17 @@ public class Journal extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY)
     private SeatView seatView;
 
+
     public static Journal from(JourCreateReqDto dto, Member member, Team team, Stadium stadium) {
         ResultScore resultScore = ResultScore.of(dto.getOurScore(), dto.getTheirScore());
 
+        // 날짜 파싱
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime parsedDate = LocalDateTime.parse(dto.getGameDate(), formatter);
+
         return Journal.builder()
                 .member(member)
-                .date(dto.getGameDateTime())
+                .date(parsedDate) // 파싱된 LocalDateTime 사용
                 .opponentTeam(team)
                 .stadium(stadium)
                 .resultScore(resultScore)
@@ -82,7 +87,6 @@ public class Journal extends BaseTimeEntity {
                 .media_url("journal/" + member.getId() + "/" + dto.getFileName())
                 .build();
     }
-
     public void updateFrom(JourUpdateReqDto dto) {
         this.ourScore = dto.getOurScore();
         this.theirScore = dto.getTheirScore();
