@@ -49,6 +49,8 @@ public class HomeController {
                       "code": "SUCCESS",
                       "message": "요청이 정상적으로 처리되었습니다.",
                       "data": {
+                        "nickName": "구혜승",
+                        "supportTeamSC": "OB",
                         "myWeaningRate": 1000,
                         "myTeamSchedule": [
                           {

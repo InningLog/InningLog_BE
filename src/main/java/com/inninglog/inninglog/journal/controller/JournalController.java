@@ -67,7 +67,7 @@ public class JournalController {
     - `ourScore`, `theirScore`: 점수 정보
     - `opponentTeamShortCode`, `stadiumShortCode`: 상대팀 및 경기장 숏코드
     - `gameDateTime`: 경기 일시 (`yyyy-MM-dd'T'HH:mm:ss` 형식)
-    - `emotion`: 감정 태그 (감동, 짜릿함, 답답함, 아쉬움, 분노 중 하나)
+    - `emotion`: 감정 태그 (감동, 짜릿함, 답답함, 아쉬움, 분노, 흡족 중 하나)
     - `review_text`: 후기 내용
     """
     )
