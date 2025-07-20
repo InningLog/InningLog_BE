@@ -57,24 +57,7 @@ public class SeatSearchController {
                                                         "content": [
                                                           {
                                                             "seatViewId": 3,
-                                                            "viewMediaUrl": "https://your-s3-bucket-url/image.jpg",
-                                                            "seatInfo": {
-                                                              "zoneName": "블루석",
-                                                              "zoneShortCode": "JAM_BLUE",
-                                                              "section": "13",
-                                                              "seatRow": "3",
-                                                              "stadiumName": "잠실"
-                                                            },
-                                                            "emotionTags": [
-                                                              {
-                                                                "code": "CHEERING_MOSTLY_STANDING",
-                                                                "label": "응원 - 일어날 사람은 일어남"
-                                                              },
-                                                              {
-                                                                "code": "SUN_NONE",
-                                                                "label": "햇빛 - 없음"
-                                                              }
-                                                            ]
+                                                            "viewMediaUrl": "https://your-s3-bucket-url/image.jpg"
                                                           }
                                                         ],
                                                         "pageNumber": 0,
@@ -127,7 +110,7 @@ public class SeatSearchController {
                     description = "서버 내부 오류"
             )
     })
-    @GetMapping("/feed")
+    @GetMapping("/gallery ")
     public ResponseEntity<SuccessResponse<SimplePageResponse<SeatViewDetailResult>>> searchSeats(
             @Parameter(
                     description = "구장 단축코드",

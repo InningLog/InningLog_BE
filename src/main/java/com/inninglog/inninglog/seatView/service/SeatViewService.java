@@ -112,16 +112,9 @@ public class SeatViewService {
                     return new CustomException(ErrorCode.SEATVIEW_NOT_FOUND);
                 });
 
-        List<SeatViewEmotionTagDto> tags = seatViewEmotionTagMapRepository.findBySeatViewId(seatViewId).stream()
-                .map(tagMap -> SeatViewEmotionTagDto.builder()
-                        .code(tagMap.getSeatViewEmotionTag().getCode())
-                        .label(tagMap.getSeatViewEmotionTag().getLabel())
-                        .build())
-                .collect(Collectors.toList());
-
         String presignedUrl = s3Uploader.generatePresignedGetUrl(seatView.getView_media_url());
 
         log.info("📌 좌석 시야 조회 성공 - seatViewId: {}, memberId: {}", seatViewId, memberId);
-        return SeatViewDetailResult.from(seatView, tags, presignedUrl);
+        return SeatViewDetailResult.from(seatView, presignedUrl);
     }
 }

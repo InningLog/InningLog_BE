@@ -79,7 +79,6 @@ public class HashtagSearchService {
         return seatViewPage.map(sv ->
                 SeatViewDetailResult.from(
                         sv,
-                        emotionTagMap.getOrDefault(sv.getId(), new ArrayList<>()),
                         s3Uploader.generatePresignedGetUrl(sv.getView_media_url())
                 )
         );

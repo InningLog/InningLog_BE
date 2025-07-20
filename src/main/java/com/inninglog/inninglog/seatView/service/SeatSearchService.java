@@ -67,7 +67,7 @@ public class SeatSearchService {
 
         return seatViews.map(sv -> {
             String presignedUrl = s3Uploader.generatePresignedGetUrl(sv.getView_media_url());
-            return SeatViewDetailResult.from(sv, emotionTagMap.getOrDefault(sv.getId(), List.of()), presignedUrl);
+            return SeatViewDetailResult.from(sv, presignedUrl);
         });
     }
 

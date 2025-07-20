@@ -23,18 +23,10 @@ public class SeatViewDetailResult {
     @Schema(description = "좌석 시야 이미지 URL", example = "https://s3.ap-northeast-2.amazonaws.com/inninglog/seat/view123.jpg")
     private String viewMediaUrl;
 
-    @Schema(description = "좌석 정보 (구역, 열 등)")
-    private SeatInfo seatInfo;
-
-    @Schema(description = "해당 좌석에 등록된 감정 태그 리스트")
-    private List<SeatViewEmotionTagDto> emotionTags;
-
-    public static SeatViewDetailResult from(SeatView seatView, List<SeatViewEmotionTagDto> tags, String presignedUrl) {
+    public static SeatViewDetailResult from(SeatView seatView, String presignedUrl) {
         return SeatViewDetailResult.builder()
                 .seatViewId(seatView.getId())
                 .viewMediaUrl(presignedUrl)
-                .seatInfo(SeatInfo.from(seatView))
-                .emotionTags(tags)
                 .build();
     }
 }
