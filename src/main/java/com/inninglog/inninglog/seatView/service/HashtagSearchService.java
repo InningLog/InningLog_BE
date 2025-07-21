@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -38,7 +39,8 @@ public class HashtagSearchService {
     public Page<SeatViewImageResult> searchSeatViewsByHashtagsGallery(String stadiumShortCode, List<String> hashtagCodes, Pageable pageable) {
         validateHashtagRequest(hashtagCodes);
 
-        log.info("🔍 해시태그 갤러리 검색 요청 | stadium={}, hashtags={}, page={}", stadiumShortCode, hashtagCodes, pageable.getPageNumber());
+        log.info("📌 [searchSeatViewsByHashtagsGallery] stadiumShortCode='{}', hashtagCodes={}, page={} 해시태그 갤러리 검색 요청",
+                stadiumShortCode, hashtagCodes, pageable.getPageNumber());
 
         Page<SeatView> seatViewPage = seatViewRepository.findSeatViewsByHashtagsAndPaged(
                 stadiumShortCode,
@@ -47,7 +49,8 @@ public class HashtagSearchService {
                 pageable
         );
 
-        log.info("✅ 갤러리 검색 결과 {}개 반환", seatViewPage.getContent().size());
+        log.info("📌 [searchSeatViewsByHashtagsGallery] stadiumShortCode='{}' 갤러리 검색 결과: resultCount={}",
+                stadiumShortCode, seatViewPage.getContent().size());
 
         return seatViewPage.map(sv -> SeatViewImageResult.builder()
                 .seatViewId(sv.getId())
@@ -59,7 +62,8 @@ public class HashtagSearchService {
     public Page<SeatViewDetailResult> searchSeatViewsByHashtagsDetail(String stadiumShortCode, List<String> hashtagCodes, Pageable pageable) {
         validateHashtagRequest(hashtagCodes);
 
-        log.info("🔍 해시태그 상세 검색 요청 | stadium={}, hashtags={}, page={}", stadiumShortCode, hashtagCodes, pageable.getPageNumber());
+        log.info("📌 [searchSeatViewsByHashtagsDetail] stadiumShortCode='{}', hashtagCodes={}, page={} 해시태그 상세 검색 요청",
+                stadiumShortCode, hashtagCodes, pageable.getPageNumber());
 
         Page<SeatView> seatViewPage = seatViewRepository.findSeatViewsByHashtagsWithDetailsAndPaged(
                 stadiumShortCode,
@@ -74,7 +78,8 @@ public class HashtagSearchService {
 
         Map<Long, List<SeatViewEmotionTagDto>> emotionTagMap = getEmotionTagMap(seatViewIds);
 
-        log.info("✅ 상세 검색 결과 {}개 반환", seatViewIds.size());
+        log.info("📌 [searchSeatViewsByHashtagsDetail] stadiumShortCode='{}' 상세 검색 결과: resultCount={}",
+                stadiumShortCode, seatViewIds.size());
 
         return seatViewPage.map(sv ->
                 SeatViewDetailResult.from(
@@ -85,9 +90,15 @@ public class HashtagSearchService {
     }
 
     private Map<Long, List<SeatViewEmotionTagDto>> getEmotionTagMap(List<Long> seatViewIds) {
-        if (seatViewIds.isEmpty()) return Map.of();
+        if (seatViewIds.isEmpty()) {
+            log.info("📌 [getEmotionTagMap] seatViewIds가 비어있음");
+            return Map.of();
+        }
 
         List<SeatViewEmotionTagMap> tagMaps = emotionTagMapRepository.findBySeatViewIds(seatViewIds);
+
+        log.info("📌 [getEmotionTagMap] seatViewIds.size={} 감정 태그 매핑 조회 완료: tagMaps.size={}",
+                seatViewIds.size(), tagMaps.size());
 
         return tagMaps.stream()
                 .collect(Collectors.groupingBy(
@@ -104,7 +115,7 @@ public class HashtagSearchService {
 
     private void validateHashtagRequest(List<String> hashtagCodes) {
         if (hashtagCodes == null || hashtagCodes.isEmpty() || hashtagCodes.size() > 5) {
-            log.warn("❌ 잘못된 해시태그 요청: {}", hashtagCodes);
+            log.info("📌 [validateHashtagRequest] hashtagCodes={} 잘못된 해시태그 요청", hashtagCodes);
             throw new CustomException(ErrorCode.INVALID_HASHTAG_REQUEST);
         }
     }

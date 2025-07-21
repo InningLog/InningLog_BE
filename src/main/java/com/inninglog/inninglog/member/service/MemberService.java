@@ -29,10 +29,14 @@ public class MemberService {
         if (existing.isPresent()) {
             Member member = existing.get();
             member.updateInfo(userInfo);
+            log.info("📌 [saveOrUpdateMember] kakaoId={} 기존 회원 정보 업데이트: isNew=false",
+                    userInfo.getId());
             return new MemberWithFlag(member, false);
         } else {
             Member newMember = Member.fromKakaoDto(userInfo);
             memberRepository.save(newMember);
+            log.info("📌 [saveOrUpdateMember] kakaoId={} 새 회원 가입: isNew=true",
+                    userInfo.getId());
             return new MemberWithFlag(newMember, true);
         }
     }
@@ -43,16 +47,18 @@ public class MemberService {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> {
-                    log.warn("[updateNickname] 존재하지 않는 회원: {}", memberId);
+                    log.info("📌 [updateNickname] memberId={} 존재하지 않는 회원", memberId);
                     return new CustomException(ErrorCode.USER_NOT_FOUND);
                 });
 
         if (memberRepository.existsByNickname(nickname)) {
-            log.warn("[updateNickname] 중복 닉네임 시도: {}", nickname);
+            log.info("📌 [updateNickname] nickname='{}' 중복 닉네임 시도", nickname);
             throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
         }
 
         member.setNickname(nickname);
+        log.info("📌 [updateNickname] memberId={} 닉네임 변경 완료: nickname='{}'",
+                memberId, nickname);
     }
 
 
@@ -62,21 +68,23 @@ public class MemberService {
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> {
-                    log.warn("[updateMemberType] 존재하지 않는 회원: {}", memberId);
+                    log.info("📌 [updateMemberType] memberId={} 존재하지 않는 회원", memberId);
                     return new CustomException(ErrorCode.USER_NOT_FOUND);
                 });
 
         if (member.getTeam() != null) {
-            log.warn("[updateMemberType] 이미 팀 설정된 유저: {}", memberId);
+            log.info("📌 [updateMemberType] memberId={} 이미 팀 설정된 유저", memberId);
             throw new CustomException(ErrorCode.ALREADY_SET);
         }
 
         Team team = teamRepository.findByShortCode(teamShortCode)
                 .orElseThrow(() -> {
-                    log.warn("[updateMemberType] 존재하지 않는 팀 코드: {}", teamShortCode);
+                    log.info("📌 [updateMemberType] teamShortCode='{}' 존재하지 않는 팀 코드", teamShortCode);
                     return new CustomException(ErrorCode.TEAM_NOT_FOUND);
                 });
 
         member.setTeam(team);
+        log.info("📌 [updateMemberType] memberId={} 응원팀 설정 완료: teamShortCode='{}'",
+                memberId, teamShortCode);
     }
 }

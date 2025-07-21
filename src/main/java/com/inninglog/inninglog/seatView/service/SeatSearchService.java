@@ -41,12 +41,12 @@ public class SeatSearchService {
         SeatSearchReq request = SeatSearchReq.from(stadiumShortCode, zoneShortCode, section, seatRow);
 
         if (!request.isValidRequest()) {
-            log.warn("❌ 잘못된 좌석 검색 요청 - 열 정보만 존재. 최소 '존' 정보 필요 | stadium={}, zone={}, section={}, seatRow={}",
+            log.warn("❌ [searchSeats] stadium={}, zone={}, section={}, seatRow={} 잘못된 좌석 검색 요청 - 열 정보만 존재. 최소 '존' 정보 필요",
                     stadiumShortCode, zoneShortCode, section, seatRow);
             throw new CustomException(ErrorCode.INVALID_SEAT_SEARCH);
         }
 
-        log.info("🔍 좌석 검색 요청 | stadium={}, zone={}, section={}, seatRow={}, page={}",
+        log.info("🔍 [searchSeats] stadium={}, zone={}, section={}, seatRow={}, page={} 좌석 검색 요청",
                 stadiumShortCode, zoneShortCode, section, seatRow, pageable.getPageNumber());
 
         Page<SeatView> seatViews = seatViewRepository.findSeatViewsBySearchCriteriaPageable(
@@ -63,7 +63,7 @@ public class SeatSearchService {
 
         Map<Long, List<SeatViewEmotionTagDto>> emotionTagMap = getEmotionTagMap(seatViewIds);
 
-        log.info("✅ 검색된 좌석 수: {}개", seatViewIds.size());
+        log.info("✅ [searchSeats] seatCount={} 검색된 좌석 수", seatViewIds.size());
 
         return seatViews.map(sv -> {
             String presignedUrl = s3Uploader.generatePresignedGetUrl(sv.getView_media_url());

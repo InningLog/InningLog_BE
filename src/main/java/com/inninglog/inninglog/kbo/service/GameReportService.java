@@ -45,19 +45,19 @@ public class GameReportService {
     public void createVisitedGame(Long memberId, String gameId, Long journalId){
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> {
-                    log.error("❌ 유저를 찾을 수 없습니다. memberId: {}", memberId);
+                    log.info("📌 [createVisitedGame] memberId={} 유저를 찾을 수 없습니다", memberId);
                     return new CustomException(ErrorCode.USER_NOT_FOUND);
                 });
 
         Journal journal = journalRepository.findById(journalId)
                 .orElseThrow(() -> {
-                    log.error("❌ 일지를 찾을 수 없습니다. journalId: {}", journalId);
+                    log.info("📌 [createVisitedGame] journalId={} 일지를 찾을 수 없습니다", journalId);
                     return new CustomException(ErrorCode.JOURNAL_NOT_FOUND);
                 });
 
         Game game = gameRepository.findByGameId(gameId)
                 .orElseThrow(() -> {
-                    log.error("❌ 게임을 찾을 수 없습니다. gameId: {}", gameId);
+                    log.info("📌 [createVisitedGame] gameId='{}' 게임을 찾을 수 없습니다", gameId);
                     return new CustomException(ErrorCode.GAME_NOT_FOUND);
                 });
 
@@ -68,7 +68,8 @@ public class GameReportService {
                 .build();
 
         visitedGameRepository.save(visitedGame);
-        log.info("✅ 직관 게임 저장 완료: memberId={}, gameId={}, journalId={}", memberId, gameId, journalId);
+        log.info("📌 [createVisitedGame] memberId={}, gameId='{}', journalId={} 직관 게임 저장 완료: resultScore={}",
+                memberId, gameId, journalId, journal.getResultScore());
     }
 
     // 나의 직관 승률 계산
@@ -76,7 +77,7 @@ public class GameReportService {
         List<VisitedGame> visitedGames = visitedGameRepository.findByMember(member);
 
         if (visitedGames.isEmpty()) {
-            log.warn("⚠️ 직관 기록이 없습니다. memberId: {}", member.getId());
+            log.info("📌 [caculateWin] memberId={} 직관 기록이 없습니다", member.getId());
             throw new CustomException(ErrorCode.NO_VISITED_GAMES);
         }
 
@@ -93,8 +94,8 @@ public class GameReportService {
 
         int winningRateHalPoongRi = (int) Math.round(((double) winGames / totalVisitedGames) * 1000);
 
-        log.info("📈 직관 승률 계산 완료: total={}, win={}, lose={}, draw={}, rate={}",
-                totalVisitedGames, winGames, lossGames, drawGames, winningRateHalPoongRi);
+        log.info("📌 [caculateWin] memberId={} 직관 승률 계산 완료: total={}, win={}, lose={}, draw={}, rate={}",
+                member.getId(), totalVisitedGames, winGames, lossGames, drawGames, winningRateHalPoongRi);
 
         return new WinningRateResult(totalVisitedGames, winGames, lossGames, drawGames, winningRateHalPoongRi);
     }
@@ -104,7 +105,7 @@ public class GameReportService {
         List<VisitedGame> visitedGames = visitedGameRepository.findByMember(member);
 
         if (visitedGames.isEmpty()) {
-            log.info("ℹ️ 홈화면: 직관 기록 없음. memberId={}", member.getId());
+            log.info("📌 [forHomeCaculateWin] memberId={} 홈화면용 직관 기록 없음", member.getId());
             return WinningRateResult.empty();
         }
 
@@ -121,7 +122,8 @@ public class GameReportService {
 
         int winningRateHalPoongRi = (int) Math.round(((double) winGames / totalVisitedGames) * 1000);
 
-        log.info("🏠 홈화면 승률 계산 완료: memberId={}, rate={}", member.getId(), winningRateHalPoongRi);
+        log.info("📌 [forHomeCaculateWin] memberId={} 홈화면 승률 계산 완료: rate={}",
+                member.getId(), winningRateHalPoongRi);
 
         return new WinningRateResult(totalVisitedGames, winGames, lossGames, drawGames, winningRateHalPoongRi);
     }
@@ -131,7 +133,7 @@ public class GameReportService {
         Team supportTeam = member.getTeam();
 
         if (supportTeam == null) {
-            log.error("❌ 응원팀이 설정되지 않았습니다. memberId={}", member.getId());
+            log.info("📌 [calculatePlayer] memberId={} 응원팀이 설정되지 않았습니다", member.getId());
             throw new CustomException(ErrorCode.TEAM_NOT_FOUND);
         }
 
@@ -139,7 +141,7 @@ public class GameReportService {
         Set<Long> gameIds = visitedGames.stream().map(vg -> vg.getGame().getId()).collect(Collectors.toSet());
 
         if (gameIds.isEmpty()) {
-            log.warn("⚠️ 직관한 경기 없음. memberId={}", member.getId());
+            log.info("📌 [calculatePlayer] memberId={} 직관한 경기 없음", member.getId());
             throw new CustomException(ErrorCode.GAME_NOT_FOUND);
         }
 
@@ -181,7 +183,8 @@ public class GameReportService {
                 .limit(1)
                 .toList();
 
-        log.info("⚾ 선수 랭킹 계산 완료: memberId={}, 총 선수 수={}", member.getId(), playerStatMap.size());
+        log.info("📌 [calculatePlayer] memberId={} 선수 랭킹 계산 완료: 총 선수 수={}",
+                member.getId(), playerStatMap.size());
 
         return new PlayerRankingResult(topBatters, topPitchers, bottomBatters, bottomPitchers);
     }
@@ -190,7 +193,7 @@ public class GameReportService {
     public GameReportResDto generateReport(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> {
-                    log.error("❌ 유저를 찾을 수 없습니다. memberId={}", memberId);
+                    log.info("📌 [generateReport] memberId={} 유저를 찾을 수 없습니다", memberId);
                     return new CustomException(ErrorCode.USER_NOT_FOUND);
                 });
 
@@ -199,11 +202,12 @@ public class GameReportService {
 
         Team team = teamRepository.findByShortCode(member.getTeam().getShortCode())
                 .orElseThrow(() -> {
-                    log.error("❌ 응원팀 정보 불일치. shortCode={}", member.getTeam().getShortCode());
+                    log.info("📌 [generateReport] shortCode='{}' 응원팀 정보 불일치", member.getTeam().getShortCode());
                     return new CustomException(ErrorCode.TEAM_NOT_FOUND);
                 });
 
-        log.info("📊 직관 리포트 생성 완료: memberId={}, team={}", memberId, team.getShortCode());
+        log.info("📌 [generateReport] memberId={}, team='{}' 직관 리포트 생성 완료",
+                memberId, team.getShortCode());
 
         return GameReportResDto.from(winningRateResult, team.getWinRate(), rankingResult);
     }
