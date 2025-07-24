@@ -20,7 +20,6 @@ jobs:
           java-version: '17'
 
       - name: Build with Gradle
-        working-directory: inninglog
         run: ./gradlew build
 
       - name: Configure AWS credentials
@@ -34,7 +33,6 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Build & Push Docker image
-        working-directory: inninglog
         run: |
           docker build -t ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }} .
           docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
