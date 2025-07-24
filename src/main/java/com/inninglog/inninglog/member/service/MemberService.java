@@ -9,11 +9,13 @@ import com.inninglog.inninglog.member.repository.MemberRepository;
 import com.inninglog.inninglog.team.domain.Team;
 import com.inninglog.inninglog.team.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -27,10 +29,14 @@ public class MemberService {
         if (existing.isPresent()) {
             Member member = existing.get();
             member.updateInfo(userInfo);
+            log.info("📌 [saveOrUpdateMember] kakaoId={} 기존 회원 정보 업데이트: isNew=false",
+                    userInfo.getId());
             return new MemberWithFlag(member, false);
         } else {
-            Member newMember = Member.fromKakaoDto(userInfo); // 💡 static 팩토리 메서드 사용
+            Member newMember = Member.fromKakaoDto(userInfo);
             memberRepository.save(newMember);
+            log.info("📌 [saveOrUpdateMember] kakaoId={} 새 회원 가입: isNew=true",
+                    userInfo.getId());
             return new MemberWithFlag(newMember, true);
         }
     }
@@ -40,30 +46,45 @@ public class MemberService {
     public void updateNickname(Long memberId, String nickname) {
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.info("📌 [updateNickname] memberId={} 존재하지 않는 회원", memberId);
+                    return new CustomException(ErrorCode.USER_NOT_FOUND);
+                });
 
-        // 중복 닉네임 검사
         if (memberRepository.existsByNickname(nickname)) {
+            log.info("📌 [updateNickname] nickname='{}' 중복 닉네임 시도", nickname);
             throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
         }
 
         member.setNickname(nickname);
+        log.info("📌 [updateNickname] memberId={} 닉네임 변경 완료: nickname='{}'",
+                memberId, nickname);
     }
 
 
     //유저 타입 & 응원 팀 설정
     @Transactional
     public void updateMemberType(Long memberId, String teamShortCode) {
+
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.info("📌 [updateMemberType] memberId={} 존재하지 않는 회원", memberId);
+                    return new CustomException(ErrorCode.USER_NOT_FOUND);
+                });
 
         if (member.getTeam() != null) {
+            log.info("📌 [updateMemberType] memberId={} 이미 팀 설정된 유저", memberId);
             throw new CustomException(ErrorCode.ALREADY_SET);
         }
 
         Team team = teamRepository.findByShortCode(teamShortCode)
-                .orElseThrow(() -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.info("📌 [updateMemberType] teamShortCode='{}' 존재하지 않는 팀 코드", teamShortCode);
+                    return new CustomException(ErrorCode.TEAM_NOT_FOUND);
+                });
 
         member.setTeam(team);
+        log.info("📌 [updateMemberType] memberId={} 응원팀 설정 완료: teamShortCode='{}'",
+                memberId, teamShortCode);
     }
 }

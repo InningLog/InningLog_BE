@@ -2,15 +2,16 @@ package com.inninglog.inninglog.journal.domain;
 
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
 import com.inninglog.inninglog.journal.dto.req.JourCreateReqDto;
+import com.inninglog.inninglog.journal.dto.req.JourUpdateReqDto;
 import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.seatView.domain.SeatView;
 import com.inninglog.inninglog.stadium.domain.Stadium;
 import com.inninglog.inninglog.team.domain.Team;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Builder
@@ -63,22 +64,19 @@ public class Journal extends BaseTimeEntity {
 
     //시야 정보
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seatView_id")
     private SeatView seatView;
 
+
     public static Journal from(JourCreateReqDto dto, Member member, Team team, Stadium stadium) {
-        ResultScore resultScore;
-        if (dto.getOurScore() > dto.getTheirScore()) {
-            resultScore = ResultScore.WIN;
-        } else if (dto.getOurScore() < dto.getTheirScore()) {
-            resultScore = ResultScore.LOSE;
-        } else {
-            resultScore = ResultScore.DRAW;
-        }
+        ResultScore resultScore = ResultScore.of(dto.getOurScore(), dto.getTheirScore());
+
+        // 날짜 파싱
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime parsedDate = LocalDateTime.parse(dto.getGameDate(), formatter);
 
         return Journal.builder()
                 .member(member)
-                .date(dto.getGameDateTime())
+                .date(parsedDate) // 파싱된 LocalDateTime 사용
                 .opponentTeam(team)
                 .stadium(stadium)
                 .resultScore(resultScore)
@@ -86,8 +84,16 @@ public class Journal extends BaseTimeEntity {
                 .theirScore(dto.getTheirScore())
                 .emotion(dto.getEmotion())
                 .review_text(dto.getReview_text())
-                .media_url(dto.getMedia_url())
+                .media_url("journal/" + member.getId() + "/" + dto.getFileName())
                 .build();
+    }
+    public void updateFrom(JourUpdateReqDto dto) {
+        this.ourScore = dto.getOurScore();
+        this.theirScore = dto.getTheirScore();
+        this.resultScore = ResultScore.of(dto.getOurScore(), dto.getTheirScore()); // 기존 방식 유지
+        this.media_url = dto.getMedia_url();
+        this.emotion = dto.getEmotion();
+        this.review_text = dto.getReview_text();
     }
 
 }

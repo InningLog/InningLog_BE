@@ -36,7 +36,7 @@ public class StadiumInitializer implements ApplicationRunner {
                     Stadium.builder().name("고척").shortCode("GOC").team(teams.get("WO")).build(),       // 키움
                     Stadium.builder().name("문학").shortCode("ICN").team(teams.get("SK")).build(),  // SSG
                     Stadium.builder().name("수원").shortCode("SUW").team(teams.get("KT")).build(),    // KT
-                    Stadium.builder().name("대전(신)").shortCode("DJN").team(teams.get("HH")).build(), // 한화
+                    Stadium.builder().name("대전").shortCode("DJN").team(teams.get("HH")).build(), // 한화
                     Stadium.builder().name("대구").shortCode("DAE").team(teams.get("SS")).build(), // 삼성
                     Stadium.builder().name("사직").shortCode("BUS").team(teams.get("LT")).build(),       // 롯데
                     Stadium.builder().name("창원").shortCode("CHW").team(teams.get("NC")).build(),         // NC

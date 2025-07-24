@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Data
 @NoArgsConstructor
@@ -27,19 +27,33 @@ public class JournalCalListResDto {
 
     @Schema(description = "경기 결과 승/무/패 중 하나", example = "WIN")
     private ResultScore resultScore;
-    private LocalDateTime date;
-    private String opponentTeamName;
-    private String stadiumName;
+
+    @Schema(description = "경기 날짜 및 시간", example = "2025-07-09 18:30")
+    private String gameDate;
+
+    @Schema(description = "우리팀 숏코드", example = "OB")
+    private String supportTeamSC;
+
+    @Schema(description = "경기 상대 팀 이름", example = "SS")
+    private String opponentTeamSC;
+
+    @Schema(description = "경기장 이름", example = "JAM")
+    private String stadiumSC;
 
     public static JournalCalListResDto from(Journal journal) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String formattedDate = journal.getDate().format(formatter);
+
         return new JournalCalListResDto(
                 journal.getId(),
                 journal.getOurScore(),
                 journal.getTheirScore(),
                 journal.getResultScore(),
-                journal.getDate(),
-                journal.getOpponentTeam().getName(),
-                journal.getStadium().getName()
+                formattedDate,
+                journal.getMember().getTeam().getShortCode(),
+                journal.getOpponentTeam().getShortCode(),
+                journal.getStadium().getShortCode()
         );
     }
 }

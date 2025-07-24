@@ -1,6 +1,7 @@
 package com.inninglog.inninglog.kbo.domain;
 
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
+import com.inninglog.inninglog.journal.domain.ResultScore;
 import com.inninglog.inninglog.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,6 +27,7 @@ public class VisitedGame extends BaseTimeEntity{
     @JoinColumn(name = "game_id")
     private Game game;
 
-    private Boolean result; //유저의 응원팀 기준 승 - true, 패 - false, 무승부
-
+    //경기 결과
+    @Enumerated(EnumType.STRING)
+    private ResultScore resultScore;
 }

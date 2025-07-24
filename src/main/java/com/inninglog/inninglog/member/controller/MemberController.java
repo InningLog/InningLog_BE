@@ -9,6 +9,7 @@ import com.inninglog.inninglog.member.service.MemberService;
 import com.inninglog.inninglog.member.dto.NicknameRequestDto;
 import com.inninglog.inninglog.member.dto.TypeRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
@@ -24,25 +25,33 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/member")
-@Tag(name = "Member", description = "회원 관련 API")
+@Tag(name = "회원", description = "회원 관련 API")
 public class MemberController {
 
     private final MemberService memberService;
 
-
-    //닉네임 수정
+    // 닉네임 수정
     @Operation(
             summary = "닉네임 수정",
             description = "JWT 토큰에서 인증된 회원 정보를 추출하여, 사용자의 닉네임을 수정합니다.\n\n" +
                     "요청 바디에는 새로운 닉네임이 포함되어야 하며, 중복된 닉네임일 경우 오류가 반환됩니다.\n"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "닉네임 수정 성공"),
-            @ApiResponse(responseCode = "400", description = "중복된 닉네임",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "회원 정보를 찾을 수 없음",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "200", description = "사용자 정보 업데이트 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "닉네임 수정", value = """
+                                            {
+                                              "code": "NICKNAME_UPDATED",
+                                              "message": "닉네임이 성공적으로 수정되었습니다.",
+                                              "data": null
+                                            }
+                                            """)
+                            }))
     })
+    @ErrorApiResponses.Nickname
     @PatchMapping("/nickname")
     public ResponseEntity<SuccessResponse<Void>> updateNickname(
             @AuthenticationPrincipal CustomUserDetails user,
@@ -52,8 +61,7 @@ public class MemberController {
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.NICKNAME_UPDATED));
     }
 
-
-    //회원 응원팀 설정
+    // 회원 응원팀 설정
     @Operation(
             summary = "회원의 응원 팀 설정",
             description = """
@@ -73,9 +81,23 @@ public class MemberController {
 
         ⚠️ **주의:** 이미 응원 팀이 설정된 회원은 변경할 수 없습니다.  
         이 경우 `400 Bad Request` 에러가 반환됩니다.
-    """
+        """
     )
-    @SuccessApiResponses.UserUpdate
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 정보 업데이트 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "응원 팀 설정", value = """
+                                            {
+                                              "code": "TEAM_SET",
+                                              "message": "응원 팀이 성공적으로 설정되었습니다.",
+                                              "data": null
+                                            }
+                                            """)
+                            }))
+    })
     @ErrorApiResponses.Common
     @ErrorApiResponses.TeamSetting
     @PatchMapping("/setup")

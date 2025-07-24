@@ -3,6 +3,7 @@ package com.inninglog.inninglog.kbo.dto;
 import com.inninglog.inninglog.kbo.domain.Player;
 import com.inninglog.inninglog.kbo.domain.PlayerStat;
 import com.inninglog.inninglog.kbo.domain.PlayerType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 @Getter
@@ -10,19 +11,31 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Schema(description = "직관 리포트용 선수 순위 DTO")
 public class PlayerRankingDto {
 
+    @Schema(description = "선수 ID", example = "5")
     private Long playerId;
+
+    @Schema(description = "선수 이름", example = "홍건희")
     private String playerName;
+
+    @Schema(description = "선수 유형 (타자 / 투수)", example = "PITCHER")
     private PlayerType playerType;
 
-    // 누적 스탯
+    @Schema(description = "누적 안타 수 (타자 전용)", example = "1")
     private int totalHits;
+
+    @Schema(description = "누적 타수 (타자 전용)", example = "3")
     private int totalAtBats;
+
+    @Schema(description = "누적 자책점 (투수 전용)", example = "2")
     private int totalEarned;
+
+    @Schema(description = "누적 이닝 수 (투수 전용)", example = "7.2")
     private double totalInning;
 
-    // 할푼리
+    @Schema(description = "할푼리 (타율 또는 방어율 환산값)", example = "333")
     private int halPoongRi;
 
     /**

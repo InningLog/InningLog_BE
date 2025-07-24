@@ -8,7 +8,8 @@ public enum EmotionTag {
     EXCITED("짜릿함"),
     FRUSTRATED("답답함"),
     REGRETFUL("아쉬움"),
-    ANGRY("분노");
+    ANGRY("분노"),
+    SATISFIED("흡족");
 
     private final String description;
 

@@ -11,12 +11,15 @@ import com.inninglog.inninglog.kbo.domain.PlayerType;
 import com.inninglog.inninglog.kbo.domain.VisitedGame;
 import com.inninglog.inninglog.kbo.dto.PlayerRankingDto;
 import com.inninglog.inninglog.kbo.dto.gameReport.GameReportResDto;
+import com.inninglog.inninglog.kbo.dto.gameReport.PlayerRankingResult;
+import com.inninglog.inninglog.kbo.dto.gameReport.WinningRateResult;
 import com.inninglog.inninglog.kbo.repository.GameRepository;
 import com.inninglog.inninglog.kbo.repository.PlayerStatRepository;
 import com.inninglog.inninglog.kbo.repository.VisitedGameRepository;
 import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.member.repository.MemberRepository;
 import com.inninglog.inninglog.team.domain.Team;
+import com.inninglog.inninglog.team.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,99 +39,129 @@ public class GameReportService {
     private final GameRepository gameRepository;
     private final VisitedGameRepository visitedGameRepository;
     private final PlayerStatRepository playerStatRepository;
+    private final TeamRepository teamRepository;
 
-    //나의 직관 게임 일정 기록
+    // 나의 직관 게임 일정 기록
     public void createVisitedGame(Long memberId, String gameId, Long journalId){
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.info("📌 [createVisitedGame] memberId={} 유저를 찾을 수 없습니다", memberId);
+                    return new CustomException(ErrorCode.USER_NOT_FOUND);
+                });
 
         Journal journal = journalRepository.findById(journalId)
-                .orElseThrow(() -> new CustomException(ErrorCode.JOURNAL_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.info("📌 [createVisitedGame] journalId={} 일지를 찾을 수 없습니다", journalId);
+                    return new CustomException(ErrorCode.JOURNAL_NOT_FOUND);
+                });
 
         Game game = gameRepository.findByGameId(gameId)
-                .orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND));
-
-        boolean isWin = journal.getResultScore() == ResultScore.WIN;
+                .orElseThrow(() -> {
+                    log.info("📌 [createVisitedGame] gameId='{}' 게임을 찾을 수 없습니다", gameId);
+                    return new CustomException(ErrorCode.GAME_NOT_FOUND);
+                });
 
         VisitedGame visitedGame = VisitedGame.builder()
                 .member(member)
                 .game(game)
-                .result(isWin)
+                .resultScore(journal.getResultScore())
                 .build();
 
         visitedGameRepository.save(visitedGame);
-
+        log.info("📌 [createVisitedGame] memberId={}, gameId='{}', journalId={} 직관 게임 저장 완료: resultScore={}",
+                memberId, gameId, journalId, journal.getResultScore());
     }
 
-    //나의 직관 승률 계산
+    // 나의 직관 승률 계산
     public WinningRateResult caculateWin(Member member) {
-
         List<VisitedGame> visitedGames = visitedGameRepository.findByMember(member);
 
-        int totalVisitedGames = visitedGames.size();
-        int winGames = 0;
+        if (visitedGames.isEmpty()) {
+            log.info("📌 [caculateWin] memberId={} 직관 기록이 없습니다", member.getId());
+            throw new CustomException(ErrorCode.NO_VISITED_GAMES);
+        }
 
-        for (VisitedGame visitedGame : visitedGames) {
-            if (Boolean.TRUE.equals(visitedGame.getResult())) {
-                winGames++;
+        int totalVisitedGames = visitedGames.size();
+        int winGames = 0, lossGames = 0, drawGames = 0;
+
+        for (VisitedGame vg : visitedGames) {
+            switch (vg.getResultScore()) {
+                case WIN -> winGames++;
+                case LOSE -> lossGames++;
+                case DRAW -> drawGames++;
             }
         }
 
-        //할푼리로 계산
-        int winningRateHalPoongRi = totalVisitedGames == 0
-                ? 0 //경기 수가 0이면 0 반환
-                : (int) Math.round(((double) winGames / totalVisitedGames) * 1000);
+        int winningRateHalPoongRi = (int) Math.round(((double) winGames / totalVisitedGames) * 1000);
 
-        return new WinningRateResult(totalVisitedGames, winGames, winningRateHalPoongRi);
+        log.info("📌 [caculateWin] memberId={} 직관 승률 계산 완료: total={}, win={}, lose={}, draw={}, rate={}",
+                member.getId(), totalVisitedGames, winGames, lossGames, drawGames, winningRateHalPoongRi);
+
+        return new WinningRateResult(totalVisitedGames, winGames, lossGames, drawGames, winningRateHalPoongRi);
     }
 
-
-    //선수들 경기 기록 계산
-    public PlayerRankingResult calculatePlayer(Member member) {
-
-        Team supportTeam = member.getTeam();
-
-        // 1. 유저가 직관한 경기들
+    // 홈 화면 용 승률 계산
+    public WinningRateResult forHomeCaculateWin(Member member) {
         List<VisitedGame> visitedGames = visitedGameRepository.findByMember(member);
 
-        //유저가 직관한 경기들의 ID만 추출해서 Set에 모음
-        Set<Long> gameIds = visitedGames.stream() //스트림으로 변환
-                .map(vg -> vg.getGame().getId()) //각 vistiedgame에서 game 객체를 꺼낸 뒤, 그 id만 추출
-                .collect(Collectors.toSet()); //추출한 id를 set에 담음 -> 중복 제거용
-
-        if (gameIds.isEmpty()) {
-            //직관한 경기가 없는 경우 에러 던지기
-            throw new CustomException(ErrorCode.GAME_NOT_FOUND);
-            //return new PlayerRankingResult(Collections.emptyList(), Collections.emptyList());
+        if (visitedGames.isEmpty()) {
+            log.info("📌 [forHomeCaculateWin] memberId={} 홈화면용 직관 기록 없음", member.getId());
+            return WinningRateResult.empty();
         }
 
-        // 2. 해당 경기들에서 응원팀 소속 선수의 기록만 조회
-        List<PlayerStat> stats = playerStatRepository.findByGameIdsAndTeam(gameIds, supportTeam);
+        int totalVisitedGames = visitedGames.size();
+        int winGames = 0, lossGames = 0, drawGames = 0;
 
-        // 3. 선수별 누적 스탯을 Map에 집계
+        for (VisitedGame vg : visitedGames) {
+            switch (vg.getResultScore()) {
+                case WIN -> winGames++;
+                case LOSE -> lossGames++;
+                case DRAW -> drawGames++;
+            }
+        }
+
+        int winningRateHalPoongRi = (int) Math.round(((double) winGames / totalVisitedGames) * 1000);
+
+        log.info("📌 [forHomeCaculateWin] memberId={} 홈화면 승률 계산 완료: rate={}",
+                member.getId(), winningRateHalPoongRi);
+
+        return new WinningRateResult(totalVisitedGames, winGames, lossGames, drawGames, winningRateHalPoongRi);
+    }
+
+    // 선수들 기록 계산
+    public PlayerRankingResult calculatePlayer(Member member) {
+        Team supportTeam = member.getTeam();
+
+        if (supportTeam == null) {
+            log.info("📌 [calculatePlayer] memberId={} 응원팀이 설정되지 않았습니다", member.getId());
+            throw new CustomException(ErrorCode.TEAM_NOT_FOUND);
+        }
+
+        List<VisitedGame> visitedGames = visitedGameRepository.findByMember(member);
+        Set<Long> gameIds = visitedGames.stream().map(vg -> vg.getGame().getId()).collect(Collectors.toSet());
+
+        if (gameIds.isEmpty()) {
+            log.info("📌 [calculatePlayer] memberId={} 직관한 경기 없음", member.getId());
+            throw new CustomException(ErrorCode.GAME_NOT_FOUND);
+        }
+
+        List<PlayerStat> stats = playerStatRepository.findByGameIdsAndTeam(gameIds, supportTeam);
         Map<Long, PlayerRankingDto> playerStatMap = new HashMap<>();
 
         for (PlayerStat stat : stats) {
             Long playerId = stat.getPlayer().getId();
-
-            PlayerRankingDto dto =
-                    playerStatMap.computeIfAbsent
-                            (playerId, id ->
-                    PlayerRankingDto
-                            .from(stat.getPlayer()));//player 엔티티로부터 dto 초기화하는 팩토리 메서드
-
+            PlayerRankingDto dto = playerStatMap.computeIfAbsent(
+                    playerId, id -> PlayerRankingDto.from(stat.getPlayer()));
             dto.addStat(stat);
         }
 
-        // 4. 할푼리 계산
         for (PlayerRankingDto dto : playerStatMap.values()) {
             dto.calculateHalPoongRi();
         }
 
-        // 5. 투수/타자 분리 및 정렬
         List<PlayerRankingDto> topBatters = playerStatMap.values().stream()
                 .filter(dto -> dto.getPlayerType() == PlayerType.HITTER)
-                .sorted(Comparator.comparingInt(PlayerRankingDto::getHalPoongRi).reversed()) // 타자는 높은 순
+                .sorted(Comparator.comparingInt(PlayerRankingDto::getHalPoongRi).reversed())
                 .limit(1)
                 .toList();
 
@@ -138,58 +171,44 @@ public class GameReportService {
                 .limit(1)
                 .toList();
 
-
-        List<PlayerRankingDto> buttomBatters = playerStatMap.values().stream()
+        List<PlayerRankingDto> bottomBatters = playerStatMap.values().stream()
                 .filter(dto -> dto.getPlayerType() == PlayerType.HITTER)
                 .sorted(Comparator.comparingInt(PlayerRankingDto::getHalPoongRi))
                 .limit(1)
                 .toList();
 
-        List<PlayerRankingDto> buttomPitchers = playerStatMap.values().stream()
+        List<PlayerRankingDto> bottomPitchers = playerStatMap.values().stream()
                 .filter(dto -> dto.getPlayerType() == PlayerType.PITCHER)
                 .sorted(Comparator.comparingInt(PlayerRankingDto::getHalPoongRi).reversed())
                 .limit(1)
                 .toList();
 
-        return new PlayerRankingResult(topBatters, topPitchers,buttomBatters,buttomPitchers);
+        log.info("📌 [calculatePlayer] memberId={} 선수 랭킹 계산 완료: 총 선수 수={}",
+                member.getId(), playerStatMap.size());
+
+        return new PlayerRankingResult(topBatters, topPitchers, bottomBatters, bottomPitchers);
     }
 
-    // 결과 DTO
-    public record PlayerRankingResult(
-            List<PlayerRankingDto> topBatters,
-            List<PlayerRankingDto> topPitchers,
-            List<PlayerRankingDto> bottomBatters,
-            List<PlayerRankingDto> bottomPitchers
-
-    ) {}
-
-    public record WinningRateResult(
-            int totalVisitedGames,
-            int winGames,
-            int winningRateHalPoongRi
-    ){}
-
-
-    //직관 리포트 생성
+    // 직관 리포트 생성
     public GameReportResDto generateReport(Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.info("📌 [generateReport] memberId={} 유저를 찾을 수 없습니다", memberId);
+                    return new CustomException(ErrorCode.USER_NOT_FOUND);
+                });
 
-       //직관 승률 계산
         WinningRateResult winningRateResult = caculateWin(member);
-
-        // 선수 랭킹 계산
         PlayerRankingResult rankingResult = calculatePlayer(member);
 
-        return GameReportResDto.builder()
-                .totalVisitedGames(winningRateResult.totalVisitedGames)
-                .winGames(winningRateResult.winGames)
-                .winningRateHalPoongRi(winningRateResult.winningRateHalPoongRi)
-                .topBatters(rankingResult.topBatters())
-                .topPitchers(rankingResult.topPitchers())
-                .bottomBatters(rankingResult.bottomBatters())
-                .bottomPitchers(rankingResult.bottomPitchers())
-                .build();
+        Team team = teamRepository.findByShortCode(member.getTeam().getShortCode())
+                .orElseThrow(() -> {
+                    log.info("📌 [generateReport] shortCode='{}' 응원팀 정보 불일치", member.getTeam().getShortCode());
+                    return new CustomException(ErrorCode.TEAM_NOT_FOUND);
+                });
+
+        log.info("📌 [generateReport] memberId={}, team='{}' 직관 리포트 생성 완료",
+                memberId, team.getShortCode());
+
+        return GameReportResDto.from(winningRateResult, team.getWinRate(), rankingResult);
     }
 }
-

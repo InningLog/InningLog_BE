@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Data
 @NoArgsConstructor
@@ -21,8 +22,8 @@ public class JourDetailResDto {
     @Schema(description = "직관일지 Id", example = "12")
     private Long journalId;
 
-    @Schema(description = "경기 날짜", example = "2025-06-25T18:30:00")
-    private LocalDateTime gameDate;
+    @Schema(description = "경기 날짜", example = "2025-06-25 18:30")
+    private String gameDate;
 
     @Schema(description = "우리팀 숏코드", example = "OB")
     private String supportTeamSC;
@@ -36,22 +37,25 @@ public class JourDetailResDto {
     @Schema(description = "감정 태그 (감동/짜릿함/답답함/아쉬움/분노 중 하나)", example = "감동")
     private EmotionTag emotion;
 
-    @Schema(description = "경기 결과 이미지 URL (S3 업로드 후 응답받은 링크)", example = "https://s3.amazonaws.com/.../image.jpg", nullable = true)
+    @Schema(description = "업로드한 이미지 파일명 (확장자 포함)", example = "photo123.jpeg")
     private String media_url; // optional
 
     @Schema(description = "후기글", example = "오늘 경기는 정말 재미있었다!", nullable = true)
     private String review_text; // optional
 
 
-    public static JourDetailResDto from(Member member, Journal journal) {
+    public static JourDetailResDto from(Member member, Journal journal, String presignedUrl) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String formattedDate = journal.getDate().format(formatter);
+
         return JourDetailResDto.builder()
                 .journalId(journal.getId())
-                .gameDate(journal.getDate())
+                .gameDate(formattedDate)
                 .supportTeamSC(member.getTeam().getShortCode())
                 .opponentTeamSC(journal.getOpponentTeam().getShortCode())
                 .stadiumSC(journal.getStadium().getShortCode())
                 .emotion(journal.getEmotion())
-                .media_url(journal.getMedia_url())
+                .media_url(presignedUrl)
                 .review_text(journal.getReview_text())
                 .build();
     }
