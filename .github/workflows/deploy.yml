@@ -37,14 +37,15 @@ jobs:
           docker build -t ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }} .
           docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
 
-      - name: Deploy to rented server via SSH (password)
+      - name: Deploy via SSH with key
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: ${{ secrets.SERVER_HOST }}           # IP 또는 도메인만 (ex. 1.2.3.4)
-          port: 1100                                 # 업체에서 SSH 포트 다르게 줬다면 수정!
-          username: ${{ secrets.SERVER_USER }}       # ex. haeseung
-          password: ${{ secrets.SERVER_PASSWORD }}   # 비밀번호
+          host: ${{ secrets.SERVER_HOST }}
+          port: 1100
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_KEY }}
           script: |
-            docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
+            echo "✅ SSH 접속 성공!"
+            docker pull ...
             docker compose down
             docker compose up -d
