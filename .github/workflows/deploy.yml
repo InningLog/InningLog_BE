@@ -1,4 +1,4 @@
-name: CI/CD to Rented Server (비밀번호 SSH)
+name: CI/CD to Rented Server (Password SSH + ECR)
 
 on:
   push:
@@ -42,10 +42,10 @@ jobs:
       - name: Deploy to rented server via SSH (password)
         uses: appleboy/ssh-action@v0.1.10
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          password: ${{ secrets.SERVER_PASSWORD }}
-          port: 22
+          host: ${{ secrets.SERVER_HOST }}           # IP 또는 도메인만 (ex. 1.2.3.4)
+          port: 1100                                 # 업체에서 SSH 포트 다르게 줬다면 수정!
+          username: ${{ secrets.SERVER_USER }}       # ex. haeseung
+          password: ${{ secrets.SERVER_PASSWORD }}   # 비밀번호
           script: |
             docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
             docker compose down
