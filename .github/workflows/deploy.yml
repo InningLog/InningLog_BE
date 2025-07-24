@@ -20,7 +20,6 @@ jobs:
           java-version: '17'
 
       - name: Build with Gradle
-        working-directory: inninglog
         run: ./gradlew build -x test
 
       - name: Configure AWS credentials
