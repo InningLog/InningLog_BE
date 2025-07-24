@@ -62,10 +62,13 @@ public class SecurityConfig {
                 "https://inninglog.shop",
                 "https://api.inninglog.shop",
                 "http://api.inninglog.shop",
-                "http://localhost:62378"
+                "http://localhost:62378",
+                "http://localhost:8002",
+                "http://127.0.0.1:8002"
 
 
-        ));
+
+                ));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowCredentials(true);
