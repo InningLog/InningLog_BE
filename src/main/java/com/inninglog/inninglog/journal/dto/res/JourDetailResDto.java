@@ -31,6 +31,12 @@ public class JourDetailResDto {
     @Schema(description = "상대팀 숏코드", example = "SS")
     private String opponentTeamSC;
 
+    @Schema(description = "우리팀 점수", example = "3")
+    private int ourScore;
+
+    @Schema(description = "상대팀 점수", example = "1")
+    private int theirScore;
+
     @Schema(description = "경기장 숏코드", example = "JAM")
     private String stadiumSC;
 
@@ -53,6 +59,8 @@ public class JourDetailResDto {
                 .gameDate(formattedDate)
                 .supportTeamSC(member.getTeam().getShortCode())
                 .opponentTeamSC(journal.getOpponentTeam().getShortCode())
+                .ourScore(journal.getOurScore())
+                .theirScore(journal.getTheirScore())
                 .stadiumSC(journal.getStadium().getShortCode())
                 .emotion(journal.getEmotion())
                 .media_url(presignedUrl)
