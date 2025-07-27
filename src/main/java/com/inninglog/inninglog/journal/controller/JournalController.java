@@ -424,7 +424,7 @@ public class JournalController {
                               "gameDate": "2025-06-03 18:30",
                               "supportTeamSC": "OB",
                               "opponentTeamSC": "OB",
-                              "ourScore": 3,
+                              "ourScore": 32,
                               "theirScore": 1,
                               "stadiumSC": "JAM",
                               "emotion": "감동",
