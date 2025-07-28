@@ -14,6 +14,9 @@ import java.util.List;
 @Schema(description = "직관 리포트 응답 DTO")
 public class GameReportResDto {
 
+    @Schema(description = "유저닉네임", example = "구혜승")
+    private String nickname;
+
     @Schema(description = "직관한 총 경기 수", example = "2")
     private int totalVisitedGames;
 
@@ -45,8 +48,9 @@ public class GameReportResDto {
     private List<PlayerRankingDto> bottomPitchers;
 
 
-    public static GameReportResDto from(WinningRateResult winningRateResult, double teamWinRate, PlayerRankingResult rankingResult) {
+    public static GameReportResDto from(String nickname, WinningRateResult winningRateResult, double teamWinRate, PlayerRankingResult rankingResult) {
         return GameReportResDto.builder()
+                .nickname(nickname)
                 .totalVisitedGames(winningRateResult.getTotalVisitedGames())
                 .winGames(winningRateResult.getWinGames())
                 .loseGames(winningRateResult.getLoseGames())
