@@ -63,6 +63,7 @@ public class GameReportController {
                   "code": "SUCCESS",
                   "message": "요청이 정상적으로 처리되었습니다.",
                   "data": {
+                    "nickname : gggg",
                     "totalVisitedGames": 2,
                     "winGames": 2,
                     "loseGames": 0,
