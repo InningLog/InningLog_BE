@@ -1,0 +1,18 @@
+spring:
+  profiles:
+    active: dev  # 기본은 dev로 (운영 땐 prod로 교체)
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+jwt:
+  secretKey: ${JWT_SECRET_KEY}
+  expiration: ${JWT_EXPIRATION}
+
+amplitude:
+  api-key: ${AMPLITUDE_API_KEY}
