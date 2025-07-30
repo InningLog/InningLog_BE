@@ -87,4 +87,10 @@ public class MemberService {
         log.info("📌 [updateMemberType] memberId={} 응원팀 설정 완료: teamShortCode='{}'",
                 memberId, teamShortCode);
     }
+
+    @Transactional
+    public void setupMemberInfo(Long memberId, String nickname, String teamShortCode) {
+        updateNickname(memberId, nickname);
+        updateMemberType(memberId, teamShortCode);
+    }
 }

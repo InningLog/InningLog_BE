@@ -5,6 +5,7 @@ import com.inninglog.inninglog.global.exception.ErrorApiResponses;
 import com.inninglog.inninglog.global.response.SuccessApiResponses;
 import com.inninglog.inninglog.global.response.SuccessResponse;
 import com.inninglog.inninglog.global.response.SuccessCode;
+import com.inninglog.inninglog.member.dto.MemberSetupRequestDto;
 import com.inninglog.inninglog.member.service.MemberService;
 import com.inninglog.inninglog.member.dto.NicknameRequestDto;
 import com.inninglog.inninglog.member.dto.TypeRequestDto;
@@ -111,5 +112,40 @@ public class MemberController {
     ) {
         memberService.updateMemberType(user.getMember().getId(), request.getTeamShortCode());
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.TEAM_SET));
+    }
+
+    @Operation(
+            summary = "회원 초기 설정 (닉네임 + 응원팀)",
+            description = """
+        회원 가입 후 최초 1회에 한해 닉네임과 응원팀을 한 번에 설정합니다.
+
+        ⚠️ 응원팀은 한 번 설정하면 변경할 수 없습니다.
+        """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "회원 정보 설정 완료",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SuccessResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "회원 설정", value = """
+                                        {
+                                          "code": "MEMBER_SETUP_SUCCESS",
+                                          "message": "회원 정보 설정이 완료되었습니다.",
+                                          "data": null
+                                        }
+                                        """)
+                            }))
+    })
+    @ErrorApiResponses.Common
+    @ErrorApiResponses.Nickname
+    @ErrorApiResponses.TeamSetting
+    @PostMapping("/setup")
+    public ResponseEntity<SuccessResponse<Void>> setupMemberInfo(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestBody MemberSetupRequestDto request
+    ) {
+        memberService.setupMemberInfo(user.getMember().getId(), request.getNickname(), request.getTeamShortCode());
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK));
     }
 }
