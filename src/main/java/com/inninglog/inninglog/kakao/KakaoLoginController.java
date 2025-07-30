@@ -7,11 +7,17 @@ import com.inninglog.inninglog.global.response.SuccessResponse;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @RestController
@@ -30,19 +36,54 @@ public class KakaoLoginController {
     @ErrorApiResponses.Common
     @SuccessApiResponses.Login
     @GetMapping("/callback")
-    public ResponseEntity<?> callback(@RequestParam("code") String code) {
+    public void callback(@RequestParam("code") String code, HttpServletResponse response) {
         try {
-            KakaoLoginResponse response = kakaoAuthService.loginWithKakao(code);
-            AuthResDto authResDto = AuthResDto.fromKakaoLoginRes(response);
+            KakaoLoginResponse kakaoRes = kakaoAuthService.loginWithKakao(code);
 
-            return ResponseEntity
-                    .status(SuccessCode.LOGIN_SUCCESS.getStatus())
-                    .headers(response.getHeaders())
-                    .body(SuccessResponse.success(SuccessCode.LOGIN_SUCCESS, authResDto));
+            String accessToken = kakaoRes.getHeaders().getFirst("Authorization");
+            String refreshToken = kakaoRes.getHeaders().getFirst("Refresh-Token");
+
+            if (accessToken == null || refreshToken == null) {
+                throw new RuntimeException("토큰이 누락되었습니다.");
+            }
+
+            //쿠키로 설정
+            Cookie accessCookie = new Cookie("ACCESS_TOKEN", accessToken.replace("Bearer ", ""));
+            accessCookie.setHttpOnly(true);
+            accessCookie.setSecure(true);
+            accessCookie.setPath("/");
+            accessCookie.setMaxAge(60 * 60);
+
+            Cookie refreshCookie = new Cookie("REFRESH_TOKEN", refreshToken);
+            refreshCookie.setHttpOnly(true);
+            refreshCookie.setSecure(true);
+            refreshCookie.setPath("/");
+            refreshCookie.setMaxAge(60 * 60 * 24 * 7);
+
+            response.addCookie(accessCookie);
+            response.addCookie(refreshCookie);
+
+            boolean isNewUser = kakaoRes.isNewUser();
+
+
+            String redirectUrl = "";
+
+            if(isNewUser) {
+                redirectUrl = "https://inninglog.shop/#/onboarding6";
+            }
+            else{
+                redirectUrl = "https://inninglog.shop/#/home";
+            }
+
+            response.sendRedirect(redirectUrl);
 
         } catch (Exception e) {
-            log.error("Error during Kakao login process", e);
-            return new ResponseEntity<>("로그인 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("카카오 로그인 중 에러 발생", e);
+            try {
+                response.sendRedirect("https://inninglog.shop/login?error=1");
+            } catch (IOException ioException) {
+                log.error("리다이렉트 에러", ioException);
+            }
         }
     }
 

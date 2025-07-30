@@ -60,11 +60,15 @@ public class SecurityConfig {
                 "http://127.0.0.1:8000",
                 "http://inninglog.shop",
                 "https://inninglog.shop",
+                "https://inninglog.shop/callback",
                 "https://api.inninglog.shop",
                 "http://api.inninglog.shop",
                 "http://localhost:62378",
                 "http://localhost:8002",
-                "http://127.0.0.1:8002"
+                "http://127.0.0.1:8002",
+                "https://*.netlify.app",
+                "https://spontaneous-yeot-598898.netlify.app",
+                "http://localhost:5000/onboarding6"
 
 
 
