@@ -58,60 +58,7 @@ public class HashtagSearchService {
                 .build());
     }
 
-    // 게시물 형태 검색 (상세 정보 포함)
-    public Page<SeatViewDetailResult> searchSeatViewsByHashtagsDetail(String stadiumShortCode, List<String> hashtagCodes, Pageable pageable) {
-        validateHashtagRequest(hashtagCodes);
 
-        log.info("📌 [searchSeatViewsByHashtagsDetail] stadiumShortCode='{}', hashtagCodes={}, page={} 해시태그 상세 검색 요청",
-                stadiumShortCode, hashtagCodes, pageable.getPageNumber());
-
-        Page<SeatView> seatViewPage = seatViewRepository.findSeatViewsByHashtagsWithDetailsAndPaged(
-                stadiumShortCode,
-                hashtagCodes,
-                hashtagCodes.size(),
-                pageable
-        );
-
-        List<Long> seatViewIds = seatViewPage.getContent().stream()
-                .map(SeatView::getId)
-                .toList();
-
-        Map<Long, List<SeatViewEmotionTagDto>> emotionTagMap = getEmotionTagMap(seatViewIds);
-
-        log.info("📌 [searchSeatViewsByHashtagsDetail] stadiumShortCode='{}' 상세 검색 결과: resultCount={}",
-                stadiumShortCode, seatViewIds.size());
-
-        return seatViewPage.map(sv ->
-                SeatViewDetailResult.from(
-                        sv,
-                        s3Uploader.generatePresignedGetUrl(sv.getView_media_url())
-                )
-        );
-    }
-
-    private Map<Long, List<SeatViewEmotionTagDto>> getEmotionTagMap(List<Long> seatViewIds) {
-        if (seatViewIds.isEmpty()) {
-            log.info("📌 [getEmotionTagMap] seatViewIds가 비어있음");
-            return Map.of();
-        }
-
-        List<SeatViewEmotionTagMap> tagMaps = emotionTagMapRepository.findBySeatViewIds(seatViewIds);
-
-        log.info("📌 [getEmotionTagMap] seatViewIds.size={} 감정 태그 매핑 조회 완료: tagMaps.size={}",
-                seatViewIds.size(), tagMaps.size());
-
-        return tagMaps.stream()
-                .collect(Collectors.groupingBy(
-                        tagMap -> tagMap.getSeatView().getId(),
-                        Collectors.mapping(
-                                tagMap -> SeatViewEmotionTagDto.builder()
-                                        .code(tagMap.getSeatViewEmotionTag().getCode())
-                                        .label(tagMap.getSeatViewEmotionTag().getLabel())
-                                        .build(),
-                                Collectors.toList()
-                        )
-                ));
-    }
 
     private void validateHashtagRequest(List<String> hashtagCodes) {
         if (hashtagCodes == null || hashtagCodes.isEmpty() || hashtagCodes.size() > 5) {

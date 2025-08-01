@@ -99,6 +99,9 @@ public class SeatViewService {
     /**
      * 특정 좌석 시야 조회
      */
+    /**
+     * 특정 좌석 시야 조회
+     */
     public SeatViewDetailResult getSeatView(Long memberId, Long seatViewId) {
         memberRepository.findById(memberId)
                 .orElseThrow(() -> {
@@ -114,7 +117,21 @@ public class SeatViewService {
 
         String presignedUrl = s3Uploader.generatePresignedGetUrl(seatView.getView_media_url());
 
+        // 감정 태그 조회 (단일 좌석 기준)
+        List<SeatViewEmotionTagDto> emotionTags = seatViewEmotionTagRepository
+                .findDtosBySeatViewId(seatViewId);
+
         log.info("📌 [getSeatView] seatViewId={}, memberId={} 좌석 시야 조회 성공", seatViewId, memberId);
-        return SeatViewDetailResult.from(seatView, presignedUrl);
+
+        return SeatViewDetailResult.from(
+                seatView,
+                presignedUrl,
+                seatView.getZone().getName(),
+                seatView.getZone().getShortCode(),
+                seatView.getSection(),
+                seatView.getSeatRow(),
+                seatView.getZone().getStadium().getName(),
+                emotionTags
+        );
     }
 }

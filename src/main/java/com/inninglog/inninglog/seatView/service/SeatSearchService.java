@@ -41,7 +41,7 @@ public class SeatSearchService {
         SeatSearchReq request = SeatSearchReq.from(stadiumShortCode, zoneShortCode, section, seatRow);
 
         if (!request.isValidRequest()) {
-            log.warn("❌ [searchSeats] stadium={}, zone={}, section={}, seatRow={} 잘못된 좌석 검색 요청 - 열 정보만 존재. 최소 '존' 정보 필요",
+            log.warn("❌ [searchSeats] stadium={}, zone={}, section={}, seatRow={} 잘못된 좌석 검색 요청",
                     stadiumShortCode, zoneShortCode, section, seatRow);
             throw new CustomException(ErrorCode.INVALID_SEAT_SEARCH);
         }
@@ -67,7 +67,18 @@ public class SeatSearchService {
 
         return seatViews.map(sv -> {
             String presignedUrl = s3Uploader.generatePresignedGetUrl(sv.getView_media_url());
-            return SeatViewDetailResult.from(sv, presignedUrl);
+            List<SeatViewEmotionTagDto> emotionTags = emotionTagMap.getOrDefault(sv.getId(), List.of());
+
+            return SeatViewDetailResult.from(
+                    sv,
+                    presignedUrl,
+                    sv.getZone().getName(),
+                    sv.getZone().getShortCode(),
+                    sv.getSection(),
+                    sv.getSeatRow(),
+                    sv.getZone().getStadium().getName(),
+                    emotionTags
+            );
         });
     }
 

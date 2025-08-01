@@ -65,14 +65,16 @@ public class KakaoLoginController {
 
             boolean isNewUser = kakaoRes.isNewUser();
 
+            log.info(String.valueOf(isNewUser));
 
-            String redirectUrl = "";
+            String redirectUrl;
 
-            if(isNewUser) {
-                redirectUrl = "https://inninglog.shop/#/onboarding6";
-            }
-            else{
-                redirectUrl = "https://inninglog.shop/#/home";
+            if (isNewUser) {
+                redirectUrl = "https://inninglog.shop/?isNewUser=true#/onboarding6";
+                log.info("redirectUrl: {}", redirectUrl);
+            } else {
+                redirectUrl = "https://inninglog.shop/?isNewUser=false#/home";
+                log.info("redirectUrl: {}", redirectUrl);
             }
 
             response.sendRedirect(redirectUrl);

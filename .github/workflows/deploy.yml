@@ -52,6 +52,6 @@ jobs:
           key: ${{ secrets.SERVER_KEY }}
           script: |
             echo "✅ SSH 접속 성공!"
+            cd /home/ubuntu 
             docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
-            docker compose down
-            docker compose up -d
+            docker compose -f docker-compose.yml up -d --build

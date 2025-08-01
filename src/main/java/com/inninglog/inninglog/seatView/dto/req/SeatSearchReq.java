@@ -17,11 +17,26 @@ public class SeatSearchReq {
 
     // 열만 입력된 경우 검증
     public boolean isValidRequest() {
-        // 열만 입력되고 존이 없는 경우는 불가
-        if (seatRow != null && !seatRow.trim().isEmpty() &&
-                (zoneShortCode == null || zoneShortCode.trim().isEmpty())) {
+        boolean hasStadium = stadiumShortCode != null && !stadiumShortCode.trim().isEmpty();
+        boolean hasRow = seatRow != null && !seatRow.trim().isEmpty();
+        boolean hasZone = zoneShortCode != null && !zoneShortCode.trim().isEmpty();
+        boolean hasSection = section != null && !section.trim().isEmpty();
+
+        // 1. 경기장은 필수
+        if (!hasStadium) {
             return false;
         }
+
+        // 2. seatRow가 있으면, 최소한 zone이나 section 하나는 있어야 함
+        if (hasRow && !hasZone && !hasSection) {
+            return false;
+        }
+
+        // 3. stadium만 있는 상태 (나머지 전부 null)도 ❌
+        if (!hasZone && !hasSection && !hasRow) {
+            return false;
+        }
+
         return true;
     }
 

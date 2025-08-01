@@ -1,9 +1,7 @@
 spring:
   profiles:
-    active: dev  # 기본은 dev로 (운영 땐 prod로 교체)
+    active: prod  # 기본은 dev로 (운영 땐 prod로 교체)
   jpa:
-    hibernate:
-      ddl-auto: create
     show-sql: false
     properties:
       hibernate:
@@ -13,6 +11,3 @@ spring:
 jwt:
   secretKey: ${JWT_SECRET_KEY}
   expiration: ${JWT_EXPIRATION}
-
-amplitude:
-  api-key: ${AMPLITUDE_API_KEY}

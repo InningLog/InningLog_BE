@@ -110,7 +110,7 @@ public class SeatSearchController {
                     description = "서버 내부 오류"
             )
     })
-    @GetMapping("/gallery ")
+    @GetMapping("/gallery")
     public ResponseEntity<SuccessResponse<SimplePageResponse<SeatViewDetailResult>>> searchSeats(
             @Parameter(
                     description = "구장 단축코드",
