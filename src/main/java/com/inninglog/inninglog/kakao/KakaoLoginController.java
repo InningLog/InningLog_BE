@@ -47,36 +47,24 @@ public class KakaoLoginController {
                 throw new RuntimeException("토큰이 누락되었습니다.");
             }
 
-            //쿠키로 설정
-            Cookie accessCookie = new Cookie("ACCESS_TOKEN", accessToken.replace("Bearer ", ""));
-            accessCookie.setHttpOnly(true);
-            accessCookie.setSecure(true);
-            accessCookie.setPath("/");
-            accessCookie.setMaxAge(60 * 60);
-
-            Cookie refreshCookie = new Cookie("REFRESH_TOKEN", refreshToken);
-            refreshCookie.setHttpOnly(true);
-            refreshCookie.setSecure(true);
-            refreshCookie.setPath("/");
-            refreshCookie.setMaxAge(60 * 60 * 24 * 7);
-
-            response.addCookie(accessCookie);
-            response.addCookie(refreshCookie);
+            // ✅ 토큰 문자열 정리 (Bearer 제거)
+            String tokenValue = accessToken.replace("Bearer ", "");
 
             boolean isNewUser = kakaoRes.isNewUser();
+            log.info("isNewUser: {}", isNewUser);
 
-            log.info(String.valueOf(isNewUser));
+            // ✅ URL 인코딩
+            String encodedToken = URLEncoder.encode(tokenValue, StandardCharsets.UTF_8);
 
+            // ✅ 쿼리 파라미터로 토큰과 isNewUser 전달
             String redirectUrl;
-
             if (isNewUser) {
-                redirectUrl = "https://inninglog.shop/?isNewUser=true#/onboarding6";
-                log.info("redirectUrl: {}", redirectUrl);
+                redirectUrl = "https://inninglog.shop/?isNewUser=true&jwt=" + encodedToken + "#/onboarding6";
             } else {
-                redirectUrl = "https://inninglog.shop/?isNewUser=false#/home";
-                log.info("redirectUrl: {}", redirectUrl);
+                redirectUrl = "https://inninglog.shop/?isNewUser=false&jwt=" + encodedToken + "#/home";
             }
 
+            log.info("redirectUrl: {}", redirectUrl);
             response.sendRedirect(redirectUrl);
 
         } catch (Exception e) {
@@ -88,6 +76,60 @@ public class KakaoLoginController {
             }
         }
     }
+
+//    @GetMapping("/callback")
+//    public void callback(@RequestParam("code") String code, HttpServletResponse response) {
+//        try {
+//            KakaoLoginResponse kakaoRes = kakaoAuthService.loginWithKakao(code);
+//
+//            String accessToken = kakaoRes.getHeaders().getFirst("Authorization");
+//            String refreshToken = kakaoRes.getHeaders().getFirst("Refresh-Token");
+//
+//            if (accessToken == null || refreshToken == null) {
+//                throw new RuntimeException("토큰이 누락되었습니다.");
+//            }
+//
+//            //쿠키로 설정
+//            Cookie accessCookie = new Cookie("ACCESS_TOKEN", accessToken.replace("Bearer ", ""));
+//            accessCookie.setHttpOnly(true);
+//            accessCookie.setSecure(true);
+//            accessCookie.setPath("/");
+//            accessCookie.setMaxAge(60 * 60);
+//
+//            Cookie refreshCookie = new Cookie("REFRESH_TOKEN", refreshToken);
+//            refreshCookie.setHttpOnly(true);
+//            refreshCookie.setSecure(true);
+//            refreshCookie.setPath("/");
+//            refreshCookie.setMaxAge(60 * 60 * 24 * 7);
+//
+//            response.addCookie(accessCookie);
+//            response.addCookie(refreshCookie);
+//
+//            boolean isNewUser = kakaoRes.isNewUser();
+//
+//            log.info(String.valueOf(isNewUser));
+//
+//            String redirectUrl;
+//
+//            if (isNewUser) {
+//                redirectUrl = "https://inninglog.shop/?isNewUser=true#/onboarding6";
+//                log.info("redirectUrl: {}", redirectUrl);
+//            } else {
+//                redirectUrl = "https://inninglog.shop/?isNewUser=false#/home";
+//                log.info("redirectUrl: {}", redirectUrl);
+//            }
+//
+//            response.sendRedirect(redirectUrl);
+//
+//        } catch (Exception e) {
+//            log.error("카카오 로그인 중 에러 발생", e);
+//            try {
+//                response.sendRedirect("https://inninglog.shop/login?error=1");
+//            } catch (IOException ioException) {
+//                log.error("리다이렉트 에러", ioException);
+//            }
+//        }
+//    }
 
 }
 
