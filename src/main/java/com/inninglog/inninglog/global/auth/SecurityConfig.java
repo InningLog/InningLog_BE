@@ -71,7 +71,8 @@ public class SecurityConfig {
                 "http://localhost:5000/onboarding6",
                 "http://dev-api.inninglog.shop",
                 "https://dev-api.inninglog.shop",
-                "http://localhost:8082"
+                "http://localhost:8082",
+                "https://inninglog.shop/authredirect"
 
 
 
