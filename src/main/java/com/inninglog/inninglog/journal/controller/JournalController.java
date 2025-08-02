@@ -94,8 +94,7 @@ public class JournalController {
     })
     @PostMapping("/contents")
     public ResponseEntity<SuccessResponse<JourCreateResDto>> createContents(
-            @Parameter(hidden = true)
-            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestParam Long memberId,
 
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
@@ -103,7 +102,7 @@ public class JournalController {
             )
             @RequestBody JourCreateReqDto request)
     {
-        JourCreateResDto resDto = journalService.createJournal(user.getMember().getId(), request);
+        JourCreateResDto resDto = journalService.createJournal(memberId, request);
 
         return ResponseEntity.ok(
                 SuccessResponse.success(SuccessCode.JOURNAL_CREATED, resDto)
@@ -166,10 +165,10 @@ public class JournalController {
                     }))
     @GetMapping("/calendar")
     public ResponseEntity<SuccessResponse<List<JournalCalListResDto>>> getCalendarJournals(
-            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestParam Long memberId,
             @RequestParam(required = false) ResultScore resultScore
     ) {
-        List<JournalCalListResDto> result = journalService.getJournalsByMemberCal(user.getMember().getId(), resultScore);
+        List<JournalCalListResDto> result = journalService.getJournalsByMemberCal(memberId, resultScore);
 
         SuccessCode code = result.isEmpty()
                 ? SuccessCode.JOURNAL_EMPTY
@@ -245,7 +244,7 @@ public class JournalController {
                     }))    @GetMapping("/summary")
     public ResponseEntity
             <SuccessResponse<SimplePageResponse<JournalSumListResDto>>> getMyJournalsSum(
-            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestParam Long memberId,
 
             @Parameter(description = "경기 결과 필터 (WIN, LOSE, DRAW)", example = "WIN")
             @RequestParam(required = false) ResultScore resultScore,
@@ -266,7 +265,7 @@ public class JournalController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "date"));
 
-        Page<JournalSumListResDto> result = journalService.getJournalsByMemberSum(user.getMember().getId(), pageable, resultScore);
+        Page<JournalSumListResDto> result = journalService.getJournalsByMemberSum(memberId, pageable, resultScore);
 
         SuccessCode code = result.isEmpty() ? SuccessCode.JOURNAL_EMPTY : SuccessCode.JOURNAL_LIST_FETCHED;
 
@@ -320,12 +319,12 @@ public class JournalController {
             )
     )    @GetMapping("/contents")
     public ResponseEntity<SuccessResponse<JourGameResDto>> getGameInfo(
-            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestParam Long memberId,
 
             @Parameter(description = "경기 Id (gameId)", required = true)
             @RequestParam String gameId
     ){
-        JourGameResDto resDto = journalService.infoJournal(user.getMember().getId(), gameId);
+        JourGameResDto resDto = journalService.infoJournal(memberId, gameId);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resDto));
     }
 
@@ -385,12 +384,12 @@ public class JournalController {
     })
     @GetMapping("/schedule")
     public ResponseEntity<SuccessResponse<GameSchResDto>> getSchedule(
-            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestParam Long memberId,
 
             @Parameter(description = "경기 일정 날짜 (예: 2025-07-01)", required = true)
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate gameDate
     ){
-        GameSchResDto resDto = journalService.getSingleGameSch(user.getMember().getId(), gameDate);
+        GameSchResDto resDto = journalService.getSingleGameSch(memberId, gameDate);
 
         if (resDto == null) {
             return ResponseEntity.ok(SuccessResponse.success(SuccessCode.NO_SCHEDULE_ON_DATE, null));
@@ -468,11 +467,11 @@ public class JournalController {
     )
     @GetMapping("/detail/{journalId}")
     public ResponseEntity<SuccessResponse<JourUpdateResDto>> getDetailJournal(
-            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestParam Long memberId,
             @Parameter(description = "직관 일지 ID. 목록 API에서 선택한 항목의 ID를 전달", required = true)
             @PathVariable Long journalId
     ) {
-        JourUpdateResDto resDto = journalService.getDetailJournal(user.getMember().getId(), journalId);
+        JourUpdateResDto resDto = journalService.getDetailJournal(memberId, journalId);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resDto));
 
     }
@@ -525,11 +524,11 @@ public class JournalController {
     @PatchMapping("/update/{journalId}")
     @ErrorApiResponses.Common
     public ResponseEntity<SuccessResponse<JourUpdateResDto>> updateJournal(
-            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestParam Long memberId,
             @PathVariable Long journalId,
             @RequestBody JourUpdateReqDto dto
     ) {
-        JourUpdateResDto updatedJournal = journalService.updateJournal(user.getMember().getId(), journalId, dto);
+        JourUpdateResDto updatedJournal = journalService.updateJournal(memberId, journalId, dto);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, updatedJournal));
     }
 }

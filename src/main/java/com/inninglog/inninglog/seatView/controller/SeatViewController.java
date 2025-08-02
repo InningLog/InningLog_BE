@@ -80,8 +80,7 @@ public class SeatViewController {
     @ErrorApiResponses.Common
     @PostMapping(value = "/contents")
     public ResponseEntity<SuccessResponse<?>> createSeatView(
-            @Parameter(hidden = true)
-            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestParam Long memberId,
 
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
@@ -89,7 +88,7 @@ public class SeatViewController {
             )
             @RequestBody SeatCreateReqDto request)
     {
-        SeatCreateResDto resDto = seatViewService.createSeatView(user.getMember().getId(), request);
+        SeatCreateResDto resDto = seatViewService.createSeatView(memberId, request);
         return ResponseEntity.ok(
                 SuccessResponse.success(SuccessCode.OK, resDto));
     }
@@ -142,11 +141,11 @@ public class SeatViewController {
     @ErrorApiResponses.Common
     @GetMapping("/{seatViewId}")
     public SuccessResponse<SeatViewDetailResult> getSeatView(
-            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestParam Long memberId,
             @Parameter(description = "조회할 SeatView의 ID", required = true)
             @PathVariable Long seatViewId
     ) {
-        SeatViewDetailResult result = seatViewService.getSeatView(user.getMember().getId(), seatViewId);
+        SeatViewDetailResult result = seatViewService.getSeatView(memberId, seatViewId);
         return SuccessResponse.success(SuccessCode.OK, result);
     }
 }

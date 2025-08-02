@@ -93,6 +93,8 @@ public class HashtagSearchController {
     @ErrorApiResponses.Common
     @GetMapping("/gallery")
     public ResponseEntity<SuccessResponse<SimplePageResponse<SeatViewImageResult>>> searchSeatViewsGallery(
+            @RequestParam Long memberId,
+
             @Parameter(description = "구장 단축코드", required = true, example = "JAM")
             @RequestParam String stadiumShortCode,
 
@@ -108,7 +110,7 @@ public class HashtagSearchController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         Page<SeatViewImageResult> resultPage = hashtagSearchService.searchSeatViewsByHashtagsGallery(
-                stadiumShortCode, hashtagCodes, pageable
+                memberId, stadiumShortCode, hashtagCodes, pageable
         );
 
         SuccessCode code = resultPage.isEmpty() ? SuccessCode.SEATVIEW_EMPTY : SuccessCode.SEATVIEW_LIST_FETCHED;

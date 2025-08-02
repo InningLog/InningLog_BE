@@ -3,6 +3,7 @@ package com.inninglog.inninglog.seatView.service;
 import com.inninglog.inninglog.global.exception.CustomException;
 import com.inninglog.inninglog.global.exception.ErrorCode;
 import com.inninglog.inninglog.global.s3.S3Uploader;
+import com.inninglog.inninglog.member.repository.MemberRepository;
 import com.inninglog.inninglog.seatView.domain.SeatView;
 import com.inninglog.inninglog.seatView.domain.SeatViewEmotionTag;
 import com.inninglog.inninglog.seatView.domain.SeatViewEmotionTagMap;
@@ -34,10 +35,14 @@ public class HashtagSearchService {
     private final SeatViewRepository seatViewRepository;
     private final SeatViewEmotionTagMapRepository emotionTagMapRepository;
     private final S3Uploader s3Uploader;
+    private final MemberRepository memberRepository;
 
     // 모아보기 형태 검색 (사진만)
-    public Page<SeatViewImageResult> searchSeatViewsByHashtagsGallery(String stadiumShortCode, List<String> hashtagCodes, Pageable pageable) {
+    public Page<SeatViewImageResult> searchSeatViewsByHashtagsGallery(Long memberId, String stadiumShortCode, List<String> hashtagCodes, Pageable pageable) {
         validateHashtagRequest(hashtagCodes);
+
+        memberRepository.findById(memberId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         log.info("📌 [searchSeatViewsByHashtagsGallery] stadiumShortCode='{}', hashtagCodes={}, page={} 해시태그 갤러리 검색 요청",
                 stadiumShortCode, hashtagCodes, pageable.getPageNumber());

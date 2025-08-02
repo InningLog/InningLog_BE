@@ -3,6 +3,7 @@ package com.inninglog.inninglog.seatView.service;
 import com.inninglog.inninglog.global.exception.CustomException;
 import com.inninglog.inninglog.global.exception.ErrorCode;
 import com.inninglog.inninglog.global.s3.S3Uploader;
+import com.inninglog.inninglog.member.repository.MemberRepository;
 import com.inninglog.inninglog.seatView.domain.SeatView;
 import com.inninglog.inninglog.seatView.domain.SeatViewEmotionTagMap;
 import com.inninglog.inninglog.seatView.dto.req.SeatSearchReq;
@@ -30,14 +31,19 @@ public class SeatSearchService {
     private final SeatViewRepository seatViewRepository;
     private final SeatViewEmotionTagMapRepository emotionTagMapRepository;
     private final S3Uploader s3Uploader;
+    private final MemberRepository memberRepository;
 
     public Page<SeatViewDetailResult> searchSeats(
+            Long memeberId,
             String stadiumShortCode,
             String zoneShortCode,
             String section,
             String seatRow,
             Pageable pageable
     ) {
+        memberRepository.findById(memeberId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
         SeatSearchReq request = SeatSearchReq.from(stadiumShortCode, zoneShortCode, section, seatRow);
 
         if (!request.isValidRequest()) {

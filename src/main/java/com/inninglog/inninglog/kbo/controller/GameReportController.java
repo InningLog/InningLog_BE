@@ -20,6 +20,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -128,8 +129,8 @@ public class GameReportController {
     @ErrorApiResponses.Common
     @GetMapping("/main")
     public ResponseEntity<SuccessResponse<GameReportResDto>> mainPage(
-            @AuthenticationPrincipal CustomUserDetails user){
-        GameReportResDto gameReportResDto = gameReportService.generateReport(user.getMember().getId());
+            @RequestParam Long memberId){
+        GameReportResDto gameReportResDto = gameReportService.generateReport(memberId);
 
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, gameReportResDto));
     }

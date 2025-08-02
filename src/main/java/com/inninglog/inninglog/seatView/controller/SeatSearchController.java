@@ -112,6 +112,9 @@ public class SeatSearchController {
     })
     @GetMapping("/gallery")
     public ResponseEntity<SuccessResponse<SimplePageResponse<SeatViewDetailResult>>> searchSeats(
+
+            @RequestParam Long memberId,
+
             @Parameter(
                     description = "구장 단축코드",
                     required = true,
@@ -158,7 +161,7 @@ public class SeatSearchController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         Page<SeatViewDetailResult> response = seatSearchService.searchSeats(
-                stadiumShortCode, zoneShortCode, section, seatRow, pageable
+                memberId, stadiumShortCode, zoneShortCode, section, seatRow, pageable
         );
 
         SuccessCode code = response.isEmpty() ? SuccessCode.SEATVIEW_EMPTY : SuccessCode.SEATVIEW_LIST_FETCHED;
