@@ -1,18 +1,14 @@
 package com.inninglog.inninglog.kakao;
 
 
-import com.inninglog.inninglog.global.auth.AuthTempStorage;
+import com.inninglog.inninglog.global.auth.service.AuthTempStorage;
 import com.inninglog.inninglog.global.exception.ErrorApiResponses;
 import com.inninglog.inninglog.global.response.SuccessApiResponses;
-import com.inninglog.inninglog.global.response.SuccessResponse;
-import com.inninglog.inninglog.global.response.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;

@@ -1,5 +1,6 @@
-package com.inninglog.inninglog.global.auth;
+package com.inninglog.inninglog.global.auth.service;
 
+import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.global.exception.CustomException;
 import com.inninglog.inninglog.global.exception.ErrorCode;
 import com.inninglog.inninglog.member.domain.Member;
@@ -8,7 +9,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -38,32 +38,30 @@ public class JwtProvider {
     }
 
 
-    public String createToken(Long kakaoId){
-        Claims claims = Jwts.claims().setSubject(kakaoId.toString()); //claims는 payload라고 생가하면됨, subject로 키값 설정
+    public String createToken(Long memberId) {
+        Claims claims = Jwts.claims().setSubject(memberId.toString()); // ✅ memberId 기준
 
         Date now = new Date();
-        String token = Jwts.builder()
+        return Jwts.builder()
                 .setClaims(claims)
-                .setIssuedAt(now) //발행시간 설정
-                .setExpiration(new Date(now.getTime()+expiration*60*1000L)) //만료일자 설정, 현재 시간에 + 토큰 만료 시간 ---> 밀리초 단위
-                .signWith(SECRET_KEY) //서명
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + expiration * 60 * 1000L))
+                .signWith(SECRET_KEY)
                 .compact();
-        return token;
     }
 
-
-    // Refresh Token 생성 메서드
-    public String createRefreshToken(Long kakaoId) {
+    public String createRefreshToken(Long memberId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + REFRESH_TOKEN_EXPIRATION_MS);
 
         return Jwts.builder()
-                .setSubject(kakaoId.toString())
+                .setSubject(memberId.toString()) // ✅ memberId로 통일
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(SECRET_KEY)
                 .compact();
     }
+
 
     // 토큰 유효성 검증 메서드
     public boolean validateToken(String token) {

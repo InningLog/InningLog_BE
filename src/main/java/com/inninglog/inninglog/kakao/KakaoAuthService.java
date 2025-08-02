@@ -1,6 +1,6 @@
 package com.inninglog.inninglog.kakao;
 
-import com.inninglog.inninglog.global.auth.JwtProvider;
+import com.inninglog.inninglog.global.auth.service.JwtProvider;
 import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.member.dto.MemberWithFlag;
 import com.inninglog.inninglog.member.service.MemberService;

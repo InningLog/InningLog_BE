@@ -1,4 +1,4 @@
-package com.inninglog.inninglog.global.auth;
+package com.inninglog.inninglog.global.auth.service;
 
 import java.time.Instant;
 import java.util.Map;

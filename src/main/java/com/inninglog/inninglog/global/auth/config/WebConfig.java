@@ -1,4 +1,4 @@
-package com.inninglog.inninglog.global.auth;
+package com.inninglog.inninglog.global.auth.config;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;

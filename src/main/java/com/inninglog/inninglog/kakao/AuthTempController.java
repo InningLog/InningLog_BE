@@ -1,6 +1,6 @@
 package com.inninglog.inninglog.kakao;
 
-import com.inninglog.inninglog.global.auth.AuthTempStorage;
+import com.inninglog.inninglog.global.auth.service.AuthTempStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

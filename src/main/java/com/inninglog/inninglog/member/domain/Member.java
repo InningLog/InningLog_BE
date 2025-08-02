@@ -47,6 +47,11 @@ public class Member extends BaseTimeEntity {
     @JoinColumn(name = "team_id")
     private Team team;
 
+
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private MemberCredential credential;
+
+
     //기존 멤버 업데이트
     public void updateInfo(KakaoUserInfoResponseDto dto) {
         this.kakao_nickname = dto.getKakaoAccount().getProfile().getNickName();

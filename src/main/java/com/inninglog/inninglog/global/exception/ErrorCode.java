@@ -12,6 +12,9 @@ public enum ErrorCode {
     INVALID_NICKNAME("INVALID_NICKNAME", HttpStatus.BAD_REQUEST, "닉네임 형식이 올바르지 않습니다."),
     ALREADY_SET("ALREADY_SET", HttpStatus.CONFLICT, "이미 팀이 설정되었습니다."),
     UNAUTHORIZED_ACCESS("UNAUTHORIZED_ACCESS",HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
+    EXIST_USERID("EXIST_USERID",HttpStatus.ALREADY_REPORTED,"이미 존재하는 아이디 입니다."),
+    INVALID_PASSWORD_FORMAT("INVALID_PASSWORD_FORMAT", HttpStatus.BAD_REQUEST, "비밀번호 형식이 맞지 않습니다."),
+    INVALID_PASSWORD("INVALID_PASSWORD", HttpStatus.BAD_REQUEST,"비밀번호가 일치하지 않습니다."),
 
     // 팀 / 구장 / 경기 관련
     TEAM_NOT_FOUND("TEAM_NOT_FOUND", HttpStatus.NOT_FOUND, "등록되지 않은 팀입니다."),
