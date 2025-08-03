@@ -15,6 +15,7 @@ public enum ErrorCode {
     EXIST_USERID("EXIST_USERID",HttpStatus.ALREADY_REPORTED,"이미 존재하는 아이디 입니다."),
     INVALID_PASSWORD_FORMAT("INVALID_PASSWORD_FORMAT", HttpStatus.BAD_REQUEST, "비밀번호 형식이 맞지 않습니다."),
     INVALID_PASSWORD("INVALID_PASSWORD", HttpStatus.BAD_REQUEST,"비밀번호가 일치하지 않습니다."),
+    INVALID_USERID_FORMAT("INVALID_USERID_FORMAT", HttpStatus.BAD_REQUEST, "아이디 형식이 맞지 않습니다."),
 
     // 팀 / 구장 / 경기 관련
     TEAM_NOT_FOUND("TEAM_NOT_FOUND", HttpStatus.NOT_FOUND, "등록되지 않은 팀입니다."),

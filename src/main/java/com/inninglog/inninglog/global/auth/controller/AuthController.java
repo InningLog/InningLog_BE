@@ -25,10 +25,11 @@ public class AuthController {
     @Operation(
             summary = "일반 회원가입",
             description = """
-                    일반 사용자의 회원가입을 처리합니다.  
-                    - 아이디(userID)는 중복되면 안 됩니다.  
-                    - 비밀번호는 영문 + 숫자 조합의 6~12자리여야 합니다.
-                    """
+            일반 사용자의 회원가입을 처리합니다.  
+            - 아이디(userID)는 중복되면 안 됩니다.  
+            - 아이디는 영문 + 숫자 조합의 6~12자리여야 합니다.  
+            - 비밀번호는 숫자 4자리여야 합니다.
+            """
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "회원가입 성공"),

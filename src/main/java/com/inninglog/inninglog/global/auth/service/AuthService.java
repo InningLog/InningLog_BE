@@ -28,6 +28,9 @@ public class AuthService {
             throw new CustomException(ErrorCode.EXIST_USERID);
         }
 
+        if(!isValidUsername(username)) {
+            throw new CustomException(ErrorCode.INVALID_USERID_FORMAT);
+        }
         if (!isValidPassword(password)) {
             throw new CustomException(ErrorCode.INVALID_PASSWORD_FORMAT); // "비밀번호는 6~12자리 영문+숫자 조합이어야 합니다."
         }
@@ -75,7 +78,12 @@ public class AuthService {
     }
 
     public boolean isValidPassword(String password) {
-        String regex = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,12}$";
+        String regex = "^\\d{4}$";  // 숫자 4자리만
         return password.matches(regex);
+    }
+
+    public boolean isValidUsername(String username) {
+        String regex = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,12}$";
+        return username.matches(regex);
     }
 }
