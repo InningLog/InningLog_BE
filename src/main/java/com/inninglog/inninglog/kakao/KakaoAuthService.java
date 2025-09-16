@@ -27,11 +27,7 @@ public class KakaoAuthService {
         String jwtAccessToken = jwtProvider.createToken(member.getId());
         String jwtRefreshToken = jwtProvider.createRefreshToken(member.getId());
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + jwtAccessToken);
-        headers.set("Refresh-Token", jwtRefreshToken);
-        headers.set("kakaoId", member.getKakaoId().toString());
 
-        return new KakaoLoginResponse(member.getNickname(), isNewUser, headers);
+        return new KakaoLoginResponse(member.getNickname(), isNewUser, jwtAccessToken, jwtRefreshToken);
     }
 }

@@ -4,11 +4,15 @@ package com.inninglog.inninglog.kakao;
 import com.inninglog.inninglog.global.auth.service.AuthTempStorage;
 import com.inninglog.inninglog.global.exception.ErrorApiResponses;
 import com.inninglog.inninglog.global.response.SuccessApiResponses;
+import com.inninglog.inninglog.member.domain.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -22,7 +26,7 @@ public class KakaoLoginController {
 
     private final KakaoAuthService kakaoAuthService;
     private final AuthTempStorage authTempStorage;
-
+    private final KakaoService kakaoService;
 
 
     @Operation(
@@ -33,32 +37,16 @@ public class KakaoLoginController {
     @ErrorApiResponses.Common
     @SuccessApiResponses.Login
     @GetMapping("/callback")
-    public void callback(@RequestParam("code") String code, HttpServletResponse response) {
+    public ResponseEntity<?> callback(@RequestParam("code") String code) {
         try {
-            KakaoLoginResponse kakaoRes = kakaoAuthService.loginWithKakao(code);
-            String accessToken = kakaoRes.getHeaders().getFirst("Authorization");
 
-            if (accessToken == null) {
-                throw new RuntimeException("accessToken이 누락되었습니다.");
-            }
+            KakaoLoginResponse res = kakaoAuthService.loginWithKakao(code);
 
-            AuthResDto authResDto = AuthResDto.fromKakaoLoginRes(kakaoRes);
+            return ResponseEntity.ok().body(AuthResDto.fromKakaoLoginRes(res));
 
-            Storage storage = Storage.from(authResDto.getNickname(), authResDto.isNewMember(), accessToken);
-
-            String tempId = authTempStorage.save(storage, 180); // 3분 TTL
-
-            String redirectUrl = String.format("https://inninglog.shop/#/bridge?id=%s", tempId);
-            response.sendRedirect(redirectUrl);
-
-            log.info(redirectUrl);
         } catch (Exception e) {
-            log.error("❌ 카카오 로그인 에러", e);
-            try {
-                response.sendRedirect("https://inninglog.shop/login?error=1");
-            } catch (IOException ioException) {
-                log.error("❌ 에러 리다이렉트 실패", ioException);
-            }
+            log.error("Error during Kakao login process", e);
+            return new ResponseEntity<>("로그인 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

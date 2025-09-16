@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.kakao;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpHeaders;
@@ -9,5 +10,5 @@ import org.springframework.http.HttpHeaders;
 public class KakaoLoginResponse {
     private String nickname;
     private boolean isNewUser;
-    private HttpHeaders headers;
-}
+    private String accessToken;
+    private String refreshToken;}
