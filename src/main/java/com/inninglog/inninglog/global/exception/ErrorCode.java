@@ -6,6 +6,10 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
 
+    METHOD_ARGUMENT_NOT_VALID("USER_NOT_FOUND",HttpStatus.BAD_REQUEST, "잘못된 [인자]입니다."),
+    RESOURCE_NOT_FOUND("RESOURCE_NOT_FOUND",HttpStatus.NOT_FOUND, "요청한 [RESOURCE, URL]를 찾을 수 없습니다."),
+    PARAMETER_NOT_FOUND("PARAMETER_NOT_FOUND",HttpStatus.BAD_REQUEST, "요청에 [Parameter]가 존재하지 않습니다."),
+
     // 인증 / 회원 관련
     USER_NOT_FOUND("USER_NOT_FOUND", HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
     DUPLICATE_NICKNAME("DUPLICATE_NICKNAME", HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다."),
