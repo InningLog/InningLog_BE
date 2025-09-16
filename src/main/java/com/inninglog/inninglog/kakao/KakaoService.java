@@ -32,7 +32,6 @@ public class KakaoService {
                 .block();
 
         String token = rawResponse.split("\"access_token\":\"")[1].split("\"")[0];
-        System.out.println("✅ AccessToken: " + token);
         return token;
     }
 

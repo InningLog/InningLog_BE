@@ -3,7 +3,9 @@ package com.inninglog.inninglog.seatView.domain;
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
 import com.inninglog.inninglog.journal.domain.Journal;
 import com.inninglog.inninglog.member.domain.Member;
+import com.inninglog.inninglog.seatView.dto.req.SeatCreateReqDto;
 import com.inninglog.inninglog.stadium.domain.Stadium;
+import com.inninglog.inninglog.team.domain.Team;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -43,5 +45,24 @@ public class SeatView extends BaseTimeEntity { //직관 일지
 
     //시야 사진 url
     private String view_media_url;
+
+
+    public static SeatView from(SeatCreateReqDto dto, Member member, Journal journal, Stadium stadium, Zone zone) {
+        String viewMediaUrl = null;
+
+        if (dto.getFileName() != null && !dto.getFileName().trim().isEmpty()) {
+            viewMediaUrl = "seatView/" + member.getId() + "/" + dto.getFileName();
+        }
+
+        return SeatView.builder()
+                .member(member)
+                .journal(journal)
+                .stadium(stadium)
+                .view_media_url(viewMediaUrl)
+                .zone(zone)
+                .section(dto.getSection())
+                .seatRow(dto.getSeatRow())
+                .build();
+    }
 
 }

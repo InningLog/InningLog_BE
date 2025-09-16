@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.global.auth;
 
+import com.inninglog.inninglog.global.auth.service.JwtProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

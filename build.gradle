@@ -22,14 +22,36 @@ configurations {
 repositories {
 	mavenCentral()
 }
+def loadEnv = { File envFile ->
+	def map = [:]
+	if (envFile.exists()) {
+		envFile.eachLine { line ->
+			if (line && line.contains("=") && !line.trim().startsWith("#")) {
+				def (key, value) = line.split("=", 2)
+				map[key.trim()] = value.trim()
+			}
+		}
+	}
+	return map
+}
 
+def env = loadEnv(file(".env"))
+
+tasks.withType(JavaExec).configureEach {
+	environment env
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+	environment env
+}
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'com.mysql:mysql-connector-j'
+	implementation 'com.mysql:mysql-connector-j:8.0.33'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -48,8 +70,12 @@ dependencies {
 
 	//S3
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'software.amazon.awssdk:s3:2.25.17'
-	implementation 'software.amazon.awssdk:auth:2.25.17'
+	implementation platform('software.amazon.awssdk:bom:2.21.29')
+	implementation 'software.amazon.awssdk:s3'
+	implementation 'software.amazon.awssdk:auth'
+//	implementation 'software.amazon.awssdk:s3-presigner'
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
 
 	//엠플리튜드
 	implementation 'org.json:json:20250517'
@@ -58,6 +84,9 @@ dependencies {
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
 	implementation 'org.jsoup:jsoup:1.16.1'
 	implementation 'org.seleniumhq.selenium:selenium-java:4.21.0'
+
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
 }
 

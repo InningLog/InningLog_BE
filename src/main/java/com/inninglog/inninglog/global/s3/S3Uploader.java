@@ -3,17 +3,18 @@ package com.inninglog.inninglog.global.s3;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
-import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
-import java.io.IOException;
-import java.util.UUID;
+import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
@@ -30,23 +31,52 @@ public class S3Uploader {
 
     private final Region region = Region.AP_NORTHEAST_2;
 
-    public String uploadFile(MultipartFile file, String dirName) throws IOException {
-        String fileName = dirName + "/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
+    public String generatePresignedUrl(String key, String contentType) {
+        AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(accessKey, secretKey);
 
-        S3Client s3Client = S3Client.builder()
+        S3Presigner presigner = S3Presigner.builder()
                 .region(region)
-                .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(accessKey, secretKey)))
+                .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))
                 .build();
 
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+        PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
-                .key(fileName)
-                .contentType(file.getContentType())
+                .key(key)
+                .contentType(contentType)
                 .build();
 
-        s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
+        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(10))
+                .putObjectRequest(objectRequest)
+                .build();
 
-        return "https://" + bucket + ".s3." + region + ".amazonaws.com/" + fileName;
+        PresignedPutObjectRequest presignedRequest = presigner.presignPutObject(presignRequest);
+        return presignedRequest.url().toString();
+    }
+
+    public String generatePresignedGetUrl(String key) {
+        if (key == null || key.trim().isEmpty()) {
+            return null;
+        }
+
+        AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(accessKey, secretKey);
+
+        S3Presigner presigner = S3Presigner.builder()
+                .region(region)
+                .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))
+                .build();
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(10))
+                .getObjectRequest(getObjectRequest)
+                .build();
+
+        PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
+        return presignedRequest.url().toString();
     }
 }

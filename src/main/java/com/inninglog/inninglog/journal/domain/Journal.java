@@ -1,6 +1,8 @@
 package com.inninglog.inninglog.journal.domain;
 
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
+import com.inninglog.inninglog.journal.dto.req.JourCreateReqDto;
+import com.inninglog.inninglog.journal.dto.req.JourUpdateReqDto;
 import com.inninglog.inninglog.member.domain.Member;
 import com.inninglog.inninglog.seatView.domain.SeatView;
 import com.inninglog.inninglog.stadium.domain.Stadium;
@@ -8,8 +10,8 @@ import com.inninglog.inninglog.team.domain.Team;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Builder
@@ -55,9 +57,6 @@ public class Journal extends BaseTimeEntity {
     //미디어 링크
     private String media_url;
 
-    //공개, 비공개 여부
-    private Boolean is_public;
-
     //경기장 정보
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stadium_id")
@@ -65,8 +64,49 @@ public class Journal extends BaseTimeEntity {
 
     //시야 정보
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seatView_id")
     private SeatView seatView;
 
+
+    public static Journal from(JourCreateReqDto dto, Member member, Team team, Stadium stadium) {
+        ResultScore resultScore = ResultScore.of(dto.getOurScore(), dto.getTheirScore());
+
+        // 날짜 파싱
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime parsedDate = LocalDateTime.parse(dto.getGameDate(), formatter);
+
+        String filename = null;
+        if (dto.getFileName() != null && !dto.getFileName().trim().isEmpty()) {
+            filename = "journal/" + member.getId() + "/" + dto.getFileName();
+        }
+
+        return Journal.builder()
+                .member(member)
+                .date(parsedDate)
+                .opponentTeam(team)
+                .stadium(stadium)
+                .resultScore(resultScore)
+                .ourScore(dto.getOurScore())
+                .theirScore(dto.getTheirScore())
+                .emotion(dto.getEmotion())
+                .review_text(dto.getReview_text())
+                .media_url(filename)
+                .build();
+    }
+
+
+    public void updateFrom(JourUpdateReqDto dto) {
+        this.ourScore = dto.getOurScore();
+        this.theirScore = dto.getTheirScore();
+        this.resultScore = ResultScore.of(dto.getOurScore(), dto.getTheirScore());
+        this.emotion = dto.getEmotion();
+        this.review_text = dto.getReview_text();
+
+        // media_url 조건 분기 처리
+        if (dto.getMedia_url() == null || dto.getMedia_url().trim().isEmpty()) {
+            this.media_url = null;
+        } else {
+            this.media_url = dto.getMedia_url();
+        }
+    }
 
 }

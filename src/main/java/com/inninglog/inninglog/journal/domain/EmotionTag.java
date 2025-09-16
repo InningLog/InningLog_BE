@@ -2,18 +2,17 @@ package com.inninglog.inninglog.journal.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.inninglog.inninglog.global.entity.BaseTimeEntity;
+import lombok.extern.slf4j.Slf4j;
 
-public enum EmotionTag  {
-    HAPPY("기쁨"),        // 😆
-    SAD("슬픔"),          // 😢
-    FRUSTRATED("짜증"),   // 😤
-    EXCITED("흥분"),      // 🤩
-    PROUD("자랑스러움"), // 😎
-    TOUCHED("감동"),      // 🥹
-    SHOCKED("충격"),      // 🤯
-    BORED("지루함"),      // 😐
-    PEACEFUL("평온함");   // 😇
+
+@Slf4j
+public enum EmotionTag {
+    TOUCHED("감동"),
+    EXCITED("짜릿함"),
+    FRUSTRATED("답답함"),
+    REGRETFUL("아쉬움"),
+    ANGRY("분노"),
+    SATISFIED("흡족");
 
     private final String description;
 
@@ -33,6 +32,7 @@ public enum EmotionTag  {
                 return tag;
             }
         }
+        log.warn("❌ EmotionTag 매핑 실패: " + input); // 또는 log.warn(...)
         throw new IllegalArgumentException("Unknown emotion tag: " + input);
     }
 }

@@ -40,6 +40,7 @@ out/
 .env
 *.env
 **/.env
+*.env.dev
+*.env.prod
 
-.properties
-*.properties
+src/main/resources/application.properties

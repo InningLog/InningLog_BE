@@ -28,4 +28,14 @@ public enum ResultScore {
         }
         throw new IllegalArgumentException("Unknown result: " + input);
     }
+
+    public static ResultScore of(int ourScore, int theirScore) {
+        if (ourScore > theirScore) {
+            return WIN;
+        } else if (ourScore < theirScore) {
+            return LOSE;
+        } else {
+            return DRAW;
+        }
+    }
 }
