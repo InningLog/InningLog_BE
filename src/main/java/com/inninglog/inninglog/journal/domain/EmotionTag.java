@@ -2,7 +2,10 @@ package com.inninglog.inninglog.journal.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.extern.slf4j.Slf4j;
 
+
+@Slf4j
 public enum EmotionTag {
     TOUCHED("감동"),
     EXCITED("짜릿함"),
@@ -29,6 +32,7 @@ public enum EmotionTag {
                 return tag;
             }
         }
+        log.warn("❌ EmotionTag 매핑 실패: " + input); // 또는 log.warn(...)
         throw new IllegalArgumentException("Unknown emotion tag: " + input);
     }
 }

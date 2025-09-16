@@ -55,10 +55,10 @@ public class MemberController {
     @ErrorApiResponses.Nickname
     @PatchMapping("/nickname")
     public ResponseEntity<SuccessResponse<Void>> updateNickname(
-            @RequestParam Long memberId,
+            @AuthenticationPrincipal CustomUserDetails user,
             @RequestBody NicknameRequestDto request
     ) {
-        memberService.updateNickname(memberId, request.getNickname());
+        memberService.updateNickname(user.getMember().getId(), request.getNickname());
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.NICKNAME_UPDATED));
     }
 
@@ -103,14 +103,14 @@ public class MemberController {
     @ErrorApiResponses.TeamSetting
     @PatchMapping("/setup")
     public ResponseEntity<SuccessResponse<Void>> updateType(
-            @RequestParam Long memberId,
+            @AuthenticationPrincipal CustomUserDetails user,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "유저가 응원하는 팀 설정",
                     required = true,
                     content = @Content(schema = @Schema(implementation = TypeRequestDto.class)))
             @RequestBody TypeRequestDto request
     ) {
-        memberService.updateMemberType(memberId, request.getTeamShortCode());
+        memberService.updateMemberType(user.getMember().getId(), request.getTeamShortCode());
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.TEAM_SET));
     }
 
@@ -142,10 +142,10 @@ public class MemberController {
     @ErrorApiResponses.TeamSetting
     @PostMapping("/setup")
     public ResponseEntity<SuccessResponse<Void>> setupMemberInfo(
-            @RequestParam Long memberId,
+            @AuthenticationPrincipal CustomUserDetails user,
             @RequestBody MemberSetupRequestDto request
     ) {
-        memberService.setupMemberInfo(memberId, request.getNickname(), request.getTeamShortCode());
+        memberService.setupMemberInfo(user.getMember().getId(), request.getNickname(), request.getTeamShortCode());
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK));
     }
 }

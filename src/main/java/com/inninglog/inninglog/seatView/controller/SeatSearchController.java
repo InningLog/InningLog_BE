@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.seatView.controller;
 
+import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.global.pageable.SimplePageResponse;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.response.SuccessResponse;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -113,7 +115,7 @@ public class SeatSearchController {
     @GetMapping("/gallery")
     public ResponseEntity<SuccessResponse<SimplePageResponse<SeatViewDetailResult>>> searchSeats(
 
-            @RequestParam Long memberId,
+            @AuthenticationPrincipal CustomUserDetails user,
 
             @Parameter(
                     description = "구장 단축코드",
@@ -161,7 +163,7 @@ public class SeatSearchController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         Page<SeatViewDetailResult> response = seatSearchService.searchSeats(
-                memberId, stadiumShortCode, zoneShortCode, section, seatRow, pageable
+                user.getMember().getId(), stadiumShortCode, zoneShortCode, section, seatRow, pageable
         );
 
         SuccessCode code = response.isEmpty() ? SuccessCode.SEATVIEW_EMPTY : SuccessCode.SEATVIEW_LIST_FETCHED;

@@ -58,9 +58,9 @@ public class S3Controller {
     public ResponseEntity<SuccessResponse<String>> generateJourPresignedUrl(
             @RequestParam String fileName,
             @RequestParam String contentType,
-            @AuthenticationPrincipal CustomUserDetails user
+            @RequestParam Long memberId
     ) {
-        String url = preSginedPutService.journalPutPreUrl(user.getMember().getId(), fileName, contentType);
+        String url = preSginedPutService.journalPutPreUrl(memberId, fileName, contentType);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, url));
     }
 
@@ -96,9 +96,9 @@ public class S3Controller {
     public ResponseEntity<SuccessResponse<String>> generateSeatPresignedUrl(
             @RequestParam String fileName,
             @RequestParam String contentType,
-            @AuthenticationPrincipal CustomUserDetails user
+            @RequestParam Long memberId
     ) {
-        String url = preSginedPutService.seatViewPutPreUrl(user.getMember().getId(), fileName, contentType);
+        String url = preSginedPutService.seatViewPutPreUrl(memberId, fileName, contentType);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, url));
     }
 }

@@ -31,7 +31,6 @@ public class HomeController {
     private final HomeService homeService;
 
 
-
     @Operation(
             summary = "홈 화면 정보 조회",
             description = "유저의 직관 승률과 응원팀 이번 달 경기 일정을 반환합니다.",
@@ -78,9 +77,9 @@ public class HomeController {
     @ErrorApiResponses.Common
     @GetMapping("/view")
     public ResponseEntity<SuccessResponse<HomeResDto>> viewHome(
-            @RequestParam Long memberId) {
+            @AuthenticationPrincipal CustomUserDetails user) {
 
-        HomeResDto resDto = homeService.homeView(memberId);
+        HomeResDto resDto = homeService.homeView(user.getMember().getId());
 
         return ResponseEntity.ok(
                 SuccessResponse.success(SuccessCode.OK, resDto)

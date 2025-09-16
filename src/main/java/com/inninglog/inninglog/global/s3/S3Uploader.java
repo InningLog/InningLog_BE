@@ -55,6 +55,10 @@ public class S3Uploader {
     }
 
     public String generatePresignedGetUrl(String key) {
+        if (key == null || key.trim().isEmpty()) {
+            return null;
+        }
+
         AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(accessKey, secretKey);
 
         S3Presigner presigner = S3Presigner.builder()

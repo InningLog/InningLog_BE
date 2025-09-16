@@ -129,8 +129,8 @@ public class GameReportController {
     @ErrorApiResponses.Common
     @GetMapping("/main")
     public ResponseEntity<SuccessResponse<GameReportResDto>> mainPage(
-            @RequestParam Long memberId){
-        GameReportResDto gameReportResDto = gameReportService.generateReport(memberId);
+            @AuthenticationPrincipal CustomUserDetails user){
+        GameReportResDto gameReportResDto = gameReportService.generateReport(user.getMember().getId());
 
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, gameReportResDto));
     }

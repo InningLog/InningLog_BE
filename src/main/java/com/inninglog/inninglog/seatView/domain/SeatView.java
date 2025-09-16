@@ -47,13 +47,18 @@ public class SeatView extends BaseTimeEntity { //직관 일지
     private String view_media_url;
 
 
-    public static SeatView from(SeatCreateReqDto dto, Member member,Journal journal, Stadium stadium, Zone zone){
+    public static SeatView from(SeatCreateReqDto dto, Member member, Journal journal, Stadium stadium, Zone zone) {
+        String viewMediaUrl = null;
+
+        if (dto.getFileName() != null && !dto.getFileName().trim().isEmpty()) {
+            viewMediaUrl = "seatView/" + member.getId() + "/" + dto.getFileName();
+        }
 
         return SeatView.builder()
                 .member(member)
                 .journal(journal)
                 .stadium(stadium)
-                .view_media_url("seatView/" + member.getId() + "/" + dto.getFileName())
+                .view_media_url(viewMediaUrl)
                 .zone(zone)
                 .section(dto.getSection())
                 .seatRow(dto.getSeatRow())

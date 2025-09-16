@@ -112,4 +112,12 @@ public interface GameRepository extends JpaRepository<Game, Long> {
      */
     @Query("SELECT g FROM Game g WHERE DATE(g.localDateTime) = :date AND g.status = 'COMPLETED' AND g.boxscoreUrl IS NULL")
     List<Game> findCompletedGamesWithoutBoxscore(@Param("date") LocalDate date);
+
+
+ @Query("""
+    SELECT g FROM Game g
+    WHERE g.homeTeam.id = :teamId OR g.awayTeam.id = :teamId
+    ORDER BY g.localDateTime ASC
+""")
+ List<Game> findByTeam(@Param("teamId") Long teamId);
 }

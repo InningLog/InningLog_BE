@@ -45,23 +45,52 @@ public class HomeService {
             throw new CustomException(ErrorCode.TEAM_NOT_FOUND);
         }
 
-        List<GameHomeResDto> myTeamSchedule = getThisMonthGamesForTeam(member.getTeam().getId());
+        List<GameHomeResDto> myTeamSchedule = getAllGamesForTeam(member.getTeam().getId());
 
         return HomeResDto.from(member,winningRateResult.getWinningRateHalPoongRi(), myTeamSchedule);
     }
 
-    // 유저의 응원팀 이번달 경기 조회
-    public List<GameHomeResDto> getThisMonthGamesForTeam(Long teamId) {
-        LocalDate today = LocalDate.now();
-        LocalDate startOfMonth = today.withDayOfMonth(1);
-        LocalDate endOfMonth = today.withDayOfMonth(today.lengthOfMonth());
+//    // 유저의 응원팀 이번달 경기 조회
+//    public List<GameHomeResDto> getThisMonthGamesForTeam(Long teamId) {
+//        LocalDate today = LocalDate.now();
+//        LocalDate startOfMonth = today.withDayOfMonth(1);
+//        LocalDate endOfMonth = today.withDayOfMonth(today.lengthOfMonth());
+//
+//        List<Game> games = gameRepository.findByTeamAndDateRange(teamId, startOfMonth, endOfMonth);
+//
+//        if (games.isEmpty()) {
+//            log.warn("📌 [getThisMonthGamesForTeam] ⚠️ 이번 달 팀 경기 일정이 없습니다. teamId={}", teamId);
+//        } else {
+//            log.info("📌 [getThisMonthGamesForTeam] 📅 {}월 경기 {}건 조회됨. teamId={}", today.getMonthValue(), games.size(), teamId);
+//        }
+//
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+//
+//        return games.stream()
+//                .map(g -> {
+//                    boolean isHomeTeam = g.getHomeTeam().getId().equals(teamId);
+//                    String myTeam = isHomeTeam ? g.getHomeTeam().getShortCode() : g.getAwayTeam().getShortCode();
+//                    String opponentTeam = isHomeTeam ? g.getAwayTeam().getShortCode() : g.getHomeTeam().getShortCode();
+//                    String formattedDateTime = g.getLocalDateTime().format(formatter);
+//
+//                    return GameHomeResDto.from(
+//                            myTeam,
+//                            opponentTeam,
+//                            g.getStadium().getShortCode(),
+//                            formattedDateTime
+//                    );
+//                })
+//                .toList();
+//    }
 
-        List<Game> games = gameRepository.findByTeamAndDateRange(teamId, startOfMonth, endOfMonth);
+    // 유저의 응원팀 전체 경기 일정 조회
+    public List<GameHomeResDto> getAllGamesForTeam(Long teamId) {
+        List<Game> games = gameRepository.findByTeam(teamId);
 
         if (games.isEmpty()) {
-            log.warn("📌 [getThisMonthGamesForTeam] ⚠️ 이번 달 팀 경기 일정이 없습니다. teamId={}", teamId);
+            log.warn("📌 [getAllGamesForTeam] ⚠️ 팀 경기 일정이 없습니다. teamId={}", teamId);
         } else {
-            log.info("📌 [getThisMonthGamesForTeam] 📅 {}월 경기 {}건 조회됨. teamId={}", today.getMonthValue(), games.size(), teamId);
+            log.info("📌 [getAllGamesForTeam] 📅 전체 경기 {}건 조회됨. teamId={}", games.size(), teamId);
         }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");

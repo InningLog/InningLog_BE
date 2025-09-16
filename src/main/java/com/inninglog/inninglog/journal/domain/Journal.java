@@ -74,9 +74,14 @@ public class Journal extends BaseTimeEntity {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         LocalDateTime parsedDate = LocalDateTime.parse(dto.getGameDate(), formatter);
 
+        String filename = null;
+        if (dto.getFileName() != null && !dto.getFileName().trim().isEmpty()) {
+            filename = "journal/" + member.getId() + "/" + dto.getFileName();
+        }
+
         return Journal.builder()
                 .member(member)
-                .date(parsedDate) // 파싱된 LocalDateTime 사용
+                .date(parsedDate)
                 .opponentTeam(team)
                 .stadium(stadium)
                 .resultScore(resultScore)
@@ -84,16 +89,24 @@ public class Journal extends BaseTimeEntity {
                 .theirScore(dto.getTheirScore())
                 .emotion(dto.getEmotion())
                 .review_text(dto.getReview_text())
-                .media_url("journal/" + member.getId() + "/" + dto.getFileName())
+                .media_url(filename)
                 .build();
     }
+
+
     public void updateFrom(JourUpdateReqDto dto) {
         this.ourScore = dto.getOurScore();
         this.theirScore = dto.getTheirScore();
-        this.resultScore = ResultScore.of(dto.getOurScore(), dto.getTheirScore()); // 기존 방식 유지
-        this.media_url = dto.getMedia_url();
+        this.resultScore = ResultScore.of(dto.getOurScore(), dto.getTheirScore());
         this.emotion = dto.getEmotion();
         this.review_text = dto.getReview_text();
+
+        // media_url 조건 분기 처리
+        if (dto.getMedia_url() == null || dto.getMedia_url().trim().isEmpty()) {
+            this.media_url = null;
+        } else {
+            this.media_url = dto.getMedia_url();
+        }
     }
 
 }

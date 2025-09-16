@@ -16,6 +16,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -59,34 +60,51 @@ public class SecurityConfig {
         return http.build();
     }
 
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration config = new CorsConfiguration();
+//        config.setAllowedOrigins(Arrays.asList(
+//                "http://localhost:8000",
+//                "http://127.0.0.1:8000",
+//                "http://inninglog.shop",
+//                "https://inninglog.shop",
+//                "https://inninglog.shop/callback",
+//                "https://api.inninglog.shop",
+//                "http://api.inninglog.shop",
+//                "http://localhost:62378",
+//                "http://localhost:8002",
+//                "http://127.0.0.1:8002",
+//                "https://*.netlify.app",
+//                "https://spontaneous-yeot-598898.netlify.app",
+//                "http://localhost:5000/onboarding6",
+//                "http://dev-api.inninglog.shop",
+//                "https://dev-api.inninglog.shop",
+//                "http://localhost:8082",
+//                "https://inninglog.shop/authredirect"
+//
+//
+//
+//                ));
+//        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+//        config.setAllowedHeaders(Arrays.asList("*"));
+//        config.setAllowCredentials(true);
+//        config.setMaxAge(3600L);
+//
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", config);
+//        return source;
+//    }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList(
-                "http://localhost:8000",
-                "http://127.0.0.1:8000",
-                "http://inninglog.shop",
-                "https://inninglog.shop",
-                "https://inninglog.shop/callback",
-                "https://api.inninglog.shop",
-                "http://api.inninglog.shop",
-                "http://localhost:62378",
-                "http://localhost:8002",
-                "http://127.0.0.1:8002",
-                "https://*.netlify.app",
-                "https://spontaneous-yeot-598898.netlify.app",
-                "http://localhost:5000/onboarding6",
-                "http://dev-api.inninglog.shop",
-                "https://dev-api.inninglog.shop",
-                "http://localhost:8082",
-                "https://inninglog.shop/authredirect"
 
+        // 모든 origin 허용
+        config.addAllowedOriginPattern("*");
 
-
-                ));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        config.setAllowedHeaders(Arrays.asList("*"));
-        config.setAllowCredentials(true);
+        config.setAllowedHeaders(Collections.singletonList("*"));
+        config.setAllowCredentials(true); // 쿠키/헤더 인증 사용 시 필요
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

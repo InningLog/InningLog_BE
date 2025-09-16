@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.seatView.controller;
 
+import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.global.exception.ErrorApiResponses;
 import com.inninglog.inninglog.global.pageable.SimplePageResponse;
 import com.inninglog.inninglog.global.response.SuccessCode;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -93,7 +95,7 @@ public class HashtagSearchController {
     @ErrorApiResponses.Common
     @GetMapping("/gallery")
     public ResponseEntity<SuccessResponse<SimplePageResponse<SeatViewImageResult>>> searchSeatViewsGallery(
-            @RequestParam Long memberId,
+            @AuthenticationPrincipal CustomUserDetails user,
 
             @Parameter(description = "구장 단축코드", required = true, example = "JAM")
             @RequestParam String stadiumShortCode,
@@ -110,7 +112,7 @@ public class HashtagSearchController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         Page<SeatViewImageResult> resultPage = hashtagSearchService.searchSeatViewsByHashtagsGallery(
-                memberId, stadiumShortCode, hashtagCodes, pageable
+                user.getMember().getId(), stadiumShortCode, hashtagCodes, pageable
         );
 
         SuccessCode code = resultPage.isEmpty() ? SuccessCode.SEATVIEW_EMPTY : SuccessCode.SEATVIEW_LIST_FETCHED;
