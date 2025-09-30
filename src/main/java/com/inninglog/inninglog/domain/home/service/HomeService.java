@@ -1,19 +1,10 @@
 package com.inninglog.inninglog.domain.home.service;
 
-import com.inninglog.inninglog.global.exception.CustomException;
-import com.inninglog.inninglog.global.exception.ErrorCode;
-import com.inninglog.inninglog.domain.home.dto.HomeResDTO;
 import com.inninglog.inninglog.domain.kbo.domain.Game;
 import com.inninglog.inninglog.domain.kbo.dto.gameReport.GameHomeResDto;
-import com.inninglog.inninglog.domain.kbo.dto.gameReport.WinningRateResult;
-import com.inninglog.inninglog.domain.kbo.repository.GameRepository;
-import com.inninglog.inninglog.domain.kbo.service.GameReportService;
-import com.inninglog.inninglog.domain.member.domain.Member;
-import com.inninglog.inninglog.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -23,41 +14,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HomeService {
 
-    private final MemberRepository memberRepository;
-    private final GameRepository gameRepository;
-    private final GameReportService gameReportService;
-
-    @Transactional(readOnly = true)
-    public HomeResDTO homeView(Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> {
-                    log.error("📌 [homeView] ❌ 유저를 찾을 수 없습니다. memberId={}", memberId);
-                    return new CustomException(ErrorCode.USER_NOT_FOUND);
-                });
-
-        log.info("📌 [homeView] ✅ 유저 조회 성공: memberId={}", memberId);
-
-        WinningRateResult winningRateResult = gameReportService.forHomeCaculateWin(member);
-
-        if (member.getTeam() == null) {
-            log.error("📌 [homeView] ❌ 유저의 응원팀이 설정되지 않음: memberId={}", memberId);
-            throw new CustomException(ErrorCode.TEAM_NOT_FOUND);
-        }
-
-        List<GameHomeResDto> myTeamSchedule = getAllGamesForTeam(member.getTeam().getId());
-
-        return HomeResDTO.from(member,winningRateResult.getWinningRateHalPoongRi(), myTeamSchedule);
-    }
-
     // 유저의 응원팀 전체 경기 일정 조회
-    public List<GameHomeResDto> getAllGamesForTeam(Long teamId) {
-        List<Game> games = gameRepository.findByTeam(teamId);
-
-        if (games.isEmpty()) {
-            log.warn("📌 [getAllGamesForTeam] ⚠️ 팀 경기 일정이 없습니다. teamId={}", teamId);
-        } else {
-            log.info("📌 [getAllGamesForTeam] 📅 전체 경기 {}건 조회됨. teamId={}", games.size(), teamId);
-        }
+    public List<GameHomeResDto> getAllGamesForTeam(List<Game> games, Long teamId) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 

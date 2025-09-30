@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.domain.home.controller;
 
+import com.inninglog.inninglog.domain.home.usecase.HomeUsecase;
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.global.exception.ErrorApiResponses;
 import com.inninglog.inninglog.global.response.SuccessCode;
@@ -26,8 +27,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 @Tag(name = "홈", description = "홈 관련 API")
 public class HomeController {
 
-    private final HomeService homeService;
-
+    private final HomeUsecase homeUsecase;
 
     @Operation(
             summary = "홈 화면 정보 조회",
@@ -77,7 +77,7 @@ public class HomeController {
     public ResponseEntity<SuccessResponse<HomeResDTO>> viewHome(
             @AuthenticationPrincipal CustomUserDetails user) {
 
-        HomeResDTO resDto = homeService.homeView(user.getMember().getId());
+        HomeResDTO resDto = homeUsecase.homeView(user.getMember().getId());
 
         return ResponseEntity.ok(
                 SuccessResponse.success(SuccessCode.OK, resDto)
