@@ -1,7 +1,6 @@
 package com.inninglog.inninglog.domain.kbo.controller;
 
 import com.inninglog.inninglog.domain.kbo.dto.MonthlyGameStatsDto;
-import com.inninglog.inninglog.kbo.dto.*;
 import com.inninglog.inninglog.domain.kbo.dto.gameResult.GameResultRequestDto;
 import com.inninglog.inninglog.domain.kbo.dto.gameSchdule.GameScheduleRequestDto;
 import com.inninglog.inninglog.domain.kbo.dto.gameSchdule.GameScheduleResponseDto;

@@ -8,7 +8,6 @@ import com.inninglog.inninglog.domain.journal.domain.Journal;
 import com.inninglog.inninglog.domain.journal.domain.ResultScore;
 import com.inninglog.inninglog.domain.journal.dto.req.JourCreateReqDto;
 import com.inninglog.inninglog.domain.journal.dto.req.JourUpdateReqDto;
-import com.inninglog.inninglog.journal.dto.res.*;
 import com.inninglog.inninglog.domain.journal.repository.JournalRepository;
 import com.inninglog.inninglog.domain.kbo.domain.Game;
 import com.inninglog.inninglog.domain.kbo.dto.gameSchdule.GameSchResDto;

@@ -1,7 +1,8 @@
-package com.inninglog.inninglog.domain.kakao.service;
+package com.inninglog.inninglog.domain.kakao.usecase;
 
 import com.inninglog.inninglog.domain.kakao.dto.KakaoLoginResDTO;
 import com.inninglog.inninglog.domain.kakao.dto.KakaoUserInfoResDTO;
+import com.inninglog.inninglog.domain.kakao.service.KakaoService;
 import com.inninglog.inninglog.global.auth.service.JwtProvider;
 import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.domain.member.dto.MemberWithFlag;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class KakaoAuthService {
+public class KakaoAuthUseCase {
 
     private final KakaoService kakaoService;
     private final MemberService memberService;

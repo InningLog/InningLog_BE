@@ -2,10 +2,8 @@ package com.inninglog.inninglog.domain.kakao.controller;
 
 
 import com.inninglog.inninglog.domain.kakao.dto.KakaoLoginResDTO;
-import com.inninglog.inninglog.domain.kakao.service.KakaoService;
 import com.inninglog.inninglog.domain.kakao.dto.AuthResDTO;
-import com.inninglog.inninglog.domain.kakao.service.KakaoAuthService;
-import com.inninglog.inninglog.global.auth.service.AuthTempStorage;
+import com.inninglog.inninglog.domain.kakao.usecase.KakaoAuthUseCase;
 import com.inninglog.inninglog.global.exception.ErrorApiResponses;
 import com.inninglog.inninglog.global.response.SuccessApiResponses;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "카카오 로그인", description = "카카오 관련 API")
 public class KakaoLoginController {
 
-    private final KakaoAuthService kakaoAuthService;
+    private final KakaoAuthUseCase kakaoAuthUseCase;
 
 
 
@@ -38,7 +36,7 @@ public class KakaoLoginController {
     public ResponseEntity<?> callback(@RequestParam("code") String code) {
         try {
 
-            KakaoLoginResDTO res = kakaoAuthService.loginWithKakao(code);
+            KakaoLoginResDTO res = kakaoAuthUseCase.loginWithKakao(code);
 
             return ResponseEntity.ok().body(AuthResDTO.fromKakaoLoginRes(res));
 
