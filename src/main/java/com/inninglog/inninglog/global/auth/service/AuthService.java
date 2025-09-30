@@ -4,13 +4,12 @@ import com.inninglog.inninglog.global.auth.dto.LoginRequest;
 import com.inninglog.inninglog.global.auth.dto.LoginResponse;
 import com.inninglog.inninglog.global.exception.CustomException;
 import com.inninglog.inninglog.global.exception.ErrorCode;
-import com.inninglog.inninglog.member.domain.Member;
-import com.inninglog.inninglog.member.domain.MemberCredential;
-import com.inninglog.inninglog.member.domain.MemberType;
-import com.inninglog.inninglog.member.repository.MemberCredentialRepository;
-import com.inninglog.inninglog.member.repository.MemberRepository;
+import com.inninglog.inninglog.domain.member.domain.Member;
+import com.inninglog.inninglog.domain.member.domain.MemberCredential;
+import com.inninglog.inninglog.domain.member.domain.MemberType;
+import com.inninglog.inninglog.domain.member.repository.MemberCredentialRepository;
+import com.inninglog.inninglog.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
