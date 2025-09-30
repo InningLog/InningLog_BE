@@ -2,7 +2,7 @@ package com.inninglog.inninglog.domain.home.service;
 
 import com.inninglog.inninglog.global.exception.CustomException;
 import com.inninglog.inninglog.global.exception.ErrorCode;
-import com.inninglog.inninglog.domain.home.dto.HomeResDto;
+import com.inninglog.inninglog.domain.home.dto.HomeResDTO;
 import com.inninglog.inninglog.domain.kbo.domain.Game;
 import com.inninglog.inninglog.domain.kbo.dto.gameReport.GameHomeResDto;
 import com.inninglog.inninglog.domain.kbo.dto.gameReport.WinningRateResult;
@@ -28,7 +28,7 @@ public class HomeService {
     private final GameReportService gameReportService;
 
     @Transactional(readOnly = true)
-    public HomeResDto homeView(Long memberId) {
+    public HomeResDTO homeView(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> {
                     log.error("📌 [homeView] ❌ 유저를 찾을 수 없습니다. memberId={}", memberId);
@@ -46,41 +46,8 @@ public class HomeService {
 
         List<GameHomeResDto> myTeamSchedule = getAllGamesForTeam(member.getTeam().getId());
 
-        return HomeResDto.from(member,winningRateResult.getWinningRateHalPoongRi(), myTeamSchedule);
+        return HomeResDTO.from(member,winningRateResult.getWinningRateHalPoongRi(), myTeamSchedule);
     }
-
-//    // 유저의 응원팀 이번달 경기 조회
-//    public List<GameHomeResDto> getThisMonthGamesForTeam(Long teamId) {
-//        LocalDate today = LocalDate.now();
-//        LocalDate startOfMonth = today.withDayOfMonth(1);
-//        LocalDate endOfMonth = today.withDayOfMonth(today.lengthOfMonth());
-//
-//        List<Game> games = gameRepository.findByTeamAndDateRange(teamId, startOfMonth, endOfMonth);
-//
-//        if (games.isEmpty()) {
-//            log.warn("📌 [getThisMonthGamesForTeam] ⚠️ 이번 달 팀 경기 일정이 없습니다. teamId={}", teamId);
-//        } else {
-//            log.info("📌 [getThisMonthGamesForTeam] 📅 {}월 경기 {}건 조회됨. teamId={}", today.getMonthValue(), games.size(), teamId);
-//        }
-//
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-//
-//        return games.stream()
-//                .map(g -> {
-//                    boolean isHomeTeam = g.getHomeTeam().getId().equals(teamId);
-//                    String myTeam = isHomeTeam ? g.getHomeTeam().getShortCode() : g.getAwayTeam().getShortCode();
-//                    String opponentTeam = isHomeTeam ? g.getAwayTeam().getShortCode() : g.getHomeTeam().getShortCode();
-//                    String formattedDateTime = g.getLocalDateTime().format(formatter);
-//
-//                    return GameHomeResDto.from(
-//                            myTeam,
-//                            opponentTeam,
-//                            g.getStadium().getShortCode(),
-//                            formattedDateTime
-//                    );
-//                })
-//                .toList();
-//    }
 
     // 유저의 응원팀 전체 경기 일정 조회
     public List<GameHomeResDto> getAllGamesForTeam(Long teamId) {
