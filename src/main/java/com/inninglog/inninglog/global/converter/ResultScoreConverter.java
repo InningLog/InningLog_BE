@@ -1,6 +1,6 @@
 package com.inninglog.inninglog.global.converter;
 
-import com.inninglog.inninglog.journal.domain.ResultScore;
+import com.inninglog.inninglog.domain.journal.domain.ResultScore;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 

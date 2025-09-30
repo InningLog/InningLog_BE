@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.*;
 
-import com.inninglog.inninglog.kakao.Storage;
+import com.inninglog.inninglog.domain.kakao.Storage;
 import org.springframework.stereotype.Component;
 
 @Component

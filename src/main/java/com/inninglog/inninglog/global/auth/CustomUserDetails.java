@@ -1,6 +1,6 @@
 package com.inninglog.inninglog.global.auth;
 
-import com.inninglog.inninglog.member.domain.Member;
+import com.inninglog.inninglog.domain.member.domain.Member;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

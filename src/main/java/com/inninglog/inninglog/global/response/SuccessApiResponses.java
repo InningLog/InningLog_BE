@@ -1,12 +1,10 @@
 package com.inninglog.inninglog.global.response;
 
-import com.inninglog.inninglog.journal.dto.res.JourCreateResDto;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import com.inninglog.inninglog.global.response.SuccessResponse;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
