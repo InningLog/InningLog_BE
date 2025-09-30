@@ -12,7 +12,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class GameVaildateService {
+public class GameValidateService {
 
     private final GameRepository gameRepository;
 

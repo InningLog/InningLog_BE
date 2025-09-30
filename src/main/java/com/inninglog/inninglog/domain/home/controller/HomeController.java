@@ -6,7 +6,6 @@ import com.inninglog.inninglog.global.exception.ErrorApiResponses;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.response.SuccessResponse;
 import com.inninglog.inninglog.domain.home.dto.HomeResDTO;
-import com.inninglog.inninglog.domain.home.service.HomeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

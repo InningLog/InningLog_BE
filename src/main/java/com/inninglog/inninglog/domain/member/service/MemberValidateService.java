@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class MembeValidateService {
+public class MemberValidateService {
 
     private final MemberRepository memberRepository;
 
