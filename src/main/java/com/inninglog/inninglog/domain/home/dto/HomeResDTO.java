@@ -15,7 +15,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class HomeResDto {
+public class HomeResDTO {
 
     @Schema(description = "유저의 닉네임", example = "구혜승")
     private String nickName;
@@ -29,8 +29,8 @@ public class HomeResDto {
     @Schema(description = "내 응원 팀의 경기 일정 목록", example = "[{...}, {...}]")
     private List<GameHomeResDto> myTeamSchedule;
 
-    public static HomeResDto from(Member member, int myWeaningRate, List<GameHomeResDto> myTeamSchedule) {
-        return HomeResDto.builder()
+    public static HomeResDTO from(Member member, int myWeaningRate, List<GameHomeResDto> myTeamSchedule) {
+        return HomeResDTO.builder()
                 .nickName(member.getNickname())
                 .supportTeamSC(member.getTeam().getShortCode())
                 .myWeaningRate(myWeaningRate)

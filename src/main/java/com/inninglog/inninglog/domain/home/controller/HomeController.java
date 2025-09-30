@@ -1,11 +1,11 @@
 package com.inninglog.inninglog.domain.home.controller;
 
+import com.inninglog.inninglog.domain.home.usecase.HomeUsecase;
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.global.exception.ErrorApiResponses;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.response.SuccessResponse;
-import com.inninglog.inninglog.domain.home.dto.HomeResDto;
-import com.inninglog.inninglog.domain.home.service.HomeService;
+import com.inninglog.inninglog.domain.home.dto.HomeResDTO;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +26,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 @Tag(name = "홈", description = "홈 관련 API")
 public class HomeController {
 
-    private final HomeService homeService;
-
+    private final HomeUsecase homeUsecase;
 
     @Operation(
             summary = "홈 화면 정보 조회",
@@ -38,7 +37,7 @@ public class HomeController {
                             description = "요청 성공 시 홈 데이터 반환",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = HomeResDto.class),
+                                    schema = @Schema(implementation = HomeResDTO.class),
                                     examples = @ExampleObject(
                                             name = "홈 응답 예시",
                                             summary = "직관 승률과 경기 일정",
@@ -74,10 +73,10 @@ public class HomeController {
     )
     @ErrorApiResponses.Common
     @GetMapping("/view")
-    public ResponseEntity<SuccessResponse<HomeResDto>> viewHome(
+    public ResponseEntity<SuccessResponse<HomeResDTO>> viewHome(
             @AuthenticationPrincipal CustomUserDetails user) {
 
-        HomeResDto resDto = homeService.homeView(user.getMember().getId());
+        HomeResDTO resDto = homeUsecase.homeView(user.getMember().getId());
 
         return ResponseEntity.ok(
                 SuccessResponse.success(SuccessCode.OK, resDto)
