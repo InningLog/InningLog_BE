@@ -1,5 +1,7 @@
-package com.inninglog.inninglog.domain.kakao;
+package com.inninglog.inninglog.domain.kakao.service;
 
+import com.inninglog.inninglog.domain.kakao.dto.KakaoLoginResDTO;
+import com.inninglog.inninglog.domain.kakao.dto.KakaoUserInfoResDTO;
 import com.inninglog.inninglog.global.auth.service.JwtProvider;
 import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.domain.member.dto.MemberWithFlag;
@@ -15,9 +17,9 @@ public class KakaoAuthService {
     private final MemberService memberService;
     private final JwtProvider jwtProvider;
 
-    public KakaoLoginResponse loginWithKakao(String code) {
+    public KakaoLoginResDTO loginWithKakao(String code) {
         String kakaoAccessToken = kakaoService.getAccessToken(code);
-        KakaoUserInfoResponseDto userInfo = kakaoService.getUserInfo(kakaoAccessToken);
+        KakaoUserInfoResDTO userInfo = kakaoService.getUserInfo(kakaoAccessToken);
 
         MemberWithFlag result = memberService.saveOrUpdateMember(userInfo);
         Member member = result.getMember();
@@ -27,6 +29,6 @@ public class KakaoAuthService {
         String jwtRefreshToken = jwtProvider.createRefreshToken(member.getId());
 
 
-        return new KakaoLoginResponse(member.getNickname(), isNewUser, jwtAccessToken, jwtRefreshToken);
+        return new KakaoLoginResDTO(member.getNickname(), isNewUser, jwtAccessToken, jwtRefreshToken);
     }
 }

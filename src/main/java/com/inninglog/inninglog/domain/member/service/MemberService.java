@@ -2,7 +2,7 @@ package com.inninglog.inninglog.domain.member.service;
 
 import com.inninglog.inninglog.global.exception.CustomException;
 import com.inninglog.inninglog.global.exception.ErrorCode;
-import com.inninglog.inninglog.domain.kakao.KakaoUserInfoResponseDto;
+import com.inninglog.inninglog.domain.kakao.dto.KakaoUserInfoResDTO;
 import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.domain.member.dto.MemberWithFlag;
 import com.inninglog.inninglog.domain.member.repository.MemberRepository;
@@ -23,7 +23,7 @@ public class MemberService {
     private final TeamRepository teamRepository;
 
     @Transactional
-    public MemberWithFlag saveOrUpdateMember(KakaoUserInfoResponseDto userInfo) {
+    public MemberWithFlag saveOrUpdateMember(KakaoUserInfoResDTO userInfo) {
         Optional<Member> existing = memberRepository.findByKakaoId(userInfo.getId());
 
         if (existing.isPresent()) {

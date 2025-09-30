@@ -1,5 +1,6 @@
-package com.inninglog.inninglog.domain.kakao;
+package com.inninglog.inninglog.domain.kakao.controller;
 
+import com.inninglog.inninglog.domain.kakao.dto.KakaoLoginPageResDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,7 +32,7 @@ public class KakaoLoginPageController {
             @ApiResponse(responseCode = "200", description = "카카오 로그인 URL 반환",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = KakaoLoginPageResponse.class)
+                            schema = @Schema(implementation = KakaoLoginPageResDTO.class)
                     )
             )
     })
@@ -40,6 +41,6 @@ public class KakaoLoginPageController {
         String location = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="
                 + client_id + "&redirect_uri=" + redirect_uri;
 
-        return ResponseEntity.ok().body(new KakaoLoginPageResponse(location));
+        return ResponseEntity.ok().body(new KakaoLoginPageResDTO(location));
     }
 }

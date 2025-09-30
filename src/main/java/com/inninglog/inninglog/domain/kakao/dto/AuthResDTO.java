@@ -1,4 +1,4 @@
-package com.inninglog.inninglog.domain.kakao;
+package com.inninglog.inninglog.domain.kakao.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class AuthResDto {
+public class AuthResDTO {
     @Schema(description = "닉네임")
     private String nickname;
 
@@ -20,8 +20,8 @@ public class AuthResDto {
     private String refreshToken;
 
 
-    public static AuthResDto fromKakaoLoginRes(KakaoLoginResponse loginResponse) {
-       return AuthResDto.builder()
+    public static AuthResDTO fromKakaoLoginRes(KakaoLoginResDTO loginResponse) {
+       return AuthResDTO.builder()
                 .nickname(loginResponse.getNickname())
                 .isNewMember(loginResponse.isNewUser())
                .accessToken(loginResponse.getAccessToken())

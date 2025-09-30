@@ -1,5 +1,6 @@
-package com.inninglog.inninglog.domain.kakao;
+package com.inninglog.inninglog.domain.kakao.service;
 
+import com.inninglog.inninglog.domain.kakao.dto.KakaoUserInfoResDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -35,12 +36,12 @@ public class KakaoService {
         return token;
     }
 
-    public KakaoUserInfoResponseDto getUserInfo(String accessToken) {
+    public KakaoUserInfoResDTO getUserInfo(String accessToken) {
         return kakaoApiClient.get()
                 .uri("/v2/user/me")
                 .header("Authorization", "Bearer " + accessToken)
                 .retrieve()
-                .bodyToMono(KakaoUserInfoResponseDto.class)
+                .bodyToMono(KakaoUserInfoResDTO.class)
                 .block();
     }
 }

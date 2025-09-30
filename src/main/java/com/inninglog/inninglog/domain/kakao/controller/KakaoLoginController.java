@@ -1,6 +1,10 @@
-package com.inninglog.inninglog.domain.kakao;
+package com.inninglog.inninglog.domain.kakao.controller;
 
 
+import com.inninglog.inninglog.domain.kakao.dto.KakaoLoginResDTO;
+import com.inninglog.inninglog.domain.kakao.service.KakaoService;
+import com.inninglog.inninglog.domain.kakao.dto.AuthResDTO;
+import com.inninglog.inninglog.domain.kakao.service.KakaoAuthService;
 import com.inninglog.inninglog.global.auth.service.AuthTempStorage;
 import com.inninglog.inninglog.global.exception.ErrorApiResponses;
 import com.inninglog.inninglog.global.response.SuccessApiResponses;
@@ -20,8 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class KakaoLoginController {
 
     private final KakaoAuthService kakaoAuthService;
-    private final AuthTempStorage authTempStorage;
-    private final KakaoService kakaoService;
+
 
 
     @Operation(
@@ -35,9 +38,9 @@ public class KakaoLoginController {
     public ResponseEntity<?> callback(@RequestParam("code") String code) {
         try {
 
-            KakaoLoginResponse res = kakaoAuthService.loginWithKakao(code);
+            KakaoLoginResDTO res = kakaoAuthService.loginWithKakao(code);
 
-            return ResponseEntity.ok().body(AuthResDto.fromKakaoLoginRes(res));
+            return ResponseEntity.ok().body(AuthResDTO.fromKakaoLoginRes(res));
 
         } catch (Exception e) {
             log.error("Error during Kakao login process", e);

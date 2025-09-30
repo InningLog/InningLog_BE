@@ -1,7 +1,7 @@
 package com.inninglog.inninglog.domain.member.domain;
 
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
-import com.inninglog.inninglog.domain.kakao.KakaoUserInfoResponseDto;
+import com.inninglog.inninglog.domain.kakao.dto.KakaoUserInfoResDTO;
 import com.inninglog.inninglog.domain.team.domain.Team;
 import jakarta.persistence.*;
 import lombok.*;
@@ -53,13 +53,13 @@ public class Member extends BaseTimeEntity {
 
 
     //기존 멤버 업데이트
-    public void updateInfo(KakaoUserInfoResponseDto dto) {
+    public void updateInfo(KakaoUserInfoResDTO dto) {
         this.kakao_nickname = dto.getKakaoAccount().getProfile().getNickName();
         this.kakao_profile_url = dto.getKakaoAccount().getProfile().getProfileImageUrl();
     }
 
     //신규 멤버 생성
-    public static Member fromKakaoDto(KakaoUserInfoResponseDto dto) {
+    public static Member fromKakaoDto(KakaoUserInfoResDTO dto) {
         return Member.builder()
                 .kakaoId(dto.getId())
                 .kakao_nickname(dto.getKakaoAccount().getProfile().getNickName())
