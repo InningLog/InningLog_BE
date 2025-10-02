@@ -526,7 +526,7 @@ public class JournalController {
             @PathVariable Long journalId,
             @RequestBody JourUpdateReqDto dto
     ) {
-        JourUpdateResDto updatedJournal = journalService.updateJournal(user.getMember().getId(), journalId, dto);
+        JourUpdateResDto updatedJournal = journalUsecase.updateJournal(user.getMember().getId(), journalId, dto);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, updatedJournal));
     }
 }

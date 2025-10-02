@@ -3,6 +3,7 @@ package com.inninglog.inninglog.domain.journal.usecase;
 import com.inninglog.inninglog.domain.journal.domain.Journal;
 import com.inninglog.inninglog.domain.journal.domain.ResultScore;
 import com.inninglog.inninglog.domain.journal.dto.req.JourCreateReqDto;
+import com.inninglog.inninglog.domain.journal.dto.req.JourUpdateReqDto;
 import com.inninglog.inninglog.domain.journal.dto.res.*;
 import com.inninglog.inninglog.domain.journal.service.JournalGetService;
 import com.inninglog.inninglog.domain.journal.service.JournalService;
@@ -111,6 +112,17 @@ public class JournalUsecase {
         return JourUpdateResDto.from(jourDetailResDto, journal.getSeatView().getId());
     }
 
+    //특정 직관 일지 수정
+    @Transactional(readOnly = true)
+    public JourUpdateResDto updateJournal(Long memberId, Long journalId, JourUpdateReqDto dto) {
+        Member member = memberValidateService.findById(memberId);
+        Journal journal = journalGetService.getJournalById(journalId);
+        journalService.accessToJournal(memberId, journal.getMember().getId());
+        journalService.updateJournal(journal, dto);
+        String presignedUrl = s3Uploader.generatePresignedGetUrl(journal.getMedia_url());
 
+        JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal, presignedUrl);
 
+        return JourUpdateResDto.from(jourDetailResDto, journal.getSeatView().getId());
+    }
 }
