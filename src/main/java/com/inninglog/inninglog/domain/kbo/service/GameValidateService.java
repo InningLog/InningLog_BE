@@ -2,6 +2,8 @@ package com.inninglog.inninglog.domain.kbo.service;
 
 import com.inninglog.inninglog.domain.kbo.domain.Game;
 import com.inninglog.inninglog.domain.kbo.repository.GameRepository;
+import com.inninglog.inninglog.global.exception.CustomException;
+import com.inninglog.inninglog.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,5 +29,14 @@ public class GameValidateService {
         }
 
         return games;
+    }
+
+    @Transactional(readOnly = true)
+    public Game findById(String gameId){
+        return gameRepository.findByGameId(gameId)
+                .orElseThrow(() -> {
+                    log.warn("⚠️ 존재하지 않는 경기: gameId={}", gameId);
+                    return new CustomException(ErrorCode.GAME_NOT_FOUND);
+                });
     }
 }

@@ -83,50 +83,6 @@ public class JournalService {
     }
 
 
-    //일지 기본 정보 제공
-    @Transactional(readOnly = true)
-    public JourGameResDto infoJournal(Long memberId, String gameId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> {
-                    log.warn("⚠️ [infoJournal] 존재하지 않는 사용자: memberId={}", memberId);
-                    return new CustomException(ErrorCode.USER_NOT_FOUND);
-                });
-
-        Game game = gameRepository.findByGameId(gameId)
-                .orElseThrow(() -> {
-                    log.warn("⚠️ [infoJournal] 존재하지 않는 경기: gameId={}", gameId);
-                    return new CustomException(ErrorCode.GAME_NOT_FOUND);
-                });
-
-
-        Long supportTeamId = member.getTeam().getId();
-
-        Long opponentTeamId = 0L;
-
-        //게임의 원정팀이 유저의 응원팀과 다를 경우
-        if(!Objects.equals(game.getAwayTeam().getId(), supportTeamId)){
-            //원정팀이 상대팀
-             opponentTeamId = game.getAwayTeam().getId();
-        }else {
-            //게임의 원정팀이 유저의 응원팀과 같은 경우
-            //상대팀은 홈팀이였다.
-            opponentTeamId = game.getHomeTeam().getId();
-        }
-
-        log.info("📌 [infoJournal] 상대팀 ID 계산 완료: {}", opponentTeamId);
-
-        final Long finalOpponentTeamId = opponentTeamId;
-
-        Team team = teamRepository.findById(finalOpponentTeamId)
-                        .orElseThrow(() -> {
-                            log.warn("⚠️ [infoJournal] 존재하지 않는 팀: teamId={}", finalOpponentTeamId);
-                            return new CustomException(ErrorCode.TEAM_NOT_FOUND);
-                        });
-
-        return JourGameResDto.fromGame(member.getTeam().getShortCode(), team.getShortCode(), game );
-    }
-
-
     //해당 일자의 경기 가져오기
     @Transactional(readOnly = true)
     public GameSchResDto getSingleGameSch(Long memberId, LocalDate gameDate) {

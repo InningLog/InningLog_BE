@@ -4,16 +4,19 @@ import com.inninglog.inninglog.domain.journal.domain.Journal;
 import com.inninglog.inninglog.domain.journal.domain.ResultScore;
 import com.inninglog.inninglog.domain.journal.dto.req.JourCreateReqDto;
 import com.inninglog.inninglog.domain.journal.dto.res.JourCreateResDto;
+import com.inninglog.inninglog.domain.journal.dto.res.JourGameResDto;
 import com.inninglog.inninglog.domain.journal.dto.res.JournalCalListResDto;
 import com.inninglog.inninglog.domain.journal.dto.res.JournalSumListResDto;
 import com.inninglog.inninglog.domain.journal.service.JournalService;
+import com.inninglog.inninglog.domain.kbo.domain.Game;
 import com.inninglog.inninglog.domain.kbo.service.GameReportService;
+import com.inninglog.inninglog.domain.kbo.service.GameValidateService;
 import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.domain.member.service.MemberValidateService;
 import com.inninglog.inninglog.domain.stadium.domain.Stadium;
 import com.inninglog.inninglog.domain.stadium.service.StadiumValidateService;
 import com.inninglog.inninglog.domain.team.domain.Team;
-import com.inninglog.inninglog.domain.team.service.TeamvalidateService;
+import com.inninglog.inninglog.domain.team.service.TeamGetService;
 import com.inninglog.inninglog.global.s3.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,9 +33,10 @@ public class JournalUsecase {
 
     private final JournalService journalService;
     private final MemberValidateService memberValidateService;
-    private final TeamvalidateService teamvalidateService;
+    private final TeamGetService teamGetService;
     private final StadiumValidateService stadiumValidateService;
     private final GameReportService gameReportService;
+    private final GameValidateService gameValidateService;
     private final S3Uploader s3Uploader;
 
 
@@ -40,7 +44,7 @@ public class JournalUsecase {
     @Transactional
     public JourCreateResDto createJournal(Long memberId, JourCreateReqDto dto) {
        Member member = memberValidateService.findById(memberId);
-       Team opponentTeam = teamvalidateService.validateTeam(dto.getOpponentTeamSC());
+       Team opponentTeam = teamGetService.validateTeam(dto.getOpponentTeamSC());
        Stadium stadium = stadiumValidateService.validateStadium(dto.getStadiumSC());
 
        Journal journal = journalService.createJournal(dto, member, opponentTeam, stadium);
@@ -67,11 +71,19 @@ public class JournalUsecase {
         Member member = memberValidateService.findById(memberId);
         Page<Journal> journals = journalService.getJournalsByMemberSum(member, pageable, resultScore);
 
-        Page<JournalSumListResDto> dtoPage = journals.map(
+        return journals.map(
                 journal -> JournalSumListResDto.from(journal, s3Uploader.generatePresignedGetUrl(journal.getMedia_url()), member.getTeam().getShortCode())
         );
-
-        return dtoPage;
-
     }
+
+    //일지 기본 정보 제공
+    @Transactional(readOnly = true)
+    public JourGameResDto infoPreJournal(Long memberId, String gameId){
+        Member member = memberValidateService.findById(memberId);
+        Game game =gameValidateService.findById(gameId);
+        String opponentTeamSC = teamGetService.getOpponentTeamSC(member, game);
+
+        return JourGameResDto.fromGame(member.getTeam().getShortCode(), opponentTeamSC, game );
+    }
+
 }
