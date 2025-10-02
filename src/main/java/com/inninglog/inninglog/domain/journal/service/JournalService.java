@@ -47,33 +47,13 @@ public class JournalService {
 
     //직관 일지 내용 업로드
     @Transactional
-    public JourCreateResDto createJournal(Long memberId, JourCreateReqDto dto) {
-
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> {
-                    log.warn("⚠️ [createJournal] 존재하지 않는 사용자: memberId={}", memberId);
-                    return new CustomException(ErrorCode.USER_NOT_FOUND);
-                });
-
-        Team opponentTeam = teamRepository.findByShortCode(dto.getOpponentTeamSC())
-                .orElseThrow(() -> {
-                    log.warn("⚠️ [createJournal] 존재하지 않는 팀: shortCode={}", dto.getOpponentTeamSC());
-                    return new CustomException(ErrorCode.TEAM_NOT_FOUND);
-                });
-
-        Stadium stadium = stadiumRepository.findByShortCode(dto.getStadiumSC())
-                .orElseThrow(() -> {
-                    log.warn("⚠️ [createJournal] 존재하지 않는 구장: shortCode={}", dto.getStadiumSC());
-                    return new CustomException(ErrorCode.STADIUM_NOT_FOUND);
-                });
+    public Journal createJournal(JourCreateReqDto dto, Member member, Team opponentTeam, Stadium stadium) {
 
         Journal journal = Journal.from(dto, member, opponentTeam, stadium);
         journalRepository.save(journal);
         log.info("📌 [createJournal] 직관 일지 저장 완료: journalId={}", journal.getId());
 
-        gameReportService.createVisitedGame(memberId, dto.getGameId(), journal.getId());
-
-        return JourCreateResDto.from(journal);
+        return journal;
     }
 
 

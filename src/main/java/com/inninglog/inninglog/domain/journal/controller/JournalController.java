@@ -1,6 +1,7 @@
 package com.inninglog.inninglog.domain.journal.controller;
 
 import com.inninglog.inninglog.domain.journal.dto.res.*;
+import com.inninglog.inninglog.domain.journal.usecase.JournalUsecase;
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.global.exception.ErrorApiResponses;
 import com.inninglog.inninglog.global.pageable.SimplePageResponse;
@@ -44,6 +45,7 @@ import java.util.List;
 public class JournalController {
 
     private final JournalService journalService;
+    private final JournalUsecase journalUsecase;
 
     //직관 일지 콘텐츠 업로드
     @Operation(
@@ -98,7 +100,7 @@ public class JournalController {
             )
             @RequestBody JourCreateReqDto request)
     {
-        JourCreateResDto resDto = journalService.createJournal(memberId, request);
+        JourCreateResDto resDto = journalUsecase.createJournal(memberId, request);
 
         return ResponseEntity.ok(
                 SuccessResponse.success(SuccessCode.JOURNAL_CREATED, resDto)
