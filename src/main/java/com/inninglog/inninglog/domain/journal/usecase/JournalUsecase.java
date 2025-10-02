@@ -113,7 +113,7 @@ public class JournalUsecase {
     }
 
     //특정 직관 일지 수정
-    @Transactional(readOnly = true)
+    @Transactional
     public JourUpdateResDto updateJournal(Long memberId, Long journalId, JourUpdateReqDto dto) {
         Member member = memberValidateService.findById(memberId);
         Journal journal = journalGetService.getJournalById(journalId);
