@@ -1,6 +1,7 @@
 package com.inninglog.inninglog.domain.journal.controller;
 
 import com.inninglog.inninglog.domain.journal.dto.res.*;
+import com.inninglog.inninglog.domain.journal.usecase.JournalUsecase;
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.global.exception.ErrorApiResponses;
 import com.inninglog.inninglog.global.pageable.SimplePageResponse;
@@ -44,6 +45,7 @@ import java.util.List;
 public class JournalController {
 
     private final JournalService journalService;
+    private final JournalUsecase journalUsecase;
 
     //직관 일지 콘텐츠 업로드
     @Operation(
@@ -98,7 +100,7 @@ public class JournalController {
             )
             @RequestBody JourCreateReqDto request)
     {
-        JourCreateResDto resDto = journalService.createJournal(memberId, request);
+        JourCreateResDto resDto = journalUsecase.createJournal(memberId, request);
 
         return ResponseEntity.ok(
                 SuccessResponse.success(SuccessCode.JOURNAL_CREATED, resDto)
@@ -164,7 +166,7 @@ public class JournalController {
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestParam(required = false) ResultScore resultScore
     ) {
-        List<JournalCalListResDto> result = journalService.getJournalsByMemberCal(user.getMember().getId(), resultScore);
+        List<JournalCalListResDto> result = journalUsecase.getJournalsByMemberCal(user.getMember().getId(), resultScore);
 
         SuccessCode code = result.isEmpty()
                 ? SuccessCode.JOURNAL_EMPTY
@@ -261,7 +263,7 @@ public class JournalController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "date"));
 
-        Page<JournalSumListResDto> result = journalService.getJournalsByMemberSum(user.getMember().getId(), pageable, resultScore);
+        Page<JournalSumListResDto> result = journalUsecase.getJournalsByMemberSum(user.getMember().getId(), pageable, resultScore);
 
         SuccessCode code = result.isEmpty() ? SuccessCode.JOURNAL_EMPTY : SuccessCode.JOURNAL_LIST_FETCHED;
 
@@ -320,7 +322,7 @@ public class JournalController {
             @Parameter(description = "경기 Id (gameId)", required = true)
             @RequestParam String gameId
     ){
-        JourGameResDto resDto = journalService.infoJournal(user.getMember().getId(), gameId);
+        JourGameResDto resDto = journalUsecase.infoPreJournal(user.getMember().getId(), gameId);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resDto));
     }
 
@@ -385,7 +387,7 @@ public class JournalController {
             @Parameter(description = "경기 일정 날짜 (예: 2025-07-01)", required = true)
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate gameDate
     ){
-        GameSchResDto resDto = journalService.getSingleGameSch(user.getMember().getId(), gameDate);
+        GameSchResDto resDto = journalUsecase.getSingleGameSch(user.getMember().getId(), gameDate);
 
         if (resDto == null) {
             return ResponseEntity.ok(SuccessResponse.success(SuccessCode.NO_SCHEDULE_ON_DATE, null));
@@ -467,7 +469,7 @@ public class JournalController {
             @Parameter(description = "직관 일지 ID. 목록 API에서 선택한 항목의 ID를 전달", required = true)
             @PathVariable Long journalId
     ) {
-        JourUpdateResDto resDto = journalService.getDetailJournal(user.getMember().getId(), journalId);
+        JourUpdateResDto resDto = journalUsecase.getDetailJournal(user.getMember().getId(), journalId);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resDto));
 
     }
@@ -524,7 +526,7 @@ public class JournalController {
             @PathVariable Long journalId,
             @RequestBody JourUpdateReqDto dto
     ) {
-        JourUpdateResDto updatedJournal = journalService.updateJournal(user.getMember().getId(), journalId, dto);
+        JourUpdateResDto updatedJournal = journalUsecase.updateJournal(user.getMember().getId(), journalId, dto);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, updatedJournal));
     }
 }
