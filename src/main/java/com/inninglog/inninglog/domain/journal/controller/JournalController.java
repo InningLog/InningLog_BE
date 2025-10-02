@@ -263,7 +263,7 @@ public class JournalController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "date"));
 
-        Page<JournalSumListResDto> result = journalService.getJournalsByMemberSum(user.getMember().getId(), pageable, resultScore);
+        Page<JournalSumListResDto> result = journalUsecase.getJournalsByMemberSum(user.getMember().getId(), pageable, resultScore);
 
         SuccessCode code = result.isEmpty() ? SuccessCode.JOURNAL_EMPTY : SuccessCode.JOURNAL_LIST_FETCHED;
 

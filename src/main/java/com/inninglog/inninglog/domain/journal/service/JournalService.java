@@ -30,7 +30,6 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -70,29 +69,17 @@ public class JournalService {
 
     //직관 일지 목록 조회(모아보기)
     @Transactional(readOnly = true)
-    public Page<JournalSumListResDto> getJournalsByMemberSum(Long memberId, Pageable pageable, ResultScore resultScore) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> {
-                    log.warn("⚠️ [getJournalsByMemberSum] 존재하지 않는 사용자: memberId={}", memberId);
-                    return new CustomException(ErrorCode.USER_NOT_FOUND);
-                });
-
-        Page<Journal> journals;
-
+    public Page<Journal> getJournalsByMemberSum(Member member, Pageable pageable, ResultScore resultScore) {
         //승무패 필터링일경우
+        Page<Journal> journals;
         if (resultScore != null) {
             journals = journalRepository.findAllByMemberAndResultScore(member, resultScore, pageable);
         } else { //전체 보기일 경우
             journals = journalRepository.findAllByMember(member, pageable);
         }
-
         log.info("📌 [getJournalsByMemberSum] 조회된 일지 개수: {}", journals.getTotalElements());
 
-        Page<JournalSumListResDto> dtoPage = journals.map(
-                journal -> JournalSumListResDto.from(journal, s3Uploader.generatePresignedGetUrl(journal.getMedia_url()), member.getTeam().getShortCode())
-        );
-
-        return dtoPage;
+        return journals;
     }
 
 
