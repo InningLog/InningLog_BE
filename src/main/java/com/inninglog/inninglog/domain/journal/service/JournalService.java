@@ -82,34 +82,6 @@ public class JournalService {
         return journals;
     }
 
-
-    //해당 일자의 경기 가져오기
-    @Transactional(readOnly = true)
-    public GameSchResDto getSingleGameSch(Long memberId, LocalDate gameDate) {
-
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> {
-                    log.warn("⚠️ [getSingleGameSch] 존재하지 않는 사용자: memberId={}", memberId);
-                    return new CustomException(ErrorCode.USER_NOT_FOUND);
-                });
-
-        Long supportTeamId = member.getTeam().getId();
-
-        Game game = gameRepository.findByDateAndTeamId(gameDate, supportTeamId);
-
-        log.info("📌 [getSingleGameSch] 조회된 경기: {}", game != null ? game.getGameId() : "없음");
-
-        if (game == null) {
-            log.warn("⚠️ [getSingleGameSch] 해당 날짜에 경기 없음: date={}, teamId={}", gameDate, supportTeamId);
-            return null;
-        }
-
-        if(game==null) return null;
-
-        return GameSchResDto.from(game, supportTeamId);
-    }
-
-
     //특정 직관 일지 조회
     @Transactional(readOnly = true)
     public JourUpdateResDto getDetailJournal(Long memberId, Long journalId){

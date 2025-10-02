@@ -9,8 +9,9 @@ import com.inninglog.inninglog.domain.journal.dto.res.JournalCalListResDto;
 import com.inninglog.inninglog.domain.journal.dto.res.JournalSumListResDto;
 import com.inninglog.inninglog.domain.journal.service.JournalService;
 import com.inninglog.inninglog.domain.kbo.domain.Game;
+import com.inninglog.inninglog.domain.kbo.dto.gameSchdule.GameSchResDto;
 import com.inninglog.inninglog.domain.kbo.service.GameReportService;
-import com.inninglog.inninglog.domain.kbo.service.GameValidateService;
+import com.inninglog.inninglog.domain.kbo.service.GameGetService;
 import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.domain.member.service.MemberValidateService;
 import com.inninglog.inninglog.domain.stadium.domain.Stadium;
@@ -24,6 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +39,7 @@ public class JournalUsecase {
     private final TeamGetService teamGetService;
     private final StadiumValidateService stadiumValidateService;
     private final GameReportService gameReportService;
-    private final GameValidateService gameValidateService;
+    private final GameGetService gameGetService;
     private final S3Uploader s3Uploader;
 
 
@@ -80,10 +83,19 @@ public class JournalUsecase {
     @Transactional(readOnly = true)
     public JourGameResDto infoPreJournal(Long memberId, String gameId){
         Member member = memberValidateService.findById(memberId);
-        Game game =gameValidateService.findById(gameId);
+        Game game = gameGetService.findById(gameId);
         String opponentTeamSC = teamGetService.getOpponentTeamSC(member, game);
 
         return JourGameResDto.fromGame(member.getTeam().getShortCode(), opponentTeamSC, game );
+    }
+
+    //해당 일자의 경기 가져오기
+    @Transactional(readOnly = true)
+    public GameSchResDto getSingleGameSch(Long memberId, LocalDate gameDate) {
+        Member member = memberValidateService.findById(memberId);
+        Long supportTeamId = teamGetService.getSupportTeamId(member);
+        Game game = gameGetService.findByDateAndTeamId(gameDate,supportTeamId);
+        return GameSchResDto.from(game, supportTeamId);
     }
 
 }

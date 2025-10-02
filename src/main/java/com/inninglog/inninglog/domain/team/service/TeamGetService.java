@@ -20,6 +20,7 @@ public class TeamGetService {
 
     private final TeamRepository teamRepository;
 
+    //숏코드로 검증
     @Transactional(readOnly = true)
     public Team validateTeam(String shortCode) {
         Team team = teamRepository.findByShortCode(shortCode).orElseThrow(()->{
@@ -29,6 +30,7 @@ public class TeamGetService {
         return team;
     }
 
+    //숏코드로 상대팀 가져오기
     @Transactional(readOnly = true)
     public String getOpponentTeamSC(Member member, Game game){
         String supportTeamId = member.getTeam().getShortCode();
@@ -46,5 +48,11 @@ public class TeamGetService {
         validateTeam(opponentTeamId);
 
         return opponentTeamId;
+    }
+
+    //유저의 응원팀 가져오기
+    @Transactional(readOnly = true)
+    public Long getSupportTeamId(Member member){
+        return member.getTeam().getId();
     }
 }

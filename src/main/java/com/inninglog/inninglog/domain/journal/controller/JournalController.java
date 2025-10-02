@@ -322,7 +322,7 @@ public class JournalController {
             @Parameter(description = "경기 Id (gameId)", required = true)
             @RequestParam String gameId
     ){
-        JourGameResDto resDto = journalService.infoJournal(user.getMember().getId(), gameId);
+        JourGameResDto resDto = journalUsecase.infoPreJournal(user.getMember().getId(), gameId);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resDto));
     }
 
@@ -387,7 +387,7 @@ public class JournalController {
             @Parameter(description = "경기 일정 날짜 (예: 2025-07-01)", required = true)
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate gameDate
     ){
-        GameSchResDto resDto = journalService.getSingleGameSch(user.getMember().getId(), gameDate);
+        GameSchResDto resDto = journalUsecase.getSingleGameSch(user.getMember().getId(), gameDate);
 
         if (resDto == null) {
             return ResponseEntity.ok(SuccessResponse.success(SuccessCode.NO_SCHEDULE_ON_DATE, null));
