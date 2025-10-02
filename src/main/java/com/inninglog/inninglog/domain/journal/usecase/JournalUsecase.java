@@ -3,10 +3,8 @@ package com.inninglog.inninglog.domain.journal.usecase;
 import com.inninglog.inninglog.domain.journal.domain.Journal;
 import com.inninglog.inninglog.domain.journal.domain.ResultScore;
 import com.inninglog.inninglog.domain.journal.dto.req.JourCreateReqDto;
-import com.inninglog.inninglog.domain.journal.dto.res.JourCreateResDto;
-import com.inninglog.inninglog.domain.journal.dto.res.JourGameResDto;
-import com.inninglog.inninglog.domain.journal.dto.res.JournalCalListResDto;
-import com.inninglog.inninglog.domain.journal.dto.res.JournalSumListResDto;
+import com.inninglog.inninglog.domain.journal.dto.res.*;
+import com.inninglog.inninglog.domain.journal.service.JournalGetService;
 import com.inninglog.inninglog.domain.journal.service.JournalService;
 import com.inninglog.inninglog.domain.kbo.domain.Game;
 import com.inninglog.inninglog.domain.kbo.dto.gameSchdule.GameSchResDto;
@@ -35,6 +33,7 @@ import java.util.stream.Collectors;
 public class JournalUsecase {
 
     private final JournalService journalService;
+    private final JournalGetService journalGetService;
     private final MemberValidateService memberValidateService;
     private final TeamGetService teamGetService;
     private final StadiumValidateService stadiumValidateService;
@@ -49,7 +48,6 @@ public class JournalUsecase {
        Member member = memberValidateService.findById(memberId);
        Team opponentTeam = teamGetService.validateTeam(dto.getOpponentTeamSC());
        Stadium stadium = stadiumValidateService.validateStadium(dto.getStadiumSC());
-
        Journal journal = journalService.createJournal(dto, member, opponentTeam, stadium);
        gameReportService.createVisitedGame(member.getId(), dto.getGameId(),journal.getId());
 
@@ -95,7 +93,24 @@ public class JournalUsecase {
         Member member = memberValidateService.findById(memberId);
         Long supportTeamId = teamGetService.getSupportTeamId(member);
         Game game = gameGetService.findByDateAndTeamId(gameDate,supportTeamId);
+
         return GameSchResDto.from(game, supportTeamId);
     }
+
+    //특정 직관 일지 조회
+    @Transactional(readOnly = true)
+    public JourUpdateResDto getDetailJournal(Long memberId, Long journalId){
+        Member member = memberValidateService.findById(memberId);
+        Journal journal = journalGetService.getJournalById(journalId);
+        String presignedUrl = s3Uploader.generatePresignedGetUrl(journal.getMedia_url());
+        JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal, presignedUrl);
+        if(journal.getSeatView() == null){
+            return JourUpdateResDto.from(jourDetailResDto, null);
+        }
+
+        return JourUpdateResDto.from(jourDetailResDto, journal.getSeatView().getId());
+    }
+
+
 
 }

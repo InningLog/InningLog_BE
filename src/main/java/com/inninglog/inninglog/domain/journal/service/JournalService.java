@@ -82,36 +82,6 @@ public class JournalService {
         return journals;
     }
 
-    //특정 직관 일지 조회
-    @Transactional(readOnly = true)
-    public JourUpdateResDto getDetailJournal(Long memberId, Long journalId){
-
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> {
-                    log.warn("⚠️ [getDetailJournal] 존재하지 않는 사용자: memberId={}", memberId);
-                    return new CustomException(ErrorCode.USER_NOT_FOUND);
-                });
-
-        Journal journal = journalRepository.findById(journalId)
-                .orElseThrow(() -> {
-                    log.warn("⚠️ [getDetailJournal] 존재하지 않는 일지: journalId={}", journalId);
-                    return new CustomException(ErrorCode.JOURNAL_NOT_FOUND);
-                });
-
-        // 프리사인드 URL 생성
-        String presignedUrl = s3Uploader.generatePresignedGetUrl(journal.getMedia_url());
-
-        log.info("📌 [getDetailJournal] 프리사인드 URL 생성 완료: {}", presignedUrl);
-
-        // Presigned URL을 포함해 DTO 생성
-        JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal, presignedUrl);
-
-        if(journal.getSeatView() == null){
-            return JourUpdateResDto.from(jourDetailResDto, null);
-        }
-
-        return JourUpdateResDto.from(jourDetailResDto, journal.getSeatView().getId());
-    }
 
     //특정 직관 일지 수정
     @Transactional

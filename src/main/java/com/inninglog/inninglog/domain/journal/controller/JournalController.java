@@ -469,7 +469,7 @@ public class JournalController {
             @Parameter(description = "직관 일지 ID. 목록 API에서 선택한 항목의 ID를 전달", required = true)
             @PathVariable Long journalId
     ) {
-        JourUpdateResDto resDto = journalService.getDetailJournal(user.getMember().getId(), journalId);
+        JourUpdateResDto resDto = journalUsecase.getDetailJournal(user.getMember().getId(), journalId);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resDto));
 
     }
