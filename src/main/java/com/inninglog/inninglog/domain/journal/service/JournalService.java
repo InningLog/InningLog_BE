@@ -59,22 +59,12 @@ public class JournalService {
 
     //직관 일지 목록 조회(캘린더)
     @Transactional(readOnly = true)
-    public List<JournalCalListResDto> getJournalsByMemberCal(Long memberId, ResultScore resultScore) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> {
-                    log.warn("⚠️ [getJournalsByMemberCal] 존재하지 않는 사용자: memberId={}", memberId);
-                    return new CustomException(ErrorCode.USER_NOT_FOUND);
-                });
-
+    public List<Journal> getJournalsByMemberCal(Member member, ResultScore resultScore) {
         List<Journal> journals = (resultScore != null) ?
                 journalRepository.findAllByMemberAndResultScore(member, resultScore) :
                 journalRepository.findAllByMember(member);
 
-        log.info("📌 [getJournalsByMemberCal] 조회된 일지 개수: {}", journals.size());
-
-        return journals.stream()
-                .map(JournalCalListResDto::from)
-                .collect(Collectors.toList());
+        return journals;
     }
 
 

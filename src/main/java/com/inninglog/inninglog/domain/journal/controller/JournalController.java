@@ -166,7 +166,7 @@ public class JournalController {
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestParam(required = false) ResultScore resultScore
     ) {
-        List<JournalCalListResDto> result = journalService.getJournalsByMemberCal(user.getMember().getId(), resultScore);
+        List<JournalCalListResDto> result = journalUsecase.getJournalsByMemberCal(user.getMember().getId(), resultScore);
 
         SuccessCode code = result.isEmpty()
                 ? SuccessCode.JOURNAL_EMPTY
