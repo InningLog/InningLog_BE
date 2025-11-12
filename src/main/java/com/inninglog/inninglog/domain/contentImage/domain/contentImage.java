@@ -1,6 +1,7 @@
 package com.inninglog.inninglog.domain.contentImage.domain;
 
 import com.inninglog.inninglog.domain.contentType.ContentType;
+import com.inninglog.inninglog.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class contentImage {
+public class contentImage extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

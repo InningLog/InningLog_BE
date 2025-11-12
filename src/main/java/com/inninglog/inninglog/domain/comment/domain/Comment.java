@@ -1,4 +1,4 @@
-package com.inninglog.inninglog.domain.like.domain;
+package com.inninglog.inninglog.domain.comment.domain;
 
 import com.inninglog.inninglog.domain.contentType.ContentType;
 import com.inninglog.inninglog.domain.member.domain.Member;
@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,12 +23,23 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Like extends BaseTimeEntity {
+public class Comment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "like_id")
+    @Column(name = "commment_id")
     private Long id;
+
+    private String content;
+
+    private LocalDateTime commentAt;
+
+    private Long rootCommentId;
+
+    private long likeCount;
+
+    @Column(nullable = false)
+    private boolean isDeleted=false;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

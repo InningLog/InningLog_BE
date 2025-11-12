@@ -2,6 +2,7 @@ package com.inninglog.inninglog.domain.scrap.domain;
 
 import com.inninglog.inninglog.domain.contentType.ContentType;
 import com.inninglog.inninglog.domain.member.domain.Member;
+import com.inninglog.inninglog.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -21,7 +22,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Scrap {
+public class Scrap extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
