@@ -1,4 +1,4 @@
-package com.inninglog.inninglog.domain.Post.domain;
+package com.inninglog.inninglog.domain.post.domain;
 
 import com.inninglog.inninglog.domain.member.domain.Member;
 import jakarta.persistence.Column;
