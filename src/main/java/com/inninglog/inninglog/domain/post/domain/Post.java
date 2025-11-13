@@ -1,6 +1,7 @@
 package com.inninglog.inninglog.domain.post.domain;
 
 import com.inninglog.inninglog.domain.member.domain.Member;
+import com.inninglog.inninglog.domain.post.dto.req.PostCreateReqDto;
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -47,4 +48,18 @@ public class Post extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    public static Post of(PostCreateReqDto dto, String team_shortCode, Member member) {
+        return Post.builder()
+                .title(dto.title())
+                .content(dto.content())
+                .team_shortCode(team_shortCode)
+                .likeCount(0L)
+                .scrapCount(0L)
+                .commentCount(0L)
+                .postAt(LocalDateTime.now())
+                .isEdit(false)
+                .member(member)
+                .build();
+    }
 }

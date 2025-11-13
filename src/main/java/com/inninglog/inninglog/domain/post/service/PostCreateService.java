@@ -10,5 +10,5 @@ public class PostCreateService {
 
     private final PostRepository postRepository;
 
-
+    //게시글 생성
 }

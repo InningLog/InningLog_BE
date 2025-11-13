@@ -1,6 +1,8 @@
 package com.inninglog.inninglog.domain.post.dto.req;
 
+import com.inninglog.inninglog.domain.contentImage.dto.req.ImageUploadReqDto;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 
 @Schema(description = "게시글 생성 요청 DTO")
 public record PostCreateReqDto (
@@ -11,7 +13,7 @@ public record PostCreateReqDto (
         @Schema(description = "게시글 본문", example = "아 진짜 화나네 진짜")
         String content,
 
-        @Schema(description = "팀 숏코드", example = "LG")
-        String team_shortCode
+        @Schema(description = "첨부 이미지 리스트")
+        List<ImageUploadReqDto> imageUploadReqDto
 ) {
 }
