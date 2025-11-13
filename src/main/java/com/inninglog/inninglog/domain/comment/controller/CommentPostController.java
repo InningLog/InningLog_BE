@@ -2,6 +2,8 @@ package com.inninglog.inninglog.domain.comment.controller;
 
 import com.inninglog.inninglog.domain.comment.dto.CommentCreateReqDto;
 import com.inninglog.inninglog.domain.comment.service.CommentCreateService;
+import com.inninglog.inninglog.domain.comment.service.CommentUsecase;
+import com.inninglog.inninglog.domain.contentType.ContentType;
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.response.SuccessResponse;
@@ -25,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "댓글 작성", description = "댓글 작성 관련 API")
 public class CommentPostController {
 
-    private final CommentCreateService commentCreateService;
+    private final CommentUsecase commentUsecase;
 
     @PostMapping("/posts/{postId}/comments")
     @Operation(
@@ -55,7 +57,7 @@ public class CommentPostController {
             @Parameter(hidden = true)
             @AuthenticationPrincipal CustomUserDetails user
     ){
-        commentCreateService.createPostComment(dto, postId, user.getMember());
+        commentUsecase.createComment(ContentType.POST, dto, postId, user.getMember());
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK));
     }
 }
