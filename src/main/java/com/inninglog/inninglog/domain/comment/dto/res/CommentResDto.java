@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import com.inninglog.inninglog.domain.comment.domain.Comment;
 import com.inninglog.inninglog.domain.member.dto.res.MemberShortResDto;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Schema(description = "댓글 단일 응답 DTO (대댓글 포함)")
@@ -53,7 +54,7 @@ public record CommentResDto (
                 comment.getCommentAt().format(formatter),
                 comment.getLikeCount(),
                 comment.isDeleted(),
-                null
+                new ArrayList<>()
         );
     }
 }

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/community")
-@Tag(name = "댓글 작성", description = "댓글 작성 관련 API")
+@Tag(name = "댓글", description = "댓글 관련 API")
 public class CommentPostController {
 
     private final CommentUsecase commentUsecase;

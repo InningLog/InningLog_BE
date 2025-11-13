@@ -25,7 +25,9 @@ public class CommentUsecase {
     @Transactional
     public void createComment(ContentType contentType, CommentCreateReqDto dto, Long postId, Member member){
         postValidateService.validatePost(postId);
-        commentValidateServcie.validateRootComment(dto.rootCommentId());
+        if(dto.rootCommentId() != null) {
+            commentValidateServcie.validateRootComment(dto.rootCommentId());
+        }
         commentCreateService.createComment(contentType, dto, postId, member);
     }
 
