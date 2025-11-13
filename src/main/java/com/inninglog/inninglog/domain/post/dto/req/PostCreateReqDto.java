@@ -1,6 +1,6 @@
 package com.inninglog.inninglog.domain.post.dto.req;
 
-import com.inninglog.inninglog.domain.contentImage.dto.req.ImageUploadReqDto;
+import com.inninglog.inninglog.domain.contentImage.dto.req.ImageCreateReqDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
@@ -14,6 +14,6 @@ public record PostCreateReqDto (
         String content,
 
         @Schema(description = "첨부 이미지 리스트")
-        List<ImageUploadReqDto> imageUploadReqDto
+        List<ImageCreateReqDto> imageCreateReqDto
 ) {
 }

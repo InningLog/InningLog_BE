@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.domain.contentImage.domain;
 
+import com.inninglog.inninglog.domain.contentImage.dto.req.ImageCreateReqDto;
 import com.inninglog.inninglog.domain.contentImage.dto.req.ImageUploadReqDto;
 import com.inninglog.inninglog.domain.contentType.ContentType;
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
@@ -39,7 +40,7 @@ public class ContentImage extends BaseTimeEntity {
     @Column(nullable = false)
     private Long targetId;
 
-    public static ContentImage of (ContentType contentType, Long targetId, String originalUrl, ImageUploadReqDto dto){
+    public static ContentImage of (ContentType contentType, Long targetId, String originalUrl, ImageCreateReqDto dto){
         return ContentImage.builder()
                 .sequence(dto.sequence())
                 .originalUrl(originalUrl)

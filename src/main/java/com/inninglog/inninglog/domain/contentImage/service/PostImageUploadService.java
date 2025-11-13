@@ -30,10 +30,14 @@ public class PostImageUploadService {
         for (ImageUploadReqDto dto : dtos) {
             String url = putPostImage(dto, memberId);
 
+            //추후에 랜덤 uuid로 변경
+            String key = "post/" + memberId + "/" + dto.fileName();
+
             result.add(
                     new ImageUploadResDto(
                             dto.sequence(),
-                            url
+                            url,
+                            key
                     )
             );
         }
