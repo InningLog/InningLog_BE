@@ -1,6 +1,5 @@
 package com.inninglog.inninglog.domain.contentImage.service;
 
-import com.inninglog.inninglog.domain.contentImage.dto.req.ImageListUploadReqDto;
 import com.inninglog.inninglog.domain.contentImage.dto.req.ImageUploadReqDto;
 import com.inninglog.inninglog.domain.contentImage.dto.res.ImageListUploadResDto;
 import com.inninglog.inninglog.domain.contentImage.dto.res.ImageUploadResDto;
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ContentImageCreateService {
+public class PostImageUploadService {
 
     private final PreSginedPutService preSginedPutService;
 
