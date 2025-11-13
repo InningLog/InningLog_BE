@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.domain.contentImage.domain;
 
+import com.inninglog.inninglog.domain.contentImage.dto.req.ImageUploadReqDto;
 import com.inninglog.inninglog.domain.contentType.ContentType;
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
@@ -18,7 +19,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class contentImage extends BaseTimeEntity {
+public class ContentImage extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,4 +38,13 @@ public class contentImage extends BaseTimeEntity {
 
     @Column(nullable = false)
     private Long targetId;
+
+    public static ContentImage of (ContentType contentType, Long targetId, String originalUrl, ImageUploadReqDto dto){
+        return ContentImage.builder()
+                .sequence(dto.sequence())
+                .originalUrl(originalUrl)
+                .contentType(contentType)
+                .targetId(targetId)
+                .build();
+    }
 }

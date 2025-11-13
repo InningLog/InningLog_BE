@@ -14,8 +14,8 @@ public class PostCreateService {
     private final PostRepository postRepository;
 
     //게시글 생성
-    public void createPost(PostCreateReqDto dto,String team_shortcode, Member member){
+    public Post createPost(PostCreateReqDto dto,String team_shortcode, Member member){
         Post post = Post.of(dto, team_shortcode, member);
-        postRepository.save(post);
+        return postRepository.save(post);
     }
 }
