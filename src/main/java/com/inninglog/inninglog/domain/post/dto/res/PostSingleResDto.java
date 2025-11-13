@@ -2,6 +2,8 @@ package com.inninglog.inninglog.domain.post.dto.res;
 
 import com.inninglog.inninglog.domain.contentImage.dto.res.ImageListResDto;
 import com.inninglog.inninglog.domain.member.dto.res.MemberShortResDto;
+import com.inninglog.inninglog.domain.post.domain.Post;
+import java.time.format.DateTimeFormatter;
 
 public record PostSingleResDto(
         MemberShortResDto member,
@@ -15,4 +17,20 @@ public record PostSingleResDto(
         boolean isEdit,
         ImageListResDto imageListResDto
 ) {
+    public static PostSingleResDto of (Post post, MemberShortResDto memberShortResDto, ImageListResDto imageListResDto){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        return new PostSingleResDto(
+                memberShortResDto,
+                post.getId(),
+                post.getTitle(),
+                post.getContent(),
+                post.getLikeCount(),
+                post.getScrapCount(),
+                post.getCommentCount(),
+                post.getPostAt().format(formatter),
+                post.isEdit(),
+                imageListResDto
+        );
+    }
 }
