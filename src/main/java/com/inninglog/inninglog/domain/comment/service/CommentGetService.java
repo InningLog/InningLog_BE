@@ -6,6 +6,7 @@ import com.inninglog.inninglog.domain.comment.dto.res.CommentResDto;
 import com.inninglog.inninglog.domain.comment.repository.CommentRepository;
 import com.inninglog.inninglog.domain.contentType.ContentType;
 import com.inninglog.inninglog.domain.member.dto.res.MemberShortResDto;
+import com.inninglog.inninglog.domain.member.service.MemberGetService;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,11 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CommentGetService {
     private final CommentRepository commentRepository;
+    private final MemberGetService memberGetService;
 
     @Transactional(readOnly = true)
-    public CommentListResDto getCommentList(ContentType contentType, MemberShortResDto memberShortResDto, Long targetId){
+    public CommentListResDto getCommentList(ContentType contentType, Long targetId){
        List<Comment> comments =  getcomments(contentType, targetId);
-       List<CommentResDto> results = buildCommentTree(memberShortResDto, comments);
+       List<CommentResDto> results = buildCommentTree(comments);
 
        return CommentListResDto.from(results);
     }
@@ -35,13 +37,14 @@ public class CommentGetService {
 
     //대댓글 매핑
     @Transactional(readOnly = true)
-    protected List<CommentResDto> buildCommentTree(MemberShortResDto memberShortResDto, List<Comment> comments) {
+    protected List<CommentResDto> buildCommentTree(List<Comment> comments) {
 
         Map<Long, CommentResDto> map = new HashMap<>();
         List<CommentResDto> roots = new ArrayList<>();
 
         // 1) DTO 변환 후 map에 넣기
         for (Comment c : comments) {
+            MemberShortResDto memberShortResDto = memberGetService.toMemberShortResDto(c.getMember());
             CommentResDto dto = CommentResDto.of(c, memberShortResDto);
             map.put(c.getId(), dto);
         }

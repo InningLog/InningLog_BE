@@ -1,8 +1,11 @@
 package com.inninglog.inninglog.domain.comment.service;
 
 import com.inninglog.inninglog.domain.comment.dto.req.CommentCreateReqDto;
+import com.inninglog.inninglog.domain.comment.dto.res.CommentListResDto;
 import com.inninglog.inninglog.domain.contentType.ContentType;
 import com.inninglog.inninglog.domain.member.domain.Member;
+import com.inninglog.inninglog.domain.member.service.MemberGetService;
+import com.inninglog.inninglog.domain.post.domain.Post;
 import com.inninglog.inninglog.domain.post.service.PostValidateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +18,8 @@ public class CommentUsecase {
     private final PostValidateService postValidateService;
     private final CommentCreateService commentCreateService;
     private final CommentValidateServcie commentValidateServcie;
+    private final CommentGetService commentGetService;
+    private final MemberGetService memberGetService;
 
     //게시글 생성
     @Transactional
@@ -22,5 +27,11 @@ public class CommentUsecase {
         postValidateService.validatePost(postId);
         commentValidateServcie.validateRootComment(dto.rootCommentId());
         commentCreateService.createComment(contentType, dto, postId, member);
+    }
+
+    @Transactional(readOnly = true)
+    public CommentListResDto getComments(ContentType contentType, Long postId){
+        postValidateService.getPostById(postId);
+        return commentGetService.getCommentList(contentType,postId);
     }
 }
