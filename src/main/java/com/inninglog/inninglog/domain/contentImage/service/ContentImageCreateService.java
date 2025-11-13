@@ -1,6 +1,8 @@
 package com.inninglog.inninglog.domain.contentImage.service;
 
+import com.inninglog.inninglog.domain.contentImage.dto.req.ImageListUploadReqDto;
 import com.inninglog.inninglog.domain.contentImage.dto.req.ImageUploadReqDto;
+import com.inninglog.inninglog.domain.contentImage.dto.res.ImageListUploadResDto;
 import com.inninglog.inninglog.domain.contentImage.dto.res.ImageUploadResDto;
 import com.inninglog.inninglog.global.s3.PreSginedPutService;
 import java.util.ArrayList;
@@ -13,6 +15,11 @@ import org.springframework.stereotype.Service;
 public class ContentImageCreateService {
 
     private final PreSginedPutService preSginedPutService;
+
+    public ImageListUploadResDto getPostImagePreseignedUrlList(List<ImageUploadReqDto> dtos,Long memberId){
+        List<ImageUploadResDto> uploadResDtos = getPostImagePresignedUrl(dtos, memberId);
+        return ImageListUploadResDto.of(uploadResDtos);
+    }
 
     public List<ImageUploadResDto> getPostImagePresignedUrl(
             List<ImageUploadReqDto> dtos,
