@@ -6,7 +6,10 @@ import com.inninglog.inninglog.domain.post.service.PostUsecase;
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.response.SuccessResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,15 +27,28 @@ public class PostGetController {
     private final PostUsecase postUsecase;
 
     @GetMapping("/{teamSC}/posts/{postId}")
+    @Operation(
+            summary = "게시글 단일 조회",
+            description = """
+                특정 팀에 속한 게시글을 단건 조회합니다.
+                
+                - 이미지 목록 포함
+                - 작성자 정보 포함
+                - 포맷팅된 작성일(postAt) 포함 (yyyy-MM-dd HH:mm)
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "게시글 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음"),
+    })
     public ResponseEntity<SuccessResponse<PostSingleResDto>> getSinglePost(
-            @Parameter(description = "팀 숏 코드 (ex: LG)", example = "LG")
+            @Parameter(description = "팀 숏 코드 (ex: LG, DS, KT)", example = "LG")
             @PathVariable("teamSC") String teamShortCode,
 
-            @Parameter(description = "게시글 Id (ex: 1)", example = "1")
+            @Parameter(description = "게시글 ID", example = "1")
             @PathVariable("postId") Long postId
-    )
-    {
-       PostSingleResDto resdto = postUsecase.getSinglePost(ContentType.POST,postId);
-       return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resdto));
+    ) {
+        PostSingleResDto resdto = postUsecase.getSinglePost(ContentType.POST, postId);
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resdto));
     }
 }
