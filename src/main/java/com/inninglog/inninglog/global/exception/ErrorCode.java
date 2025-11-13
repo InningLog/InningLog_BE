@@ -39,6 +39,9 @@ public enum ErrorCode {
     INVALID_SEAT_SEARCH("INVALID_SEAT_SEARCH", HttpStatus.BAD_REQUEST,"존 정보 없이 열만으로는 검색할 수 없습니다."),
     INVALID_HASHTAG_REQUEST("INVALID_HASHTAG_REQUEST",HttpStatus.BAD_REQUEST, "해시태그는 최소 1개, 최대 5개까지 선택할 수 있습니다."),
 
+    //게시글 관련
+    POST_NOT_FOUND("POST_NOT_FOUND", HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."),
+
     //댓글 관련
     ROOT_COMMENT_NOT_FOUND("COMMENT_NOT_FOUND", HttpStatus.NOT_FOUND, "존재하지 않는 상위 댓글입니다."),
 
