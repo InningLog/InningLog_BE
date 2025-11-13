@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 public record PostSingleResDto(
         MemberShortResDto member,
         Long postId,
+        String teamShortCode,
         String title,
         String content,
         long likeCount,
@@ -23,6 +24,7 @@ public record PostSingleResDto(
         return new PostSingleResDto(
                 memberShortResDto,
                 post.getId(),
+                post.getTeam_shortCode(),
                 post.getTitle(),
                 post.getContent(),
                 post.getLikeCount(),

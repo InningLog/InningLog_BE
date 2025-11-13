@@ -33,9 +33,9 @@ public class PostUsecase {
     }
 
     //게시글 단일 조회
-    public PostSingleResDto getSinglePost(ContentType contentType, Long postId, Member member){
+    public PostSingleResDto getSinglePost(ContentType contentType, Long postId){
         Post post = postValidateService.getPostById(postId);
-        MemberShortResDto memberShortResDto = memberGetService.toMemberShortResDto(member);
+        MemberShortResDto memberShortResDto = memberGetService.toMemberShortResDto(post.getMember());
         ImageListResDto imageListResDto = imageGetService.getImageList(contentType, postId);
         return postGetService.getSinglePost(post, memberShortResDto, imageListResDto);
     }
