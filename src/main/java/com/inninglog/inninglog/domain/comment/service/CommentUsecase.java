@@ -1,6 +1,6 @@
 package com.inninglog.inninglog.domain.comment.service;
 
-import com.inninglog.inninglog.domain.comment.dto.CommentCreateReqDto;
+import com.inninglog.inninglog.domain.comment.dto.req.CommentCreateReqDto;
 import com.inninglog.inninglog.domain.contentType.ContentType;
 import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.domain.post.service.PostValidateService;

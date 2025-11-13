@@ -1,7 +1,6 @@
 package com.inninglog.inninglog.domain.comment.controller;
 
-import com.inninglog.inninglog.domain.comment.dto.CommentCreateReqDto;
-import com.inninglog.inninglog.domain.comment.service.CommentCreateService;
+import com.inninglog.inninglog.domain.comment.dto.req.CommentCreateReqDto;
 import com.inninglog.inninglog.domain.comment.service.CommentUsecase;
 import com.inninglog.inninglog.domain.contentType.ContentType;
 import com.inninglog.inninglog.global.auth.CustomUserDetails;

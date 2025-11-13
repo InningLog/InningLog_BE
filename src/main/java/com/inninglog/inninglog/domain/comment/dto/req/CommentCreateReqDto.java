@@ -1,4 +1,4 @@
-package com.inninglog.inninglog.domain.comment.dto;
+package com.inninglog.inninglog.domain.comment.dto.req;
 
 import jakarta.annotation.Nullable;
 
