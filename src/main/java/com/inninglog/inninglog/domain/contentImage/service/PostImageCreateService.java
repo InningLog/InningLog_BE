@@ -6,6 +6,7 @@ import com.inninglog.inninglog.domain.contentImage.dto.req.ImageUploadReqDto;
 import com.inninglog.inninglog.domain.contentImage.repository.ContentImageRepository;
 import com.inninglog.inninglog.domain.contentType.ContentType;
 import com.inninglog.inninglog.global.s3.S3UrlProperties;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.checkerframework.checker.units.qual.C;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,13 @@ public class PostImageCreateService {
 
     private final ContentImageRepository contentImageRepository;
     private final S3UrlProperties s3UrlProperties;
+
+    @Transactional
+    public void createPostImageList(Long postId, List<ImageCreateReqDto> dtos){
+        for (ImageCreateReqDto dto : dtos) {
+            createPostImage(postId, dto);
+        }
+    }
 
     @Transactional
     public void createPostImage(Long postId, ImageCreateReqDto dto) {
