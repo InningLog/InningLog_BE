@@ -1,8 +1,10 @@
 package com.inninglog.inninglog.domain.comment.domain;
 
+import com.inninglog.inninglog.domain.comment.dto.CommentCreateReqDto;
 import com.inninglog.inninglog.domain.contentType.ContentType;
 import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -34,6 +36,7 @@ public class Comment extends BaseTimeEntity {
 
     private LocalDateTime commentAt;
 
+    @Nullable
     private Long rootCommentId;
 
     private long likeCount;
@@ -51,4 +54,17 @@ public class Comment extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    public static Comment of(CommentCreateReqDto dto, ContentType contentType, Long postId, Member member) {
+        return Comment.builder()
+                .content(dto.content())
+                .commentAt(LocalDateTime.now())
+                .rootCommentId(dto.rootCommentId())
+                .likeCount(0L)
+                .isDeleted(false)
+                .contentType(contentType)
+                .targetId(postId)
+                .member(member)
+                .build();
+    }
 }
