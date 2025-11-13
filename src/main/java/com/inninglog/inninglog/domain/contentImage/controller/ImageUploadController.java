@@ -6,6 +6,7 @@ import com.inninglog.inninglog.domain.contentImage.dto.res.ImageListUploadResDto
 import com.inninglog.inninglog.domain.contentImage.dto.res.ImageUploadResDto;
 import com.inninglog.inninglog.domain.contentImage.service.ContentImageCreateService;
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
+import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class ImageUploadController {
     public ResponseEntity<SuccessResponse<ImageListUploadResDto>> uploadPostImage(
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestBody ImageListUploadReqDto reqDto){
-        contentImageCreateService.getPostImagePresignedUrl(reqDto.imageUploadReqDto(), user.getMember().getId())
+        ImageListUploadResDto dto = contentImageCreateService.getPostImagePreseignedUrlList(reqDto.imageUploadReqDto(), user.getMember().getId());
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, dto));
     }
 }
