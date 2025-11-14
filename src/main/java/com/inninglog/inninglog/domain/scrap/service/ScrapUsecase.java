@@ -1,0 +1,27 @@
+package com.inninglog.inninglog.domain.scrap.service;
+
+import com.inninglog.inninglog.domain.contentType.ContentType;
+import com.inninglog.inninglog.domain.contentType.ContentValidateService;
+import com.inninglog.inninglog.domain.member.domain.Member;
+import com.inninglog.inninglog.domain.scrap.domain.ScrapableContent;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class ScrapUsecase {
+
+    private final ScrapCreateService scrapCreateService;
+    private final ContentValidateService contentValidateService;
+
+    //스크랩 생성
+    @Transactional
+    public void createScrap(ContentType contentType, Long targetId, Member member){
+        ScrapableContent content = contentValidateService.validateContentToScrap(contentType,targetId);
+        //스크랩 중복 여부 검증
+        scrapCreateService.createScrap(contentType, targetId, member);
+        content.increaseScrapCount();
+    }
+
+}

@@ -39,4 +39,12 @@ public class Scrap extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    public static Scrap of(ContentType contentType, Long targetId, Member member) {
+        return Scrap.builder()
+                .contentType(contentType)
+                .targetId(targetId)
+                .member(member)
+                .build();
+    }
 }

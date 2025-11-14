@@ -3,6 +3,7 @@ package com.inninglog.inninglog.domain.post.domain;
 import com.inninglog.inninglog.domain.like.domain.LikeableContent;
 import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.domain.post.dto.req.PostCreateReqDto;
+import com.inninglog.inninglog.domain.scrap.domain.ScrapableContent;
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,7 +24,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Post extends BaseTimeEntity implements LikeableContent {
+public class Post extends BaseTimeEntity implements LikeableContent, ScrapableContent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -89,6 +90,18 @@ public class Post extends BaseTimeEntity implements LikeableContent {
     public void decreaseLikeCount() {
         if (this.likeCount > 0) {
             this.likeCount--;
+        }
+    }
+
+    @Override
+    public void increaseScrapCount(){
+        this.scrapCount++;
+    }
+
+    @Override
+    public void decreaseScrapCount() {
+        if (this.scrapCount > 0) {
+            this.scrapCount--;
         }
     }
 }

@@ -1,12 +1,11 @@
 package com.inninglog.inninglog.domain.like.service;
 
 import com.inninglog.inninglog.domain.contentType.ContentType;
+import com.inninglog.inninglog.domain.contentType.ContentValidateService;
 import com.inninglog.inninglog.domain.like.domain.Like;
 import com.inninglog.inninglog.domain.like.domain.LikeableContent;
 import com.inninglog.inninglog.domain.member.domain.Member;
-import com.inninglog.inninglog.domain.post.service.PostUpdateService;
 import com.inninglog.inninglog.domain.post.service.PostValidateService;
-import com.inninglog.inninglog.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,35 +16,22 @@ public class LikeUsecase {
 
     private final LikeCreateService likeCreateService;
     private final LikeDeleteService likeDeleteService;
-    private final PostValidateService postValidateService;
+    private final ContentValidateService contentValidateService;
     private final LikeValidateService likeValidateService;
 
     //좋아요 생성
     @Transactional
     public void createLike(ContentType contentType, Long targetId, Member member) {
-        LikeableContent content = validateContent(contentType, targetId);
+        LikeableContent content = contentValidateService.validateContentToLike(contentType, targetId);
         likeValidateService.existLikeByMember(contentType, targetId, member);
-        likeCreateService.createLikeAtPost(contentType, targetId, member);
+        likeCreateService.createLike(contentType, targetId, member);
         content.increaseLikeCount();
-    }
-    
-    //콘텐츠 검증
-    @Transactional(readOnly = true)
-    protected LikeableContent validateContent(ContentType contentType, Long targetId){
-        if(contentType==ContentType.POST){
-            return postValidateService.getPostById(targetId);
-        } else if (contentType==ContentType.JOURNAL) {
-            //직관일지 반환
-        } else if (contentType==ContentType.MARKET) {
-            //이닝장터 반환
-        }
-        throw new IllegalArgumentException("지원 안 함");
     }
 
     //좋아요 삭제
     @Transactional
     public void deleteLike(ContentType contentType, Long targetId, Member member) {
-        LikeableContent content = validateContent(contentType, targetId);
+        LikeableContent content = contentValidateService.validateContentToLike(contentType, targetId);
 
         Like like = likeValidateService.getLike(contentType, targetId, member);
         likeDeleteService.deleteLike(like);
