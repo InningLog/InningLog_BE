@@ -35,6 +35,6 @@ public class ScrapUsecase {
         Scrap scrap = scrapValidateService.getScrap(contentType, targetId, member);
         scrapDeleteService.deleteScrap(scrap);
 
-        content.increaseScrapCount();
+        content.decreaseScrapCount();
     }
 }
