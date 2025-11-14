@@ -20,4 +20,9 @@ public class ScrapValidateService {
             throw new CustomException(ErrorCode.SCRAP_ALREADY_EXISTS);
         }
     }
+
+    @Transactional(readOnly = true)
+    public boolean scrapedByMe(ContentType contentType, Long targetId, Member member){
+        return scrapRepository.existsByContentTypeAndTargetIdAndMember(contentType, targetId, member);
+    }
 }

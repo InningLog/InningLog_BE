@@ -11,6 +11,7 @@ import com.inninglog.inninglog.domain.member.service.MemberGetService;
 import com.inninglog.inninglog.domain.post.domain.Post;
 import com.inninglog.inninglog.domain.post.dto.req.PostCreateReqDto;
 import com.inninglog.inninglog.domain.post.dto.res.PostSingleResDto;
+import com.inninglog.inninglog.domain.scrap.service.ScrapValidateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ public class PostUsecase {
     private final MemberGetService memberGetService;
     private final ImageGetService imageGetService;
     private final LikeValidateService likeValidateService;
+    private final ScrapValidateService scrapValidateService;
 
     //게시글 업로드 + 이미지 저장
     @Transactional
@@ -39,7 +41,10 @@ public class PostUsecase {
         Post post = postValidateService.getPostById(postId);
         MemberShortResDto memberShortResDto = memberGetService.toMemberShortResDto(post.getMember());
         ImageListResDto imageListResDto = imageGetService.getImageList(contentType, postId);
+
         boolean likedByMe = likeValidateService.likedByMe(contentType, postId, me);
-        return postGetService.getSinglePost(post, memberShortResDto, imageListResDto, likedByMe);
+        boolean scrapedByMe = scrapValidateService.scrapedByMe(contentType, postId, me);
+
+        return postGetService.getSinglePost(post, memberShortResDto, imageListResDto, likedByMe, scrapedByMe);
     }
 }

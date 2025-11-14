@@ -33,6 +33,9 @@ public record PostSingleResDto(
         @Schema(description = "게시글 스크랩 수", example = "3")
         long scrapCount,
 
+        @Schema(description = "내가 스크랩한 여부", example = "false")
+        boolean scrapedByMe,
+
         @Schema(description = "댓글 수", example = "5")
         long commentCount,
 
@@ -50,7 +53,8 @@ public record PostSingleResDto(
             Post post,
             MemberShortResDto memberShortResDto,
             ImageListResDto imageListResDto,
-            boolean likedByMe){
+            boolean likedByMe,
+            boolean scrapedByMe){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
         return new PostSingleResDto(
@@ -62,6 +66,7 @@ public record PostSingleResDto(
                 post.getLikeCount(),
                 likedByMe,
                 post.getScrapCount(),
+                scrapedByMe,
                 post.getCommentCount(),
                 post.getPostAt().format(formatter),
                 post.isEdit(),

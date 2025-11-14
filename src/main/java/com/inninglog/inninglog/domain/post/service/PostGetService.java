@@ -21,8 +21,9 @@ public class PostGetService {
             Post post,
             MemberShortResDto memberShortResDto,
             ImageListResDto imageListResDto,
-            boolean likedByMe
+            boolean likedByMe,
+            boolean scrapedByMe
     ) {
-        return PostSingleResDto.of(post, memberShortResDto, imageListResDto, likedByMe);
+        return PostSingleResDto.of(post, memberShortResDto, imageListResDto, likedByMe, scrapedByMe);
     }
 }
