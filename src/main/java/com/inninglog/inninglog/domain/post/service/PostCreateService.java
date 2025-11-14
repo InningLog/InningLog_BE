@@ -19,10 +19,4 @@ public class PostCreateService {
         Post post = Post.of(dto, team_shortcode, member);
        return postRepository.save(post).getId();
     }
-
-    //댓글 추가시 댓글 필드 수 증가 로직
-    @Transactional
-    public void increaseCommentCount(Post post) {
-        post.increaseCommentCount();
-    }
 }

@@ -7,6 +7,7 @@ import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.domain.member.service.MemberGetService;
 import com.inninglog.inninglog.domain.post.domain.Post;
 import com.inninglog.inninglog.domain.post.service.PostCreateService;
+import com.inninglog.inninglog.domain.post.service.PostUpdateService;
 import com.inninglog.inninglog.domain.post.service.PostValidateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentUsecase {
 
     private final PostValidateService postValidateService;
-    private final PostCreateService postCreateService;
+    private final PostUpdateService postUpdateService;
     private final CommentCreateService commentCreateService;
     private final CommentValidateServcie commentValidateServcie;
     private final CommentGetService commentGetService;
@@ -30,7 +31,7 @@ public class CommentUsecase {
             commentValidateServcie.validateRootComment(dto.rootCommentId());
         }
         commentCreateService.createComment(contentType, dto, postId, member);
-        postCreateService.increaseCommentCount(post);
+        postUpdateService.increaseCommentCount(post);
     }
 
     //댓글 목록 조회

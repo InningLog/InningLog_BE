@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.domain.post.domain;
 
+import com.inninglog.inninglog.domain.like.domain.LikeableContent;
 import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.domain.post.dto.req.PostCreateReqDto;
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
@@ -22,7 +23,8 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Post extends BaseTimeEntity {
+public class Post extends BaseTimeEntity implements LikeableContent {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
@@ -51,7 +53,8 @@ public class Post extends BaseTimeEntity {
     private Member member;
 
     @Version
-    private Long version;
+    @Column(nullable = false)
+    private Long version = 0L;
 
     public static Post of(PostCreateReqDto dto, String team_shortCode, Member member) {
         return Post.builder()
@@ -74,6 +77,18 @@ public class Post extends BaseTimeEntity {
     public void decreaseCommentCount() {
         if (this.commentCount > 0) {
             this.commentCount--;
+        }
+    }
+
+    @Override
+    public void increaseLikeCount(){
+        this.likeCount++;
+    }
+
+    @Override
+    public void decreaseLikeCount() {
+        if (this.likeCount > 0) {
+            this.likeCount--;
         }
     }
 }

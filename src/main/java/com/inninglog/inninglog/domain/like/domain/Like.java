@@ -39,4 +39,8 @@ public class Like extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    public static Like of(ContentType contentType, Long targetId, Member member) {
+        return Like.builder().contentType(contentType).targetId(targetId).member(member).build();
+    }
 }
