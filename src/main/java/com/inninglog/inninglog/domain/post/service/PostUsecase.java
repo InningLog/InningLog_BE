@@ -4,6 +4,7 @@ import com.inninglog.inninglog.domain.contentImage.dto.res.ImageListResDto;
 import com.inninglog.inninglog.domain.contentImage.service.ImageGetService;
 import com.inninglog.inninglog.domain.contentImage.service.PostImageCreateService;
 import com.inninglog.inninglog.domain.contentType.ContentType;
+import com.inninglog.inninglog.domain.like.service.LikeValidateService;
 import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.domain.member.dto.res.MemberShortResDto;
 import com.inninglog.inninglog.domain.member.service.MemberGetService;
@@ -24,6 +25,7 @@ public class PostUsecase {
     private final PostValidateService postValidateService;
     private final MemberGetService memberGetService;
     private final ImageGetService imageGetService;
+    private final LikeValidateService likeValidateService;
 
     //게시글 업로드 + 이미지 저장
     @Transactional
@@ -33,10 +35,11 @@ public class PostUsecase {
     }
 
     //게시글 단일 조회
-    public PostSingleResDto getSinglePost(ContentType contentType, Long postId){
+    public PostSingleResDto getSinglePost(ContentType contentType, Long postId, Member me){
         Post post = postValidateService.getPostById(postId);
         MemberShortResDto memberShortResDto = memberGetService.toMemberShortResDto(post.getMember());
         ImageListResDto imageListResDto = imageGetService.getImageList(contentType, postId);
-        return postGetService.getSinglePost(post, memberShortResDto, imageListResDto);
+        boolean likedByMe = likeValidateService.likedByMe(contentType, postId, me);
+        return postGetService.getSinglePost(post, memberShortResDto, imageListResDto, likedByMe);
     }
 }

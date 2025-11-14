@@ -17,7 +17,12 @@ public class PostGetService {
 
     //게시글 단일 조회
     @Transactional(readOnly = true)
-    public PostSingleResDto getSinglePost(Post post, MemberShortResDto memberShortResDto, ImageListResDto imageListResDto) {
-        return PostSingleResDto.of(post, memberShortResDto, imageListResDto);
+    public PostSingleResDto getSinglePost(
+            Post post,
+            MemberShortResDto memberShortResDto,
+            ImageListResDto imageListResDto,
+            boolean likedByMe
+    ) {
+        return PostSingleResDto.of(post, memberShortResDto, imageListResDto, likedByMe);
     }
 }

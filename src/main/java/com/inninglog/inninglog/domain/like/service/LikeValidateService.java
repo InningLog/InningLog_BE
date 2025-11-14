@@ -25,6 +25,10 @@ public class LikeValidateService {
         }
     }
 
+    @Transactional
+    public boolean likedByMe(ContentType contentType, Long targetId, Member member){
+        return likeRepository.existsByContentTypeAndTargetIdAndMember(contentType, targetId, member);}
+
     //이미 좋아요 누른건지 확인
     @Transactional
     public Like getLike(ContentType contentType, Long targetId, Member member){

@@ -27,6 +27,9 @@ public record PostSingleResDto(
         @Schema(description = "게시글 좋아요 수", example = "12")
         long likeCount,
 
+        @Schema(description = "내가 좋아요 누른 여부", example = "false")
+        boolean likedByMe,
+
         @Schema(description = "게시글 스크랩 수", example = "3")
         long scrapCount,
 
@@ -43,7 +46,11 @@ public record PostSingleResDto(
         ImageListResDto imageListResDto
 ) {
 
-    public static PostSingleResDto of(Post post, MemberShortResDto memberShortResDto, ImageListResDto imageListResDto){
+    public static PostSingleResDto of(
+            Post post,
+            MemberShortResDto memberShortResDto,
+            ImageListResDto imageListResDto,
+            boolean likedByMe){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
         return new PostSingleResDto(
@@ -53,6 +60,7 @@ public record PostSingleResDto(
                 post.getTitle(),
                 post.getContent(),
                 post.getLikeCount(),
+                likedByMe,
                 post.getScrapCount(),
                 post.getCommentCount(),
                 post.getPostAt().format(formatter),

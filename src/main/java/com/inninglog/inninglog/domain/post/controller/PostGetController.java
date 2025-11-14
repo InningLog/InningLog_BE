@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostGetController {
     private final PostUsecase postUsecase;
 
-    @GetMapping("/{teamSC}/posts/{postId}")
+    @GetMapping("/posts/{postId}")
     @Operation(
             summary = "게시글 단일 조회",
             description = """
@@ -42,13 +42,13 @@ public class PostGetController {
             @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음"),
     })
     public ResponseEntity<SuccessResponse<PostSingleResDto>> getSinglePost(
-            @Parameter(description = "팀 숏 코드 (ex: LG, DS, KT)", example = "LG")
-            @PathVariable("teamSC") String teamShortCode,
-
             @Parameter(description = "게시글 ID", example = "1")
-            @PathVariable("postId") Long postId
+            @PathVariable("postId") Long postId,
+
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal CustomUserDetails user
     ) {
-        PostSingleResDto resdto = postUsecase.getSinglePost(ContentType.POST, postId);
+        PostSingleResDto resdto = postUsecase.getSinglePost(ContentType.POST, postId, user.getMember());
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resdto));
     }
 }
