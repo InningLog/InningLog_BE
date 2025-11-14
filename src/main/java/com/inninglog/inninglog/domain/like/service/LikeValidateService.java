@@ -1,8 +1,10 @@
 package com.inninglog.inninglog.domain.like.service;
 
 import static com.inninglog.inninglog.global.exception.ErrorCode.LIKE_ALREADY_EXISTS;
+import static com.inninglog.inninglog.global.exception.ErrorCode.LIKE_NOT_FOUND;
 
 import com.inninglog.inninglog.domain.contentType.ContentType;
+import com.inninglog.inninglog.domain.like.domain.Like;
 import com.inninglog.inninglog.domain.like.repository.LikeRepository;
 import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.global.exception.CustomException;
@@ -21,5 +23,13 @@ public class LikeValidateService {
         if(likeRepository.existsByContentTypeAndTargetIdAndMember(contentType, targetId, member)){
             throw new CustomException(LIKE_ALREADY_EXISTS);
         }
+    }
+
+    //이미 좋아요 누른건지 확인
+    @Transactional
+    public Like getLike(ContentType contentType, Long targetId, Member member){
+        return likeRepository
+                .findByContentTypeAndTargetIdAndMember(contentType, targetId, member)
+                .orElseThrow(() -> new CustomException(LIKE_NOT_FOUND));
     }
 }

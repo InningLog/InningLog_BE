@@ -1,6 +1,7 @@
 package com.inninglog.inninglog.domain.like.service;
 
 import com.inninglog.inninglog.domain.contentType.ContentType;
+import com.inninglog.inninglog.domain.like.domain.Like;
 import com.inninglog.inninglog.domain.like.domain.LikeableContent;
 import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.domain.post.service.PostUpdateService;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class LikeUsecase {
 
     private final LikeCreateService likeCreateService;
+    private final LikeDeleteService likeDeleteService;
     private final PostValidateService postValidateService;
     private final LikeValidateService likeValidateService;
 
@@ -38,5 +40,16 @@ public class LikeUsecase {
             //이닝장터 반환
         }
         throw new IllegalArgumentException("지원 안 함");
+    }
+
+    //좋아요 삭제
+    @Transactional
+    public void deleteLike(ContentType contentType, Long targetId, Member member) {
+        LikeableContent content = validateContent(contentType, targetId);
+
+        Like like = likeValidateService.getLike(contentType, targetId, member);
+        likeDeleteService.deleteLike(like);
+
+        content.decreaseLikeCount();
     }
 }
