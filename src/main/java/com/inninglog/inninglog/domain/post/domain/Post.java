@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Version;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -49,6 +50,9 @@ public class Post extends BaseTimeEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
+    @Version
+    private Long version;
+
     public static Post of(PostCreateReqDto dto, String team_shortCode, Member member) {
         return Post.builder()
                 .title(dto.title())
@@ -61,5 +65,15 @@ public class Post extends BaseTimeEntity {
                 .isEdit(false)
                 .member(member)
                 .build();
+    }
+
+    public void increaseCommentCount(){
+        this.commentCount++;
+    }
+
+    public void decreaseCommentCount() {
+        if (this.commentCount > 0) {
+            this.commentCount--;
+        }
     }
 }
