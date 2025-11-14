@@ -25,6 +25,7 @@ public class LikeValidateService {
         }
     }
 
+    //내가 좋아요 누른건지에 대한 볼린 형태 반환
     @Transactional
     public boolean likedByMe(ContentType contentType, Long targetId, Member member){
         return likeRepository.existsByContentTypeAndTargetIdAndMember(contentType, targetId, member);}

@@ -13,15 +13,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class ScrapUsecase {
 
     private final ScrapCreateService scrapCreateService;
+    private final ScrapValidateService scrapValidateService;
     private final ContentValidateService contentValidateService;
 
     //스크랩 생성
     @Transactional
     public void createScrap(ContentType contentType, Long targetId, Member member){
         ScrapableContent content = contentValidateService.validateContentToScrap(contentType,targetId);
-        //스크랩 중복 여부 검증
+        scrapValidateService.existScrapByMember(contentType,targetId,member);
         scrapCreateService.createScrap(contentType, targetId, member);
         content.increaseScrapCount();
     }
-
 }
