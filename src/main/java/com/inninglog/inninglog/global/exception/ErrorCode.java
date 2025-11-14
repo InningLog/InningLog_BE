@@ -45,6 +45,9 @@ public enum ErrorCode {
     //댓글 관련
     ROOT_COMMENT_NOT_FOUND("COMMENT_NOT_FOUND", HttpStatus.NOT_FOUND, "존재하지 않는 상위 댓글입니다."),
 
+    //좋아요 관련
+    LIKE_ALREADY_EXISTS("LIKE_ALREADY_EXISTS", HttpStatus.BAD_REQUEST, "이미 좋아요를 누른 컨텐츠입니다."),
+
     // 공통 예외
     VALIDATION_ERROR("VALIDATION_ERROR", HttpStatus.BAD_REQUEST, "요청값이 올바르지 않습니다."),
     TYPE_MISMATCH("TYPE_MISMATCH", HttpStatus.BAD_REQUEST, "요청 파라미터 타입이 올바르지 않습니다."),

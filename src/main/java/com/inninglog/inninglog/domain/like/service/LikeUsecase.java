@@ -16,12 +16,13 @@ public class LikeUsecase {
 
     private final LikeCreateService likeCreateService;
     private final PostValidateService postValidateService;
-    private final PostUpdateService postUpdateService;
+    private final LikeValidateService likeValidateService;
 
     //좋아요 생성
     @Transactional
     public void createLike(ContentType contentType, Long targetId, Member member) {
         LikeableContent content = validateContent(contentType, targetId);
+        likeValidateService.existLikeByMember(contentType, targetId, member);
         likeCreateService.createLikeAtPost(contentType, targetId, member);
         content.increaseLikeCount();
     }
