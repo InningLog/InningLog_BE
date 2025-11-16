@@ -1,8 +1,11 @@
 package com.inninglog.inninglog.domain.comment.service;
 
+import com.inninglog.inninglog.domain.comment.domain.CommentableContent;
 import com.inninglog.inninglog.domain.comment.dto.req.CommentCreateReqDto;
 import com.inninglog.inninglog.domain.comment.dto.res.CommentListResDto;
 import com.inninglog.inninglog.domain.contentType.ContentType;
+import com.inninglog.inninglog.domain.contentType.ContentValidateService;
+import com.inninglog.inninglog.domain.like.domain.LikeableContent;
 import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.domain.member.service.MemberGetService;
 import com.inninglog.inninglog.domain.post.domain.Post;
@@ -22,16 +25,17 @@ public class CommentUsecase {
     private final CommentCreateService commentCreateService;
     private final CommentValidateServcie commentValidateServcie;
     private final CommentGetService commentGetService;
+    private final ContentValidateService contentValidateService;
 
     //댓글 생성
     @Transactional
     public void createComment(ContentType contentType, CommentCreateReqDto dto, Long postId, Member member){
-        Post post = postValidateService.getPostById(postId);
+        CommentableContent content = contentValidateService.validateContentToComment(contentType, postId);
         if(dto.rootCommentId() != null) {
             commentValidateServcie.validateRootComment(dto.rootCommentId());
         }
         commentCreateService.createComment(contentType, dto, postId, member);
-        postUpdateService.increaseCommentCount(post);
+        content.increaseCommentCount();
     }
 
     //댓글 목록 조회

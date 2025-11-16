@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.domain.contentType;
 
+import com.inninglog.inninglog.domain.comment.domain.CommentableContent;
 import com.inninglog.inninglog.domain.like.domain.LikeableContent;
 import com.inninglog.inninglog.domain.post.service.PostValidateService;
 import com.inninglog.inninglog.domain.scrap.domain.ScrapableContent;
@@ -27,6 +28,18 @@ public class ContentValidateService {
 
     @Transactional(readOnly = true)
     public ScrapableContent validateContentToScrap(ContentType contentType, Long targetId){
+        if(contentType==ContentType.POST){
+            return postValidateService.getPostById(targetId);
+        } else if (contentType==ContentType.JOURNAL) {
+            //직관일지 반환
+        } else if (contentType==ContentType.MARKET) {
+            //이닝장터 반환
+        }
+        throw new IllegalArgumentException("지원 안 함");
+    }
+
+    @Transactional(readOnly = true)
+    public CommentableContent validateContentToComment(ContentType contentType, Long targetId){
         if(contentType==ContentType.POST){
             return postValidateService.getPostById(targetId);
         } else if (contentType==ContentType.JOURNAL) {

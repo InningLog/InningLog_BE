@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.domain.post.domain;
 
+import com.inninglog.inninglog.domain.comment.domain.CommentableContent;
 import com.inninglog.inninglog.domain.like.domain.LikeableContent;
 import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.domain.post.dto.req.PostCreateReqDto;
@@ -24,7 +25,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Post extends BaseTimeEntity implements LikeableContent, ScrapableContent {
+public class Post extends BaseTimeEntity implements LikeableContent, ScrapableContent, CommentableContent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -71,10 +72,12 @@ public class Post extends BaseTimeEntity implements LikeableContent, ScrapableCo
                 .build();
     }
 
+    @Override
     public void increaseCommentCount(){
         this.commentCount++;
     }
 
+    @Override
     public void decreaseCommentCount() {
         if (this.commentCount > 0) {
             this.commentCount--;
