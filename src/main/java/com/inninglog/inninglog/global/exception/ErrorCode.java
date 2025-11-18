@@ -43,7 +43,8 @@ public enum ErrorCode {
     POST_NOT_FOUND("POST_NOT_FOUND", HttpStatus.NOT_FOUND, "존재하지 않는 게시글입니다."),
 
     //댓글 관련
-    ROOT_COMMENT_NOT_FOUND("COMMENT_NOT_FOUND", HttpStatus.NOT_FOUND, "존재하지 않는 상위 댓글입니다."),
+    ROOT_COMMENT_NOT_FOUND("ROOT_COMMENT_NOT_FOUND", HttpStatus.NOT_FOUND, "존재하지 않는 상위 댓글입니다."),
+    COMMENT_NOT_FOUND("COMMENT_NOT_FOUND", HttpStatus.NOT_FOUND, "존재하지 않는 댓글입니다."),
 
     //좋아요 관련
     LIKE_ALREADY_EXISTS("LIKE_ALREADY_EXISTS", HttpStatus.BAD_REQUEST, "이미 좋아요를 누른 컨텐츠입니다."),

@@ -80,4 +80,9 @@ public class Comment extends BaseTimeEntity implements LikeableContent {
             this.likeCount--;
         }
     }
+
+    public void deleteComment() {
+        this.content = null;
+        this.isDeleted=true;
+    }
 }

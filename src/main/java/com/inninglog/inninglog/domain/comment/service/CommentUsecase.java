@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.domain.comment.service;
 
+import com.inninglog.inninglog.domain.comment.domain.Comment;
 import com.inninglog.inninglog.domain.comment.domain.CommentableContent;
 import com.inninglog.inninglog.domain.comment.dto.req.CommentCreateReqDto;
 import com.inninglog.inninglog.domain.comment.dto.res.CommentListResDto;
@@ -21,9 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentUsecase {
 
     private final PostValidateService postValidateService;
-    private final PostUpdateService postUpdateService;
     private final CommentCreateService commentCreateService;
     private final CommentValidateServcie commentValidateServcie;
+    private final CommentDeleteService commentDeleteService;
     private final CommentGetService commentGetService;
     private final ContentValidateService contentValidateService;
 
@@ -43,5 +44,12 @@ public class CommentUsecase {
     public CommentListResDto getComments(ContentType contentType, Long postId){
         postValidateService.getPostById(postId);
         return commentGetService.getCommentList(contentType,postId);
+    }
+
+    //댓글 삭제
+    @Transactional
+    public void deleteComment(Long commentId){
+        Comment comment = commentValidateServcie.getCommentIdAndIsDeletedFalse(commentId);
+        commentDeleteService.delete(comment);
     }
 }

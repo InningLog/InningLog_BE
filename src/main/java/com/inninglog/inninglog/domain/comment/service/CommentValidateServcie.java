@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.domain.comment.service;
 
+import static com.inninglog.inninglog.global.exception.ErrorCode.COMMENT_NOT_FOUND;
 import static com.inninglog.inninglog.global.exception.ErrorCode.ROOT_COMMENT_NOT_FOUND;
 
 import com.inninglog.inninglog.domain.comment.domain.Comment;
@@ -26,6 +27,13 @@ public class CommentValidateServcie {
     @Transactional(readOnly = true)
     public Comment getCommentId (Long commentId){
         return commentRepository.findById(commentId)
-                .orElseThrow(() -> new CustomException(ROOT_COMMENT_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
+    }
+
+    //삭제 되지 않은 뎃글 아이디로 반환
+    @Transactional(readOnly = true)
+    public Comment getCommentIdAndIsDeletedFalse(Long commentId){
+        return commentRepository.findByIdAndIsDeletedFalse(commentId)
+                .orElseThrow(() -> new CustomException(COMMENT_NOT_FOUND));
     }
 }
