@@ -65,6 +65,16 @@ public class LikeDeleteController {
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK));
     }
 
+    @Operation(
+            summary = "댓글 좋아요 취소",
+            description = "특정 댓글에 등록된 좋아요를 취소합니다. 아직 좋아요를 누르지 않은 상태에서 취소 요청 시 에러가 발생합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "댓글 좋아요 취소 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (좋아요를 누르지 않은 상태에서 취소 요청 등)"),
+            @ApiResponse(responseCode = "404", description = "댓글 또는 좋아요 정보를 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
     @DeleteMapping("/comments/{commentId}/likes")
     public ResponseEntity<SuccessResponse<Void>> deleteLikeAtComment(
             @Parameter(description = "좋아요를 취소할 댓글 ID", example = "3")
