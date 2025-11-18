@@ -62,4 +62,13 @@ public class LikeCreateController {
         likeUsecase.createLike(ContentType.POST, postId, user.getMember());
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK));
     }
+
+    @PostMapping("/comments/{commentId}/likes")
+    public ResponseEntity<SuccessResponse<Void>> createLikeAtComment(
+            @PathVariable Long commentId,
+            @AuthenticationPrincipal CustomUserDetails user
+    ){
+        likeUsecase.createLike(ContentType.COMMENT, commentId, user.getMember());
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK));
+    }
 }

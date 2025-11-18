@@ -1,6 +1,7 @@
 package com.inninglog.inninglog.domain.contentType;
 
 import com.inninglog.inninglog.domain.comment.domain.CommentableContent;
+import com.inninglog.inninglog.domain.comment.service.CommentValidateServcie;
 import com.inninglog.inninglog.domain.like.domain.LikeableContent;
 import com.inninglog.inninglog.domain.post.service.PostValidateService;
 import com.inninglog.inninglog.domain.scrap.domain.ScrapableContent;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ContentValidateService {
 
     private final PostValidateService postValidateService;
+    private final CommentValidateServcie commentValidateServcie;
 
     @Transactional(readOnly = true)
     public LikeableContent validateContentToLike(ContentType contentType, Long targetId){
@@ -22,6 +24,8 @@ public class ContentValidateService {
             //직관일지 반환
         } else if (contentType==ContentType.MARKET) {
             //이닝장터 반환
+        }else if(contentType==ContentType.COMMENT){
+            return commentValidateServcie.getCommentId(targetId);
         }
         throw new IllegalArgumentException("지원 안 함");
     }

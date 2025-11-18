@@ -2,6 +2,7 @@ package com.inninglog.inninglog.domain.comment.domain;
 
 import com.inninglog.inninglog.domain.comment.dto.req.CommentCreateReqDto;
 import com.inninglog.inninglog.domain.contentType.ContentType;
+import com.inninglog.inninglog.domain.like.domain.LikeableContent;
 import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
 import jakarta.annotation.Nullable;
@@ -25,7 +26,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment extends BaseTimeEntity {
+public class Comment extends BaseTimeEntity implements LikeableContent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,5 +67,17 @@ public class Comment extends BaseTimeEntity {
                 .targetId(postId)
                 .member(member)
                 .build();
+    }
+
+    @Override
+    public void increaseLikeCount(){
+        this.likeCount++;
+    }
+
+    @Override
+    public void decreaseLikeCount() {
+        if (this.likeCount > 0) {
+            this.likeCount--;
+        }
     }
 }

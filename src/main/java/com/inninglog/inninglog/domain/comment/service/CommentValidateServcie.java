@@ -2,6 +2,7 @@ package com.inninglog.inninglog.domain.comment.service;
 
 import static com.inninglog.inninglog.global.exception.ErrorCode.ROOT_COMMENT_NOT_FOUND;
 
+import com.inninglog.inninglog.domain.comment.domain.Comment;
 import com.inninglog.inninglog.domain.comment.repository.CommentRepository;
 import com.inninglog.inninglog.global.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,13 @@ public class CommentValidateServcie {
     @Transactional(readOnly = true)
     public void validateRootComment (Long commentId){
         commentRepository.findById(commentId)
+                .orElseThrow(() -> new CustomException(ROOT_COMMENT_NOT_FOUND));
+    }
+
+    //댓글 아이디로 반환
+    @Transactional(readOnly = true)
+    public Comment getCommentId (Long commentId){
+        return commentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException(ROOT_COMMENT_NOT_FOUND));
     }
 }
