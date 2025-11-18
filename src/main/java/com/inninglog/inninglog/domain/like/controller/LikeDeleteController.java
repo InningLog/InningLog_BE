@@ -64,4 +64,15 @@ public class LikeDeleteController {
         likeUsecase.deleteLike(ContentType.POST, postId, user.getMember());
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK));
     }
+
+    @DeleteMapping("/comments/{commentId}/likes")
+    public ResponseEntity<SuccessResponse<Void>> deleteLikeAtComment(
+            @Parameter(description = "좋아요를 취소할 댓글 ID", example = "3")
+            @PathVariable Long commentId,
+
+            @AuthenticationPrincipal CustomUserDetails user
+    ){
+        likeUsecase.deleteLike(ContentType.COMMENT, commentId, user.getMember());
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK));
+    }
 }
