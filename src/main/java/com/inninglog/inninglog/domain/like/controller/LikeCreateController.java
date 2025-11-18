@@ -63,9 +63,21 @@ public class LikeCreateController {
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK));
     }
 
+    @Operation(
+            summary = "댓글 좋아요 생성",
+            description = "특정 댓글에 좋아요를 등록합니다. 이미 좋아요를 누른 상태에서 다시 요청할 경우 에러가 발생합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "댓글 좋아요 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (이미 좋아요를 누른 경우 등)"),
+            @ApiResponse(responseCode = "404", description = "댓글을 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
     @PostMapping("/comments/{commentId}/likes")
     public ResponseEntity<SuccessResponse<Void>> createLikeAtComment(
+            @Parameter(description = "좋아요를 등록할 댓글 ID", example = "15")
             @PathVariable Long commentId,
+
             @AuthenticationPrincipal CustomUserDetails user
     ){
         likeUsecase.createLike(ContentType.COMMENT, commentId, user.getMember());
