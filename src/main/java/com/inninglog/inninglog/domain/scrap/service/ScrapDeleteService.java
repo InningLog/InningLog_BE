@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.domain.scrap.service;
 
+import com.inninglog.inninglog.domain.contentType.ContentType;
 import com.inninglog.inninglog.domain.scrap.domain.Scrap;
 import com.inninglog.inninglog.domain.scrap.repository.ScrapRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,5 +16,10 @@ public class ScrapDeleteService {
     @Transactional
     public void deleteScrap(Scrap scrap) {
         scrapRepository.delete(scrap);
+    }
+
+    @Transactional
+    public void deleteByTargetId(ContentType contentType, Long targetId) {
+        scrapRepository.deleteAllByContent(contentType, targetId);
     }
 }

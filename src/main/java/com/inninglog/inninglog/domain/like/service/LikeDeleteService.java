@@ -17,4 +17,9 @@ public class LikeDeleteService {
     public void deleteLike(Like like) {
         likeRepository.delete(like);
     }
+
+    @Transactional
+    public void deleteByTargetId(ContentType contentType, Long targetId) {
+        likeRepository.deleteAllByContent(contentType, targetId);
+    }
 }
