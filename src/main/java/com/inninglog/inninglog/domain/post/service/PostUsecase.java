@@ -13,6 +13,7 @@ import com.inninglog.inninglog.domain.like.service.LikeValidateService;
 import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.domain.member.dto.res.MemberShortResDto;
 import com.inninglog.inninglog.domain.member.service.MemberGetService;
+import com.inninglog.inninglog.domain.member.service.MemberValidateService;
 import com.inninglog.inninglog.domain.post.domain.Post;
 import com.inninglog.inninglog.domain.post.dto.req.PostCreateReqDto;
 import com.inninglog.inninglog.domain.post.dto.req.PostUpdateReqDto;
@@ -37,6 +38,7 @@ public class PostUsecase {
     private final PostImageUpdateService postImageUpdateService;
 
     private final MemberGetService memberGetService;
+    private final MemberValidateService memberValidateService;
     private final ImageGetService imageGetService;
 
     private final LikeValidateService likeValidateService;
@@ -82,8 +84,9 @@ public class PostUsecase {
 
     //게시글 수정
     @Transactional
-    public void updatePost(Long postId, PostUpdateReqDto dto){
+    public void updatePost(Long memberId, Long postId, PostUpdateReqDto dto){
         Post post = postValidateService.getPostById(postId);
+        memberValidateService.validateWriter(memberId, post.getMember().getId());
         postUpdateService.updatePostFromDto(post, dto);
 
         List<ContentImage> existingImages = imageGetService.getImageList(ContentType.POST, postId);

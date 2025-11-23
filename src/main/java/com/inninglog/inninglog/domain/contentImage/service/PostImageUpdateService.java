@@ -23,7 +23,7 @@ public class PostImageUpdateService {
         // 2) 유지할 이미지 map 구성 (id → sequence)
         Map<Long, Integer> remainSeqMap = remainImages.stream()
                 .collect(Collectors.toMap(
-                        ImageRemainUpdateReqDto::remainImage,
+                        ImageRemainUpdateReqDto::remainImageId,
                         ImageRemainUpdateReqDto::sequence
                 ));
 

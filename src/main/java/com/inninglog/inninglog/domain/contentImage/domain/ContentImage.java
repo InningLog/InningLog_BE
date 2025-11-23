@@ -51,7 +51,4 @@ public class ContentImage extends BaseTimeEntity {
     public void updateSequence(Integer seq) {
         this.sequence = seq;
     }
-
-    public static ContentImage updateOf(ContentType contentType, Long targetId, String originalUrl, ImageNewUpdateReqDto dto)
-
 }
