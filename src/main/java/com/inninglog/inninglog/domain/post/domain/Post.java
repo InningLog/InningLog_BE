@@ -4,6 +4,7 @@ import com.inninglog.inninglog.domain.comment.domain.CommentableContent;
 import com.inninglog.inninglog.domain.like.domain.LikeableContent;
 import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.domain.post.dto.req.PostCreateReqDto;
+import com.inninglog.inninglog.domain.post.dto.req.PostUpdateReqDto;
 import com.inninglog.inninglog.domain.scrap.domain.ScrapableContent;
 import com.inninglog.inninglog.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
@@ -106,5 +107,12 @@ public class Post extends BaseTimeEntity implements LikeableContent, ScrapableCo
         if (this.scrapCount > 0) {
             this.scrapCount--;
         }
+    }
+
+    //게시글 수정
+    public void update(PostUpdateReqDto dto){
+        this.title = dto.title();
+        this.content = dto.content();
+        this.isEdit = true;
     }
 }
