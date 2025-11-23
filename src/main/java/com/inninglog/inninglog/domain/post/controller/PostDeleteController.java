@@ -2,6 +2,7 @@ package com.inninglog.inninglog.domain.post.controller;
 
 import com.inninglog.inninglog.domain.post.service.PostUpdateService;
 import com.inninglog.inninglog.domain.post.service.PostUsecase;
+import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,9 +47,10 @@ public class PostDeleteController {
     @DeleteMapping("/posts/{postId}")
     public ResponseEntity<SuccessResponse<Void>> deletePost(
             @Parameter(description = "삭제할 게시글의 ID", example = "42")
-            @PathVariable Long postId
+            @PathVariable Long postId,
+            @AuthenticationPrincipal CustomUserDetails user
     ){
-        postUsecase.deletePost(postId);
+        postUsecase.deletePost(user.getMember().getId(), postId);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK));
     }
 }

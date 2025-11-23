@@ -73,12 +73,13 @@ public class PostUsecase {
 
     //게시글 삭제
     @Transactional
-    public void deletePost(Long postId){
+    public void deletePost(Long memberId, Long postId){
+        Post post = postValidateService.getPostById(postId);
+        memberValidateService.validateWriter(memberId, post.getMember().getId());
         likeDeleteService.deleteByTargetId(ContentType.POST, postId);
         commentDeleteService.deleteByTargetId(ContentType.POST, postId);
         scrapDeleteService.deleteByTargetId(ContentType.POST, postId);
         contentImageRepository.deleteAllByContent(ContentType.POST, postId);
-        Post post = postValidateService.getPostById(postId);
         postDeleteService.postDelete(post);
     }
 
