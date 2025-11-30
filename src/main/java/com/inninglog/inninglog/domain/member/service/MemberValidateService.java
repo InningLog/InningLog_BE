@@ -37,7 +37,7 @@ public class MemberValidateService {
     }
 
     //게시글 작성자 여부
-    public boolean checkPostWriter(Member writeMember, Member me){
-        return writeMember.equals(me);
+    public boolean checkPostWriter(Long writeMemberId, Long meId){
+        return writeMemberId.equals(meId);
     }
 }

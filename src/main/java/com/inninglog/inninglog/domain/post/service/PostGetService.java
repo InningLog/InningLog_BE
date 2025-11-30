@@ -1,6 +1,7 @@
 package com.inninglog.inninglog.domain.post.service;
 
 import com.inninglog.inninglog.domain.contentImage.dto.res.ImageListResDto;
+import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.domain.member.dto.res.MemberShortResDto;
 import com.inninglog.inninglog.domain.post.domain.Post;
 import com.inninglog.inninglog.domain.post.dto.res.PostSingleResDto;
@@ -36,6 +37,12 @@ public class PostGetService {
     public Slice<Post> getPostsByTeam(String teamShortCode, Pageable pageable) {
         return postRepository
                 .findByTeamShortCodeOrderByPostAtDesc(teamShortCode, pageable);
+    }
+
+    //게시글 작성자 Id 가져오기
+    @Transactional(readOnly = true)
+    public Member getPostWriterId(Post post){
+        return post.getMember();
     }
 }
 

@@ -21,6 +21,7 @@ import com.inninglog.inninglog.domain.post.dto.res.PostSingleResDto;
 import com.inninglog.inninglog.domain.post.dto.res.PostSummaryResDto;
 import com.inninglog.inninglog.domain.scrap.service.ScrapDeleteService;
 import com.inninglog.inninglog.domain.scrap.service.ScrapValidateService;
+import com.inninglog.inninglog.global.dto.SliceResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -65,10 +66,11 @@ public class PostUsecase {
     @Transactional(readOnly = true)
     public PostSingleResDto getSinglePost(ContentType contentType, Long postId, Member me){
         Post post = postValidateService.getPostById(postId);
-        MemberShortResDto memberShortResDto = memberGetService.toMemberShortResDto(post.getMember());
+        Member writer = postGetService.getPostWriterId(post);
+        MemberShortResDto memberShortResDto = memberGetService.toMemberShortResDto(writer);
         ImageListResDto imageListResDto = imageGetService.getImageListToDto(contentType, postId);
 
-        boolean writedByMe = memberValidateService.checkPostWriter(post.getMember(), me);
+        boolean writedByMe = memberValidateService.checkPostWriter(writer.getId(), me.getId());
         boolean likedByMe = likeValidateService.likedByMe(contentType, postId, me);
         boolean scrapedByMe = scrapValidateService.scrapedByMe(contentType, postId, me);
 
@@ -101,9 +103,10 @@ public class PostUsecase {
 
     //게시글 조회
     @Transactional(readOnly = true)
-    public Slice<PostSummaryResDto> getPostList(String teamShortCode, Pageable pageable){
+    public SliceResponse<PostSummaryResDto> getPostList(String teamShortCode, Pageable pageable){
         Slice<Post> posts = postGetService.getPostsByTeam(teamShortCode, pageable);
-        return getPostsByTeam(posts);
+        Slice<PostSummaryResDto> dtos =  getPostsByTeam(posts);
+        return SliceResponse.of(dtos);
     }
 
     @Transactional(readOnly = true)
