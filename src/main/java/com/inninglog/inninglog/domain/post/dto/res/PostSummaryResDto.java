@@ -32,16 +32,16 @@ public record PostSummaryResDto(
         String thumbImageUrl
 ) {
 
-    public static PostSummaryResDto of(Post post, MemberShortResDto member, String thumbImageUrl) {
+    public static PostSummaryResDto of(Post post, MemberShortResDto member) {
         return new PostSummaryResDto(
                 post.getId(),
-                post.getTeam_shortCode(),
+                post.getTeamShortCode(),
                 post.getTitle(),
                 post.getContent(),
                 member,
                 post.getLikeCount(),
                 post.getCommentCount(),
-                thumbImageUrl
+                post.getThumbnailUrl()
         );
     }
 }

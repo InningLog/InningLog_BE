@@ -18,10 +18,13 @@ import com.inninglog.inninglog.domain.post.domain.Post;
 import com.inninglog.inninglog.domain.post.dto.req.PostCreateReqDto;
 import com.inninglog.inninglog.domain.post.dto.req.PostUpdateReqDto;
 import com.inninglog.inninglog.domain.post.dto.res.PostSingleResDto;
+import com.inninglog.inninglog.domain.post.dto.res.PostSummaryResDto;
 import com.inninglog.inninglog.domain.scrap.service.ScrapDeleteService;
 import com.inninglog.inninglog.domain.scrap.service.ScrapValidateService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -94,5 +97,22 @@ public class PostUsecase {
         List<ContentImage> existingImages = imageGetService.getImageList(ContentType.POST, postId);
         postImageUpdateService.updateImages(dto.remainImages(), existingImages);
         postImageCreateService.createPostImageList(postId, dto.newImages());
+    }
+
+    //게시글 조회
+    @Transactional(readOnly = true)
+    public Slice<PostSummaryResDto> getPostList(String teamShortCode, Pageable pageable){
+        Slice<Post> posts = postGetService.getPostsByTeam(teamShortCode, pageable);
+        return getPostsByTeam(posts);
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<PostSummaryResDto> getPostsByTeam(Slice<Post> posts) {
+        return posts.map(post ->
+                PostSummaryResDto.of(
+                        post,
+                        memberGetService.toMemberShortResDto(post.getMember())
+                )
+        );
     }
 }
