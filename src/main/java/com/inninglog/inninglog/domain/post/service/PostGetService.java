@@ -6,6 +6,7 @@ import com.inninglog.inninglog.domain.post.domain.Post;
 import com.inninglog.inninglog.domain.post.dto.res.PostSingleResDto;
 import com.inninglog.inninglog.domain.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,5 +30,8 @@ public class PostGetService {
     }
 
     //게시글 목록 조회 - 팀별
+    public Slice<PostListResDto> getPosts(){
+
+    }
 
 }
