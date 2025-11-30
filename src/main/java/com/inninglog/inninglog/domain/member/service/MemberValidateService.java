@@ -35,4 +35,9 @@ public class MemberValidateService {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
     }
+
+    //게시글 작성자 여부
+    public boolean checkPostWriter(Member writeMember, Member me){
+        return writeMember.equals(me);
+    }
 }

@@ -65,10 +65,11 @@ public class PostUsecase {
         MemberShortResDto memberShortResDto = memberGetService.toMemberShortResDto(post.getMember());
         ImageListResDto imageListResDto = imageGetService.getImageListToDto(contentType, postId);
 
+        boolean writedByMe = memberValidateService.checkPostWriter(post.getMember(), me);
         boolean likedByMe = likeValidateService.likedByMe(contentType, postId, me);
         boolean scrapedByMe = scrapValidateService.scrapedByMe(contentType, postId, me);
 
-        return postGetService.getSinglePost(post, memberShortResDto, imageListResDto, likedByMe, scrapedByMe);
+        return postGetService.getSinglePost(post, memberShortResDto, imageListResDto, writedByMe, likedByMe, scrapedByMe);
     }
 
     //게시글 삭제

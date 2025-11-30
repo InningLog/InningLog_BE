@@ -21,9 +21,13 @@ public class PostGetService {
             Post post,
             MemberShortResDto memberShortResDto,
             ImageListResDto imageListResDto,
+            boolean writedByMe,
             boolean likedByMe,
             boolean scrapedByMe
     ) {
-        return PostSingleResDto.of(post, memberShortResDto, imageListResDto, likedByMe, scrapedByMe);
+        return PostSingleResDto.of(post, memberShortResDto, imageListResDto, writedByMe, likedByMe, scrapedByMe);
     }
+
+    //게시글 목록 조회 - 팀별
+
 }
