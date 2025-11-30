@@ -65,7 +65,7 @@ public record PostSingleResDto(
                 memberShortResDto,
                 writedByMe,
                 post.getId(),
-                post.getTeam_shortCode(),
+                post.getTeamShortCode(),
                 post.getTitle(),
                 post.getContent(),
                 post.getLikeCount(),

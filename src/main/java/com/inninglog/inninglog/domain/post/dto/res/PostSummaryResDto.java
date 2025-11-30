@@ -25,6 +25,9 @@ public record PostSummaryResDto(
         @Schema(description = "좋아요 수", example = "12")
         long likeCount,
 
+        @Schema(description = "게시글 스크랩 수", example = "3")
+        long scrapCount,
+
         @Schema(description = "댓글 수", example = "5")
         long commentCount,
 
@@ -40,6 +43,7 @@ public record PostSummaryResDto(
                 post.getContent(),
                 member,
                 post.getLikeCount(),
+                post.getScrapCount(),
                 post.getCommentCount(),
                 post.getThumbnailUrl()
         );
