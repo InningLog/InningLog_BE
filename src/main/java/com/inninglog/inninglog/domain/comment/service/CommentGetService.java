@@ -9,6 +9,7 @@ import com.inninglog.inninglog.domain.like.service.LikeValidateService;
 import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.domain.member.dto.res.MemberShortResDto;
 import com.inninglog.inninglog.domain.member.service.MemberGetService;
+import com.inninglog.inninglog.domain.member.service.MemberValidateService;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ public class CommentGetService {
     private final CommentRepository commentRepository;
     private final MemberGetService memberGetService;
     private final LikeValidateService likeValidateService;
+    private final MemberValidateService memberValidateService;
 
     @Transactional(readOnly = true)
     public CommentListResDto getCommentList(ContentType contentType, Long targetId, Member me){
@@ -50,7 +52,8 @@ public class CommentGetService {
             MemberShortResDto memberShortResDto = memberGetService.toMemberShortResDto(c.getMember());
 
             boolean likedByMe = likeValidateService.likedByMe(ContentType.COMMENT,c.getId(), me);
-            CommentResDto dto = CommentResDto.of(c, likedByMe, memberShortResDto);
+            boolean writedByMe = memberValidateService.checkPostWriter(c.getMember().getId(), me.getId());
+            CommentResDto dto = CommentResDto.of(c, writedByMe, likedByMe, memberShortResDto);
             map.put(c.getId(), dto);
         }
 

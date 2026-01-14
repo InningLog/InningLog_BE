@@ -16,6 +16,9 @@ public record CommentResDto (
         @Schema(description = "작성자 정보")
         MemberShortResDto memberShortResDto,
 
+        @Schema(description = "내가 작성한 댓글인지 여부", example = "false")
+        boolean writedByMe,
+
         @Schema(description = "댓글 내용", example = "와 오늘 경기 미쳤다 ㄷㄷ")
         String content,
 
@@ -35,6 +38,7 @@ public record CommentResDto (
         List<CommentResDto> replies
 ){
     public static CommentResDto of (Comment comment,
+                                    boolean writedByMe,
                                     boolean likedByMe,
                                     MemberShortResDto memberShortResDto,
                                     List<CommentResDto> replies) {
@@ -43,6 +47,7 @@ public record CommentResDto (
         return new CommentResDto(
                 comment.getId(),
                 memberShortResDto,
+                writedByMe,
                 comment.getContent(),
                 comment.getCommentAt().format(formatter),
                 comment.getLikeCount(),
@@ -53,12 +58,14 @@ public record CommentResDto (
     }
 
     public static CommentResDto of(Comment comment,
+                                   boolean writedByMe,
                                    boolean likedByMe,
                                    MemberShortResDto memberShortResDto) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         return new CommentResDto(
                 comment.getId(),
                 memberShortResDto,
+                writedByMe,
                 comment.getContent(),
                 comment.getCommentAt().format(formatter),
                 comment.getLikeCount(),
