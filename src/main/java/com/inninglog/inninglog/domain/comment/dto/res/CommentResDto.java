@@ -25,13 +25,19 @@ public record CommentResDto (
         @Schema(description = "좋아요 수", example = "3")
         long likeCount,
 
+        @Schema(description = "내가 좋아요 누른 여부", example = "false")
+        boolean likedByMe,
+
         @Schema(description = "삭제 여부(soft delete)", example = "false")
         boolean isDeleted,
 
         @Schema(description = "대댓글 리스트 (재귀 구조)", nullable = true)
         List<CommentResDto> replies
 ){
-    public static CommentResDto of (Comment comment, MemberShortResDto memberShortResDto, List<CommentResDto> replies) {
+    public static CommentResDto of (Comment comment,
+                                    boolean likedByMe,
+                                    MemberShortResDto memberShortResDto,
+                                    List<CommentResDto> replies) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
         return new CommentResDto(
@@ -40,12 +46,15 @@ public record CommentResDto (
                 comment.getContent(),
                 comment.getCommentAt().format(formatter),
                 comment.getLikeCount(),
+                likedByMe,
                 comment.isDeleted(),
                 replies
         );
     }
 
-    public static CommentResDto of(Comment comment, MemberShortResDto memberShortResDto) {
+    public static CommentResDto of(Comment comment,
+                                   boolean likedByMe,
+                                   MemberShortResDto memberShortResDto) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         return new CommentResDto(
                 comment.getId(),
@@ -53,6 +62,7 @@ public record CommentResDto (
                 comment.getContent(),
                 comment.getCommentAt().format(formatter),
                 comment.getLikeCount(),
+                likedByMe,
                 comment.isDeleted(),
                 new ArrayList<>()
         );

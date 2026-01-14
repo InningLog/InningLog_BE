@@ -3,12 +3,14 @@ package com.inninglog.inninglog.domain.comment.controller;
 import com.inninglog.inninglog.domain.comment.dto.res.CommentListResDto;
 import com.inninglog.inninglog.domain.comment.service.CommentUsecase;
 import com.inninglog.inninglog.domain.contentType.ContentType;
+import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,9 +26,10 @@ public class CommentGetController {
     @GetMapping("/posts/{postId}/comments")
     public ResponseEntity<SuccessResponse<CommentListResDto>> getPostComments(
             @Parameter(description = "게시글 ID", example = "1")
-            @PathVariable("postId") Long postId
+            @PathVariable("postId") Long postId,
+            @AuthenticationPrincipal CustomUserDetails user
     ){
-        CommentListResDto resdto = commentUsecase.getComments(ContentType.POST, postId);
+        CommentListResDto resdto = commentUsecase.getComments(ContentType.POST, postId, user.getMember());
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, resdto));
     }
 }
