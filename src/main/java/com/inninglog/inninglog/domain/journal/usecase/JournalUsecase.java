@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.domain.journal.usecase;
 
+import com.inninglog.inninglog.domain.contentType.ContentType;
 import com.inninglog.inninglog.domain.journal.domain.Journal;
 import com.inninglog.inninglog.domain.journal.domain.ResultScore;
 import com.inninglog.inninglog.domain.journal.dto.req.JourCreateReqDto;
@@ -11,6 +12,8 @@ import com.inninglog.inninglog.domain.kbo.domain.Game;
 import com.inninglog.inninglog.domain.kbo.dto.gameSchdule.GameSchResDto;
 import com.inninglog.inninglog.domain.kbo.service.GameReportService;
 import com.inninglog.inninglog.domain.kbo.service.GameGetService;
+import com.inninglog.inninglog.domain.like.service.LikeValidateService;
+import com.inninglog.inninglog.domain.scrap.service.ScrapValidateService;
 import com.inninglog.inninglog.domain.member.domain.Member;
 import com.inninglog.inninglog.domain.member.service.MemberValidateService;
 import com.inninglog.inninglog.domain.stadium.domain.Stadium;
@@ -41,6 +44,8 @@ public class JournalUsecase {
     private final GameReportService gameReportService;
     private final GameGetService gameGetService;
     private final S3Uploader s3Uploader;
+    private final LikeValidateService likeValidateService;
+    private final ScrapValidateService scrapValidateService;
 
 
     //직관 일지 생성
@@ -104,7 +109,9 @@ public class JournalUsecase {
         Member member = memberValidateService.findById(memberId);
         Journal journal = journalGetService.getJournalById(journalId);
         String presignedUrl = s3Uploader.generatePresignedGetUrl(journal.getMedia_url());
-        JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal, presignedUrl);
+        boolean likedByMe = likeValidateService.likedByMe(ContentType.JOURNAL, journalId, member);
+        boolean scrapedByMe = scrapValidateService.scrapedByMe(ContentType.JOURNAL, journalId, member);
+        JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal, presignedUrl, likedByMe, scrapedByMe);
         if(journal.getSeatView() == null){
             return JourUpdateResDto.from(jourDetailResDto, null);
         }
@@ -120,8 +127,10 @@ public class JournalUsecase {
         journalService.accessToJournal(memberId, journal.getMember().getId());
         journalService.updateJournal(journal, dto);
         String presignedUrl = s3Uploader.generatePresignedGetUrl(journal.getMedia_url());
+        boolean likedByMe = likeValidateService.likedByMe(ContentType.JOURNAL, journalId, member);
+        boolean scrapedByMe = scrapValidateService.scrapedByMe(ContentType.JOURNAL, journalId, member);
 
-        JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal, presignedUrl);
+        JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal, presignedUrl, likedByMe, scrapedByMe);
 
         return JourUpdateResDto.from(jourDetailResDto, journal.getSeatView().getId());
     }
