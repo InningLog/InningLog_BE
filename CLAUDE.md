@@ -100,6 +100,24 @@ Located in `src/main/java/com/inninglog/inninglog/global/`:
 
 예시: `feat : Journal 댓글 API 추가 #88`
 
+### Branch Naming
+`{type}/#{이슈번호}/{설명}` 형식 사용:
+```
+feat/#88/journal-comment
+fix/#42/login-bug
+docs/#91/claude-md-update
+chore/#93/git-workflow
+```
+
+### Git Workflow
+```
+1. Issue 생성     → gh issue create
+2. Branch 생성    → git checkout -b {type}/#{번호}/{설명}
+3. 작업 & Commit  → git commit -m "type : 내용 #번호"
+4. Push & PR      → git push → gh pr create
+5. Merge          → gh pr merge
+```
+
 ### Key Patterns
 - All authenticated endpoints require JWT tokens (via Kakao OAuth)
 - Image uploads use S3 presigned URLs (no direct file handling in backend)
@@ -152,3 +170,4 @@ node -e "const c=require('crypto'),s='JWT_SECRET_KEY값',k=Buffer.from(s,'base64
 - `/plan-feature {기능명}` - 기획서 작성
 - `/implement-feature {기능명}` - TDD 구현
 - `/test-api {엔드포인트}` - API 테스트
+- `/commit {type} {설명}` - 이슈→브랜치→커밋→PR 자동화
