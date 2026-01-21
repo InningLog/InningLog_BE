@@ -147,27 +147,56 @@ Set<Long> findLikedTargetIds(ContentType type, List<Long> ids, Member member);
 
 ---
 
-## 4. 성능 비교
+## 4. 성능 비교 (실제 테스트 결과)
 
-### 댓글 조회 (Comment)
+### 테스트 환경
+- H2 In-Memory Database
+- 댓글 10개, 각각 다른 Member 작성
+- `CommentGetServiceN1Test.java` 통합 테스트
 
-| 항목 | Before | After |
-|------|--------|-------|
-| 댓글 10개 쿼리 수 | 21개 (1+10+10) | **2개** (Fetch Join + Like 배치) |
-| 댓글 50개 쿼리 수 | 101개 | **2개** |
-| 댓글 100개 쿼리 수 | 201개 | **2개** |
+### 실제 실행된 쿼리
 
-### 게시글 목록 조회 (Post)
+**Before (최적화 전)**
+```
+댓글 10개 조회 시:
+1. 댓글 목록 조회: 1개
+2. 각 댓글의 Member 조회: 10개
+3. 각 댓글의 Like 여부: 10개
+총: 21개 쿼리
+```
 
-| 항목 | Before | After |
-|------|--------|-------|
-| 게시글 10개 쿼리 수 | 11개 (1+10) | **1개** (Fetch Join) |
-| 게시글 50개 쿼리 수 | 51개 | **1개** |
+**After (최적화 후)**
+```sql
+-- 1. Comment + Member Fetch Join (1개)
+SELECT c.*, m.* FROM comment c
+JOIN member m ON m.id = c.member_id
+WHERE c.content_type = ? AND c.target_id = ?
+
+-- 2. Like 배치 조회 IN 쿼리 (1개)
+SELECT l.target_id FROM content_like l
+WHERE l.content_type = ? AND l.target_id IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) AND l.member_id = ?
+
+총: 2개 쿼리 ✅
+```
 
 ### 개선 효과
-- 댓글 조회: **쿼리 수 97% 감소** (101개 → 2개, 50개 댓글 기준)
-- 게시글 목록: **쿼리 수 98% 감소** (51개 → 1개, 50개 게시글 기준)
-- DB 왕복 횟수가 N에 비례하지 않고 **상수**가 됨
+
+| 항목 | Before | After | 개선율 |
+|------|--------|-------|--------|
+| 댓글 10개 | 21개 쿼리 | **2개** | 90% 감소 |
+| 댓글 50개 | 101개 쿼리 | **2개** | 98% 감소 |
+| 댓글 100개 | 201개 쿼리 | **2개** | 99% 감소 |
+
+### 추가 발견된 문제
+
+`Member` → `MemberCredential` N+1 문제가 추가로 발견됨:
+```java
+// Member.java
+@OneToOne(mappedBy = "member")
+private MemberCredential credential;
+```
+이 문제는 MemberCredential이 양방향 OneToOne 관계이기 때문에 발생.
+→ 향후 별도 리팩토링에서 해결 예정
 
 ---
 
@@ -193,6 +222,8 @@ Set<Long> findLikedTargetIds(ContentType type, List<Long> ids, Member member);
 - [x] PostRepository Fetch Join 추가
 - [x] PostGetService 수정
 - [x] 빌드 통과
+- [x] 통합 테스트 작성 (`CommentGetServiceN1Test.java`)
+- [x] 성능 테스트 실행 및 쿼리 수 확인
 
 ---
 
