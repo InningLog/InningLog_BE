@@ -147,28 +147,7 @@ node -e "const c=require('crypto'),s='JWT_SECRET_KEY값',k=Buffer.from(s,'base64
 - `/implement-feature {기능명}` - TDD 구현
 - `/test-api {엔드포인트}` - API 테스트
 
-## 진행 중인 작업 (2025-01-21)
+## 작업 체크포인트
 
-### N+1 쿼리 최적화 (PR #98)
-- **브랜치**: `refact/#97/n+1-query-optimization`
-- **베이스**: `feat/#88/댓글응답수정`
-- **상태**: PR 생성됨, 리뷰 대기
-- **완료**:
-  - CommentRepository/PostRepository Fetch Join 추가
-  - LikeRepository 배치 조회 추가
-  - 통합 테스트 (`CommentGetServiceN1Test`) 작성
-  - 쿼리 수 90% 감소 확인 (21개 → 2개)
-- **문서**: `docs/refactoring/001-n+1-query-optimization.md`
-
-### 추가 발견된 이슈
-1. **MemberCredential N+1**: Member → MemberCredential 양방향 OneToOne 관계에서 추가 N+1 발생
-   - 향후 별도 리팩토링 필요
-2. **로컬 서버 실행 불가**: `.env.local`에 `LOCAL_AWS_ACCESS_KEY`, `LOCAL_AWS_SECRET_KEY` 없음
-   - S3 PreSignedPut 서비스 빈 생성 실패
-   - 테스트는 H2 + test 프로파일로 가능
-
-### 다음 세션 TODO
-- [ ] PR #98 머지 (feat/#88으로)
-- [ ] feat/#88 브랜치 main으로 머지
-- [ ] MemberCredential N+1 최적화 검토
-- [ ] 로컬 개발 환경 AWS 설정 또는 조건부 로딩 검토
+세션 간 작업 상태는 별도 파일에 기록:
+→ **`docs/checkpoint.md`**
