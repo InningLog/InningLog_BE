@@ -126,7 +126,14 @@ chore/#93/git-workflow
 
 ## API Documentation
 
-Swagger UI available at `/swagger-ui.html` (requires basic auth configured via `SWAGGER_NAME`/`SWAGGER_PW`)
+Swagger UI: `/swagger-ui.html`
+- username: `frontend`
+- password: `inninglog0909`
+
+API docs 확인:
+```bash
+curl -s -u "frontend:inninglog0909" "http://localhost:8080/v3/api-docs"
+```
 
 ## Context Optimization (토큰 절약)
 
