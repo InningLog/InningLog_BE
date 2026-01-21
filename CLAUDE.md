@@ -27,11 +27,15 @@ InningLog is a Spring Boot 3 REST API for a baseball fan engagement platform (�
 
 ## Environment Setup
 
-The application requires a `.env` file in the project root with the following variables:
-- Database: `PROD_DB_URL`, `PROD_DB_USERNAME`, `PROD_DB_PASSWORD`
+환경변수 파일:
+- `.env.local` - 로컬 개발용
+- `.env` - 운영/배포용
+
+주요 변수:
+- Database: `LOCAL_DB_URL`, `LOCAL_DB_USERNAME`, `LOCAL_DB_PASSWORD`
 - JWT: `JWT_SECRET_KEY`, `JWT_EXPIRATION`
 - Kakao OAuth: `KAKAO_CLIENT_ID`, `KAKAO_REDIRECT_URI`
-- AWS S3: `PROD_AWS_ACCESS_KEY`, `PROD_AWS_SECRET_KEY`, `PROD_REGION`, `PROD_AWS_S3_BUCKET`
+- AWS S3: `LOCAL_AWS_ACCESS_KEY`, `LOCAL_AWS_SECRET_KEY`, `AWS_REGION`, `LOCAL_AWS_S3_BUCKET`
 - Swagger: `SWAGGER_NAME`, `SWAGGER_PW`
 
 Profiles: `local` (default), `dev`, `prod`
@@ -85,14 +89,16 @@ Located in `src/main/java/com/inninglog/inninglog/global/`:
 ## Code Conventions
 
 ### PR/Commit Format
-`[TYPE] 작업 내용` where TYPE is:
-- `FEAT`: New feature
-- `FIX`: Bug fix
-- `CHORE`: Build/config changes
-- `DOCS`: Documentation
-- `STYLE`: Formatting (no functional change)
-- `REFACT`: Refactoring
-- `TEST`: Test code
+`type : 작업 내용 #이슈번호` 형식 사용:
+- `feat` : New feature
+- `fix` : Bug fix
+- `chore` : Build/config changes
+- `docs` : Documentation
+- `style` : Formatting (no functional change)
+- `refact` : Refactoring
+- `test` : Test code
+
+예시: `feat : Journal 댓글 API 추가 #88`
 
 ### Key Patterns
 - All authenticated endpoints require JWT tokens (via Kakao OAuth)
