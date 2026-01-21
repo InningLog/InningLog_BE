@@ -167,7 +167,7 @@ public record JourDetailResDto(
 - [x] JourDetailResDto에 likeCount, likedByMe 추가
 - [x] JournalUsecase에서 likedByMe 조회 로직 추가
 - [x] API 테스트
-- [ ] Swagger 문서 확인
+- [x] Swagger 문서 확인
 
 ## 7. 참고: 댓글 좋아요는 이미 구현됨
 
