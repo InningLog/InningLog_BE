@@ -146,3 +146,9 @@ node -e "const c=require('crypto'),s='JWT_SECRET_KEY값',k=Buffer.from(s,'base64
 - `/plan-feature {기능명}` - 기획서 작성
 - `/implement-feature {기능명}` - TDD 구현
 - `/test-api {엔드포인트}` - API 테스트
+- `/checkpoint` - 세션 종료 전 작업 상태 기록
+
+## 작업 체크포인트
+
+세션 간 작업 상태는 별도 파일에 기록:
+→ **`docs/checkpoint.md`**

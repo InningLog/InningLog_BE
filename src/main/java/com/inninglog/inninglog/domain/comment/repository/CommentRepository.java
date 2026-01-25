@@ -13,6 +13,10 @@ import org.springframework.stereotype.Service;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findAllByContentTypeAndTargetIdOrderByCommentAtDesc(ContentType contentType, Long targetId);
 
+    // N+1 최적화: Member를 한 번에 조회
+    @Query("SELECT c FROM Comment c JOIN FETCH c.member WHERE c.contentType = :contentType AND c.targetId = :targetId ORDER BY c.commentAt DESC")
+    List<Comment> findAllWithMemberByContentTypeAndTargetId(ContentType contentType, Long targetId);
+
     Optional<Comment> findByIdAndIsDeletedFalse(Long id);
 
     @Modifying
