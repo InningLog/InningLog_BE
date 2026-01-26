@@ -7,11 +7,16 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.H2Dialect
+
+# N+1 성능 테스트를 위한 SQL 로깅
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
   security:
     user:
       name: test

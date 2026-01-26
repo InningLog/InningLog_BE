@@ -32,11 +32,10 @@ public class PostGetService {
         return PostSingleResDto.of(post, memberShortResDto, imageListResDto, writedByMe, likedByMe, scrapedByMe);
     }
 
-    //게시글 목록 조회 - 팀별
+    //게시글 목록 조회 - 팀별 (N+1 최적화: Member Fetch Join 적용)
     @Transactional(readOnly = true)
     public Slice<Post> getPostsByTeam(String teamShortCode, Pageable pageable) {
-        return postRepository
-                .findByTeamShortCodeOrderByPostAtDesc(teamShortCode, pageable);
+        return postRepository.findWithMemberByTeamShortCode(teamShortCode, pageable);
     }
 
     //게시글 작성자 Id 가져오기
