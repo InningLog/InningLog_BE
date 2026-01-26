@@ -27,11 +27,15 @@ InningLog is a Spring Boot 3 REST API for a baseball fan engagement platform (�
 
 ## Environment Setup
 
-The application requires a `.env` file in the project root with the following variables:
-- Database: `PROD_DB_URL`, `PROD_DB_USERNAME`, `PROD_DB_PASSWORD`
+환경변수 파일:
+- `.env.local` - 로컬 개발용
+- `.env` - 운영/배포용
+
+주요 변수:
+- Database: `LOCAL_DB_URL`, `LOCAL_DB_USERNAME`, `LOCAL_DB_PASSWORD`
 - JWT: `JWT_SECRET_KEY`, `JWT_EXPIRATION`
 - Kakao OAuth: `KAKAO_CLIENT_ID`, `KAKAO_REDIRECT_URI`
-- AWS S3: `PROD_AWS_ACCESS_KEY`, `PROD_AWS_SECRET_KEY`, `PROD_REGION`, `PROD_AWS_S3_BUCKET`
+- AWS S3: `LOCAL_AWS_ACCESS_KEY`, `LOCAL_AWS_SECRET_KEY`, `AWS_REGION`, `LOCAL_AWS_S3_BUCKET`
 - Swagger: `SWAGGER_NAME`, `SWAGGER_PW`
 
 Profiles: `local` (default), `dev`, `prod`
@@ -85,14 +89,34 @@ Located in `src/main/java/com/inninglog/inninglog/global/`:
 ## Code Conventions
 
 ### PR/Commit Format
-`[TYPE] 작업 내용` where TYPE is:
-- `FEAT`: New feature
-- `FIX`: Bug fix
-- `CHORE`: Build/config changes
-- `DOCS`: Documentation
-- `STYLE`: Formatting (no functional change)
-- `REFACT`: Refactoring
-- `TEST`: Test code
+`type : 작업 내용 #이슈번호` 형식 사용:
+- `feat` : New feature
+- `fix` : Bug fix
+- `chore` : Build/config changes
+- `docs` : Documentation
+- `style` : Formatting (no functional change)
+- `refact` : Refactoring
+- `test` : Test code
+
+예시: `feat : Journal 댓글 API 추가 #88`
+
+### Branch Naming
+`{type}/#{이슈번호}/{설명}` 형식 사용:
+```
+feat/#88/journal-comment
+fix/#42/login-bug
+docs/#91/claude-md-update
+chore/#93/git-workflow
+```
+
+### Git Workflow
+```
+1. Issue 생성     → gh issue create
+2. Branch 생성    → git checkout -b {type}/#{번호}/{설명}
+3. 작업 & Commit  → git commit -m "type : 내용 #번호"
+4. Push & PR      → git push → gh pr create
+5. Merge          → gh pr merge
+```
 
 ### Key Patterns
 - All authenticated endpoints require JWT tokens (via Kakao OAuth)
@@ -102,7 +126,14 @@ Located in `src/main/java/com/inninglog/inninglog/global/`:
 
 ## API Documentation
 
-Swagger UI available at `/swagger-ui.html` (requires basic auth configured via `SWAGGER_NAME`/`SWAGGER_PW`)
+Swagger UI: `/swagger-ui.html`
+- username: `frontend`
+- password: `inninglog0909`
+
+API docs 확인:
+```bash
+curl -s -u "frontend:inninglog0909" "http://localhost:8080/v3/api-docs"
+```
 
 ## Context Optimization (토큰 절약)
 
@@ -152,3 +183,4 @@ node -e "const c=require('crypto'),s='JWT_SECRET_KEY값',k=Buffer.from(s,'base64
 
 세션 간 작업 상태는 별도 파일에 기록:
 → **`docs/checkpoint.md`**
+- `/commit {type} {설명}` - 이슈→브랜치→커밋→PR 자동화

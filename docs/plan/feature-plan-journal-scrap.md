@@ -167,4 +167,4 @@ public record JourDetailResDto(
 - [x] JourDetailResDto에 scrapCount, scrapedByMe 추가
 - [x] JournalUsecase에서 scrapedByMe 조회 로직 추가
 - [x] API 테스트
-- [ ] Swagger 문서 확인
+- [x] Swagger 문서 확인
