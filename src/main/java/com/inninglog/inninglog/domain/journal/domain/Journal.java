@@ -81,6 +81,10 @@ public class Journal extends BaseTimeEntity implements CommentableContent, Likea
     @Builder.Default
     private long scrapCount = 0;
 
+    //공개 여부
+    @Builder.Default
+    private boolean isPublic = false;
+
     @Override
     public void increaseCommentCount() {
         this.commentCount++;
@@ -140,6 +144,7 @@ public class Journal extends BaseTimeEntity implements CommentableContent, Likea
                 .emotion(dto.getEmotion())
                 .review_text(dto.getReview_text())
                 .media_url(filename)
+                .isPublic(dto.isPublic())
                 .build();
     }
 
@@ -150,6 +155,7 @@ public class Journal extends BaseTimeEntity implements CommentableContent, Likea
         this.resultScore = ResultScore.of(dto.getOurScore(), dto.getTheirScore());
         this.emotion = dto.getEmotion();
         this.review_text = dto.getReview_text();
+        this.isPublic = dto.isPublic();
 
         // media_url 조건 분기 처리
         if (dto.getMedia_url() == null || dto.getMedia_url().trim().isEmpty()) {

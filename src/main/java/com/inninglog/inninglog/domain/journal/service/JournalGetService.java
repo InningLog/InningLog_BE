@@ -6,6 +6,8 @@ import com.inninglog.inninglog.global.exception.CustomException;
 import com.inninglog.inninglog.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,5 +26,15 @@ public class JournalGetService {
                     return new CustomException(ErrorCode.JOURNAL_NOT_FOUND);
                 });
         return journal;
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<Journal> getPublicJournals(Pageable pageable) {
+        return journalRepository.findPublicJournals(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<Journal> getPublicJournalsByTeam(String teamShortCode, Pageable pageable) {
+        return journalRepository.findPublicJournalsByTeam(teamShortCode, pageable);
     }
 }
