@@ -6,6 +6,7 @@ import com.inninglog.inninglog.domain.journal.domain.ResultScore;
 import com.inninglog.inninglog.domain.journal.dto.req.JourCreateReqDto;
 import com.inninglog.inninglog.domain.journal.dto.req.JourUpdateReqDto;
 import com.inninglog.inninglog.domain.journal.dto.res.*;
+import com.inninglog.inninglog.global.dto.SliceResponse;
 import com.inninglog.inninglog.domain.journal.service.JournalGetService;
 import com.inninglog.inninglog.domain.journal.service.JournalService;
 import com.inninglog.inninglog.domain.kbo.domain.Game;
@@ -23,6 +24,7 @@ import com.inninglog.inninglog.domain.team.service.TeamGetService;
 import com.inninglog.inninglog.global.s3.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -133,5 +135,23 @@ public class JournalUsecase {
         JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal, presignedUrl, likedByMe, scrapedByMe);
 
         return JourUpdateResDto.from(jourDetailResDto, journal.getSeatView().getId());
+    }
+
+    //공개 일지 피드 조회
+    @Transactional(readOnly = true)
+    public SliceResponse<JournalFeedResDto> getPublicJournalFeed(String teamShortCode, Pageable pageable) {
+        Slice<Journal> journals;
+
+        if (teamShortCode == null || teamShortCode.isBlank()) {
+            journals = journalGetService.getPublicJournals(pageable);
+        } else {
+            journals = journalGetService.getPublicJournalsByTeam(teamShortCode, pageable);
+        }
+
+        Slice<JournalFeedResDto> dtoSlice = journals.map(journal ->
+            JournalFeedResDto.from(journal, s3Uploader.generatePresignedGetUrl(journal.getMedia_url()))
+        );
+
+        return SliceResponse.of(dtoSlice);
     }
 }
