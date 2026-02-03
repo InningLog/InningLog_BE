@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/journals/{journalId}/scraps")
-@Tag(name = "직관일지 스크랩", description = "직관일지 스크랩 관련 API")
+@Tag(name = "직관일지 - 소셜", description = "직관일지 댓글/좋아요/스크랩 API")
 public class ScrapJournalController {
 
     private final ScrapUsecase scrapUsecase;
