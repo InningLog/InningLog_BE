@@ -17,6 +17,8 @@ import com.inninglog.inninglog.domain.member.service.MemberValidateService;
 import com.inninglog.inninglog.domain.post.domain.Post;
 import com.inninglog.inninglog.domain.post.dto.req.PostCreateReqDto;
 import com.inninglog.inninglog.domain.post.dto.req.PostUpdateReqDto;
+import com.inninglog.inninglog.domain.post.dto.res.CommunityHomePostResDto;
+import com.inninglog.inninglog.domain.post.dto.res.CommunityHomeResDto;
 import com.inninglog.inninglog.domain.post.dto.res.PostSingleResDto;
 import com.inninglog.inninglog.domain.post.dto.res.PostSummaryResDto;
 import com.inninglog.inninglog.domain.scrap.service.ScrapDeleteService;
@@ -24,6 +26,7 @@ import com.inninglog.inninglog.domain.scrap.service.ScrapValidateService;
 import com.inninglog.inninglog.global.dto.SliceResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -117,5 +120,30 @@ public class PostUsecase {
                         memberGetService.toMemberShortResDto(post.getMember())
                 )
         );
+    }
+
+    //인기 게시글 조회 (좋아요 10개 이상)
+    @Transactional(readOnly = true)
+    public SliceResponse<PostSummaryResDto> getPopularPostList(Pageable pageable) {
+        Slice<Post> posts = postGetService.getPopularPosts(10L, pageable);
+        Slice<PostSummaryResDto> dtos = getPostsByTeam(posts);
+        return SliceResponse.of(dtos);
+    }
+
+    //커뮤니티 홈 조회
+    @Transactional(readOnly = true)
+    public CommunityHomeResDto getCommunityHome(Member member) {
+        String teamShortCode = member.getTeam().getShortCode();
+        Slice<Post> posts = postGetService.getPopularPosts(10L, PageRequest.of(0, 2));
+
+        List<CommunityHomePostResDto> popularPosts = posts.stream()
+                .map(post -> {
+                    boolean likedByMe = likeValidateService.likedByMe(ContentType.POST, post.getId(), member);
+                    boolean scrapedByMe = scrapValidateService.scrapedByMe(ContentType.POST, post.getId(), member);
+                    return CommunityHomePostResDto.of(post, likedByMe, scrapedByMe);
+                })
+                .toList();
+
+        return CommunityHomeResDto.of(teamShortCode, popularPosts);
     }
 }
