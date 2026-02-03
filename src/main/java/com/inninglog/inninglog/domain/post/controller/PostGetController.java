@@ -11,6 +11,7 @@ import com.inninglog.inninglog.global.response.SuccessResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -81,7 +82,50 @@ public class PostGetController {
                     description = "팀별 게시글 목록 조회 성공",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = SliceResponse.class)
+                            schema = @Schema(implementation = SliceResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "게시글 목록", value = """
+                                        {
+                                          "code": "SUCCESS",
+                                          "message": "요청이 정상적으로 처리되었습니다.",
+                                          "data": {
+                                            "content": [
+                                              {
+                                                "postId": 45,
+                                                "teamShortCode": "LG",
+                                                "title": "오늘 경기 직관 후기",
+                                                "content": "오늘 잠실 가서 경기 봤는데 역전승해서 너무 좋았어요!",
+                                                "member": {
+                                                  "nickName": "볼빨간스트라스버그",
+                                                  "profile_url": "https://k.kakaocdn.net/.../img.jpg"
+                                                },
+                                                "likeCount": 12,
+                                                "scrapCount": 3,
+                                                "commentCount": 8,
+                                                "thumbImageUrl": "https://s3.amazonaws.com/.../thumb.jpg",
+                                                "imageCount": 3,
+                                                "postAt": "2025-06-03 18:30"
+                                              }
+                                            ],
+                                            "hasNext": true,
+                                            "page": 0,
+                                            "size": 10
+                                          }
+                                        }
+                                        """),
+                                    @ExampleObject(name = "게시글 없음", value = """
+                                        {
+                                          "code": "SUCCESS",
+                                          "message": "요청이 정상적으로 처리되었습니다.",
+                                          "data": {
+                                            "content": [],
+                                            "hasNext": false,
+                                            "page": 0,
+                                            "size": 10
+                                          }
+                                        }
+                                        """)
+                            }
                     )
             )
     })

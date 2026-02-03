@@ -1,6 +1,7 @@
 package com.inninglog.inninglog.domain.journal.controller;
 
 import com.inninglog.inninglog.domain.journal.dto.res.*;
+import com.inninglog.inninglog.global.dto.SliceResponse;
 import com.inninglog.inninglog.domain.journal.usecase.JournalUsecase;
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.global.exception.ErrorApiResponses;
@@ -528,6 +529,111 @@ public class JournalController {
     ) {
         JourUpdateResDto updatedJournal = journalUsecase.updateJournal(user.getMember().getId(), journalId, dto);
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, updatedJournal));
+    }
+
+
+    @Operation(
+            summary = "공개 직관 일지 피드 조회",
+            description = """
+                공개 설정된 직관 일지를 조회합니다. 인증이 필요합니다.
+
+                📌 **팀 필터링**
+                - `teamShortCode=ALL`: 전체 공개 일지 조회
+                - `teamShortCode=LG`: 특정 팀(작성자 응원팀 기준) 일지만 조회
+
+                📌 **페이지네이션**
+                - 무한 스크롤 방식 (Slice 기반)
+                - `page`, `size` 파라미터로 제어
+                - 최신순(createdAt DESC)으로 정렬
+
+                📌 **응답 필드**
+                - `writedByMe`: 내가 작성한 일지인지 여부
+                - `likedByMe`: 내가 좋아요 눌렀는지 여부
+                - `scrapedByMe`: 내가 스크랩했는지 여부
+
+                ✅ 예시 요청:
+                - 전체 조회: `/journals/feed?teamShortCode=ALL&page=0&size=10`
+                - LG팬 일지만: `/journals/feed?teamShortCode=LG&page=0&size=10`
+                """
+    )
+    @ErrorApiResponses.Common
+    @ApiResponse(
+            responseCode = "200",
+            description = "피드 조회 성공",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = SliceResponse.class),
+                    examples = {
+                            @ExampleObject(name = "피드 목록", value = """
+                                {
+                                  "code": "SUCCESS",
+                                  "message": "요청이 정상적으로 처리되었습니다.",
+                                  "data": {
+                                    "content": [
+                                      {
+                                        "journalId": 123,
+                                        "thumbnailUrl": "https://s3.amazonaws.com/.../image.jpg",
+                                        "member": {
+                                          "nickName": "볼빨간스트라스버그",
+                                          "profile_url": "https://k.kakaocdn.net/.../img.jpg"
+                                        },
+                                        "writedByMe": false,
+                                        "reviewPreview": "오늘 경기 정말 재밌었다! 우리 팀이 역전승...",
+                                        "createdAt": "2025-06-03 18:30",
+                                        "likeCount": 15,
+                                        "likedByMe": true,
+                                        "commentCount": 3,
+                                        "scrapCount": 2,
+                                        "scrapedByMe": false
+                                      }
+                                    ],
+                                    "hasNext": true,
+                                    "page": 0,
+                                    "size": 10
+                                  }
+                                }
+                                """),
+                            @ExampleObject(name = "피드 없음", value = """
+                                {
+                                  "code": "SUCCESS",
+                                  "message": "요청이 정상적으로 처리되었습니다.",
+                                  "data": {
+                                    "content": [],
+                                    "hasNext": false,
+                                    "page": 0,
+                                    "size": 10
+                                  }
+                                }
+                                """)
+                    }
+            )
+    )
+    @GetMapping("/feed")
+    public ResponseEntity<SuccessResponse<SliceResponse<JournalFeedResDto>>> getPublicJournalFeed(
+            @Parameter(description = "팀 숏코드 (ALL: 전체 조회, 특정 팀코드: 해당 팀 응원 사용자 일지만)", example = "ALL")
+            @RequestParam String teamShortCode,
+
+            @Parameter(
+                    description = "페이지 번호 (0부터 시작)",
+                    example = "0",
+                    schema = @Schema(type = "integer", minimum = "0")
+            )
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(
+                    description = "페이지 크기",
+                    example = "10",
+                    schema = @Schema(type = "integer", minimum = "1", maximum = "100")
+            )
+            @RequestParam(defaultValue = "10") int size,
+
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        SliceResponse<JournalFeedResDto> result = journalUsecase.getPublicJournalFeed(user.getMemberId(), teamShortCode, pageable);
+
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, result));
     }
 }
 
