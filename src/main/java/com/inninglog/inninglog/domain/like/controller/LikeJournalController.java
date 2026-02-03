@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/journals/{journalId}/likes")
-@Tag(name = "직관일지 좋아요", description = "직관일지 좋아요 관련 API")
+@Tag(name = "직관일지 - 소셜", description = "직관일지 댓글/좋아요/스크랩 API")
 public class LikeJournalController {
 
     private final LikeUsecase likeUsecase;

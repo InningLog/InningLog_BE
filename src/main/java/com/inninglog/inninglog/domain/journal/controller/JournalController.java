@@ -42,7 +42,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/journals")
-@Tag(name = "직관 일지", description = "직관 일지 관련 API")
+@Tag(name = "직관일지", description = "직관 일지 관련 API")
 public class JournalController {
 
     private final JournalService journalService;
