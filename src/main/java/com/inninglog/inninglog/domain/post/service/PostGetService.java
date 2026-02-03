@@ -43,5 +43,11 @@ public class PostGetService {
     public Member getPostWriterId(Post post){
         return post.getMember();
     }
+
+    //인기 게시글 목록 조회 (좋아요 수 기준)
+    @Transactional(readOnly = true)
+    public Slice<Post> getPopularPosts(long minLikeCount, Pageable pageable) {
+        return postRepository.findPopularPostsWithMember(minLikeCount, pageable);
+    }
 }
 

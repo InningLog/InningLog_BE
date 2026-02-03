@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/journals/{journalId}/comments")
-@Tag(name = "직관일지 댓글", description = "직관일지 댓글 관련 API")
+@Tag(name = "직관일지 - 소셜", description = "직관일지 댓글/좋아요/스크랩 API")
 public class CommentJournalController {
 
     private final CommentUsecase commentUsecase;
