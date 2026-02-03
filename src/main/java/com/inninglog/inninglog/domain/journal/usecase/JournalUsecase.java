@@ -32,6 +32,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -139,18 +140,38 @@ public class JournalUsecase {
 
     //공개 일지 피드 조회
     @Transactional(readOnly = true)
-    public SliceResponse<JournalFeedResDto> getPublicJournalFeed(String teamShortCode, Pageable pageable) {
+    public SliceResponse<JournalFeedResDto> getPublicJournalFeed(Long memberId, String teamShortCode, Pageable pageable) {
+        Member member = memberValidateService.findById(memberId);
         Slice<Journal> journals;
 
-        if (teamShortCode == null || teamShortCode.isBlank()) {
+        // teamShortCode가 "ALL"이면 전체 조회, 그 외에는 팀별 조회
+        if ("ALL".equalsIgnoreCase(teamShortCode)) {
             journals = journalGetService.getPublicJournals(pageable);
         } else {
             journals = journalGetService.getPublicJournalsByTeam(teamShortCode, pageable);
         }
 
-        Slice<JournalFeedResDto> dtoSlice = journals.map(journal ->
-            JournalFeedResDto.from(journal, s3Uploader.generatePresignedGetUrl(journal.getMedia_url()))
-        );
+        // N+1 최적화: 좋아요/스크랩 여부를 한 번에 조회
+        List<Long> journalIds = journals.getContent().stream()
+                .map(Journal::getId)
+                .toList();
+
+        Set<Long> likedIds = likeValidateService.findLikedTargetIds(ContentType.JOURNAL, journalIds, member);
+        Set<Long> scrapedIds = scrapValidateService.findScrapedTargetIds(ContentType.JOURNAL, journalIds, member);
+
+        Slice<JournalFeedResDto> dtoSlice = journals.map(journal -> {
+            boolean writedByMe = journal.getMember().getId().equals(memberId);
+            boolean likedByMe = likedIds.contains(journal.getId());
+            boolean scrapedByMe = scrapedIds.contains(journal.getId());
+
+            return JournalFeedResDto.from(
+                    journal,
+                    s3Uploader.generatePresignedGetUrl(journal.getMedia_url()),
+                    writedByMe,
+                    likedByMe,
+                    scrapedByMe
+            );
+        });
 
         return SliceResponse.of(dtoSlice);
     }

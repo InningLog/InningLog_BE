@@ -6,6 +6,8 @@ import com.inninglog.inninglog.domain.scrap.domain.Scrap;
 import com.inninglog.inninglog.domain.scrap.repository.ScrapRepository;
 import com.inninglog.inninglog.global.exception.CustomException;
 import com.inninglog.inninglog.global.exception.ErrorCode;
+import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,5 +33,11 @@ public class ScrapValidateService {
     public Scrap getScrap(ContentType contentType, Long targetId, Member member){
         return scrapRepository.findByContentTypeAndTargetIdAndMember(contentType, targetId, member)
                 .orElseThrow(() -> new CustomException(ErrorCode.SCRAP_NOT_FOUND));
+    }
+
+    // N+1 최적화: 여러 targetId에 대해 스크랩 여부를 한 번에 조회
+    @Transactional(readOnly = true)
+    public Set<Long> findScrapedTargetIds(ContentType contentType, List<Long> targetIds, Member member){
+        return scrapRepository.findScrapedTargetIds(contentType, targetIds, member);
     }
 }
