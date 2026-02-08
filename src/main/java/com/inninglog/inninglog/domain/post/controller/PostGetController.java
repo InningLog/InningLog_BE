@@ -273,4 +273,215 @@ public class PostGetController {
 
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, result));
     }
+
+    @Operation(
+            summary = "내가 쓴 글 목록 조회",
+            description = """
+                내가 작성한 게시글 목록을 조회합니다.
+
+                ✔ 최신순(postAt DESC)으로 정렬되어 반환됩니다.
+                ✔ page는 0부터 시작합니다. (0=첫 페이지)
+                ✔ size는 한 페이지에서 가져올 게시글 수를 의미합니다.
+                ✔ hasNext가 true이면 다음 페이지 요청이 가능합니다.
+                """,
+            tags = {"마이페이지"}
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "내가 쓴 글 목록 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SliceResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "내가 쓴 글 목록", value = """
+                                        {
+                                          "code": "SUCCESS",
+                                          "message": "요청이 정상적으로 처리되었습니다.",
+                                          "data": {
+                                            "content": [
+                                              {
+                                                "postId": 45,
+                                                "teamShortCode": "LG",
+                                                "title": "오늘 경기 직관 후기",
+                                                "content": "오늘 잠실 가서 경기 봤는데 역전승해서 너무 좋았어요!",
+                                                "member": {
+                                                  "nickName": "볼빨간스트라스버그",
+                                                  "profile_url": "https://k.kakaocdn.net/.../img.jpg"
+                                                },
+                                                "likeCount": 12,
+                                                "scrapCount": 3,
+                                                "commentCount": 8,
+                                                "thumbImageUrl": "https://s3.amazonaws.com/.../thumb.jpg",
+                                                "imageCount": 3,
+                                                "postAt": "2025-06-03 18:30"
+                                              }
+                                            ],
+                                            "hasNext": true,
+                                            "page": 0,
+                                            "size": 10
+                                          }
+                                        }
+                                        """)
+                            }
+                    )
+            )
+    })
+    @GetMapping("/posts/my")
+    public ResponseEntity<SuccessResponse<SliceResponse<PostSummaryResDto>>> getMyPosts(
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal CustomUserDetails user,
+
+            @Parameter(description = "조회할 페이지 번호 (0부터 시작)", example = "0")
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(description = "한 페이지당 게시글 개수", example = "10")
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        SliceResponse<PostSummaryResDto> result = postUsecase.getMyPosts(user.getMember(), pageable);
+
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, result));
+    }
+
+    @Operation(
+            summary = "내가 댓글 단 글 목록 조회",
+            description = """
+                내가 댓글을 작성한 게시글 목록을 조회합니다.
+
+                ✔ 최신 댓글을 단 게시글 순으로 정렬되어 반환됩니다.
+                ✔ 같은 게시글에 여러 댓글을 달아도 중복 없이 1번만 표시됩니다.
+                ✔ page는 0부터 시작합니다. (0=첫 페이지)
+                ✔ size는 한 페이지에서 가져올 게시글 수를 의미합니다.
+                ✔ hasNext가 true이면 다음 페이지 요청이 가능합니다.
+                """,
+            tags = {"마이페이지"}
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "내가 댓글 단 글 목록 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SliceResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "내가 댓글 단 글 목록", value = """
+                                        {
+                                          "code": "SUCCESS",
+                                          "message": "요청이 정상적으로 처리되었습니다.",
+                                          "data": {
+                                            "content": [
+                                              {
+                                                "postId": 32,
+                                                "teamShortCode": "OB",
+                                                "title": "두산 팬들 모여라",
+                                                "content": "오늘 경기 어떻게 보셨나요?",
+                                                "member": {
+                                                  "nickName": "두산베어스팬",
+                                                  "profile_url": "https://k.kakaocdn.net/.../img.jpg"
+                                                },
+                                                "likeCount": 5,
+                                                "scrapCount": 1,
+                                                "commentCount": 15,
+                                                "thumbImageUrl": null,
+                                                "imageCount": 0,
+                                                "postAt": "2025-06-02 20:15"
+                                              }
+                                            ],
+                                            "hasNext": false,
+                                            "page": 0,
+                                            "size": 10
+                                          }
+                                        }
+                                        """)
+                            }
+                    )
+            )
+    })
+    @GetMapping("/posts/my/commented")
+    public ResponseEntity<SuccessResponse<SliceResponse<PostSummaryResDto>>> getMyCommentedPosts(
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal CustomUserDetails user,
+
+            @Parameter(description = "조회할 페이지 번호 (0부터 시작)", example = "0")
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(description = "한 페이지당 게시글 개수", example = "10")
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        SliceResponse<PostSummaryResDto> result = postUsecase.getMyCommentedPosts(user.getMember(), pageable);
+
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, result));
+    }
+
+    @Operation(
+            summary = "내가 스크랩한 글 목록 조회",
+            description = """
+                내가 스크랩한 게시글 목록을 조회합니다.
+
+                ✔ 최근 스크랩한 순으로 정렬되어 반환됩니다.
+                ✔ page는 0부터 시작합니다. (0=첫 페이지)
+                ✔ size는 한 페이지에서 가져올 게시글 수를 의미합니다.
+                ✔ hasNext가 true이면 다음 페이지 요청이 가능합니다.
+                """,
+            tags = {"마이페이지"}
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "내가 스크랩한 글 목록 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SliceResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "내가 스크랩한 글 목록", value = """
+                                        {
+                                          "code": "SUCCESS",
+                                          "message": "요청이 정상적으로 처리되었습니다.",
+                                          "data": {
+                                            "content": [
+                                              {
+                                                "postId": 58,
+                                                "teamShortCode": "LG",
+                                                "title": "잠실 좌석 추천",
+                                                "content": "1루 응원석 뷰가 정말 좋아요!",
+                                                "member": {
+                                                  "nickName": "야구덕후",
+                                                  "profile_url": "https://k.kakaocdn.net/.../img.jpg"
+                                                },
+                                                "likeCount": 28,
+                                                "scrapCount": 12,
+                                                "commentCount": 7,
+                                                "thumbImageUrl": "https://s3.amazonaws.com/.../view.jpg",
+                                                "imageCount": 5,
+                                                "postAt": "2025-06-01 14:00"
+                                              }
+                                            ],
+                                            "hasNext": true,
+                                            "page": 0,
+                                            "size": 10
+                                          }
+                                        }
+                                        """)
+                            }
+                    )
+            )
+    })
+    @GetMapping("/posts/my/scrapped")
+    public ResponseEntity<SuccessResponse<SliceResponse<PostSummaryResDto>>> getMyScrappedPosts(
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal CustomUserDetails user,
+
+            @Parameter(description = "조회할 페이지 번호 (0부터 시작)", example = "0")
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(description = "한 페이지당 게시글 개수", example = "10")
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        SliceResponse<PostSummaryResDto> result = postUsecase.getMyScrappedPosts(user.getMember(), pageable);
+
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, result));
+    }
 }
