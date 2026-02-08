@@ -1,6 +1,7 @@
 package com.inninglog.inninglog.domain.post.service;
 
 import com.inninglog.inninglog.domain.comment.service.CommentDeleteService;
+import com.inninglog.inninglog.domain.comment.service.CommentGetService;
 import com.inninglog.inninglog.domain.contentImage.domain.ContentImage;
 import com.inninglog.inninglog.domain.contentImage.dto.res.ImageListResDto;
 import com.inninglog.inninglog.domain.contentImage.repository.ContentImageRepository;
@@ -25,6 +26,9 @@ import com.inninglog.inninglog.domain.scrap.service.ScrapDeleteService;
 import com.inninglog.inninglog.domain.scrap.service.ScrapValidateService;
 import com.inninglog.inninglog.global.dto.SliceResponse;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -55,6 +59,7 @@ public class PostUsecase {
     private final ScrapDeleteService scrapDeleteService;
 
     private final CommentDeleteService commentDeleteService;
+    private final CommentGetService commentGetService;
 
     private final ContentImageRepository contentImageRepository;
 
@@ -145,5 +150,61 @@ public class PostUsecase {
                 .toList();
 
         return CommunityHomeResDto.of(teamShortCode, popularPosts);
+    }
+
+    //마이페이지: 내가 쓴 글 목록
+    @Transactional(readOnly = true)
+    public SliceResponse<PostSummaryResDto> getMyPosts(Member member, Pageable pageable) {
+        Slice<Post> posts = postGetService.getMyPosts(member, pageable);
+        Slice<PostSummaryResDto> dtos = getPostsByTeam(posts);
+        return SliceResponse.of(dtos);
+    }
+
+    //마이페이지: 내가 댓글 단 글 목록
+    @Transactional(readOnly = true)
+    public SliceResponse<PostSummaryResDto> getMyCommentedPosts(Member member, Pageable pageable) {
+        Slice<Long> postIdSlice = commentGetService.getCommentedPostIds(member, pageable);
+        List<Long> postIds = postIdSlice.getContent();
+
+        if (postIds.isEmpty()) {
+            return SliceResponse.empty(pageable);
+        }
+
+        List<Post> posts = postGetService.findAllByIds(postIds);
+        // ID 순서 유지를 위한 Map 생성
+        Map<Long, Post> postMap = posts.stream()
+                .collect(Collectors.toMap(Post::getId, Function.identity()));
+        // 원래 순서대로 정렬
+        List<PostSummaryResDto> dtos = postIds.stream()
+                .map(postMap::get)
+                .filter(post -> post != null)
+                .map(post -> PostSummaryResDto.of(post, memberGetService.toMemberShortResDto(post.getMember())))
+                .toList();
+
+        return SliceResponse.of(dtos, postIdSlice.hasNext(), pageable);
+    }
+
+    //마이페이지: 내가 스크랩한 글 목록
+    @Transactional(readOnly = true)
+    public SliceResponse<PostSummaryResDto> getMyScrappedPosts(Member member, Pageable pageable) {
+        Slice<Long> postIdSlice = scrapValidateService.getScrappedPostIds(member, pageable);
+        List<Long> postIds = postIdSlice.getContent();
+
+        if (postIds.isEmpty()) {
+            return SliceResponse.empty(pageable);
+        }
+
+        List<Post> posts = postGetService.findAllByIds(postIds);
+        // ID 순서 유지를 위한 Map 생성
+        Map<Long, Post> postMap = posts.stream()
+                .collect(Collectors.toMap(Post::getId, Function.identity()));
+        // 원래 순서대로 정렬
+        List<PostSummaryResDto> dtos = postIds.stream()
+                .map(postMap::get)
+                .filter(post -> post != null)
+                .map(post -> PostSummaryResDto.of(post, memberGetService.toMemberShortResDto(post.getMember())))
+                .toList();
+
+        return SliceResponse.of(dtos, postIdSlice.hasNext(), pageable);
     }
 }

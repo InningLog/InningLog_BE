@@ -9,6 +9,8 @@ import com.inninglog.inninglog.global.exception.ErrorCode;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,5 +41,11 @@ public class ScrapValidateService {
     @Transactional(readOnly = true)
     public Set<Long> findScrapedTargetIds(ContentType contentType, List<Long> targetIds, Member member){
         return scrapRepository.findScrapedTargetIds(contentType, targetIds, member);
+    }
+
+    //마이페이지: 내가 스크랩한 게시글 ID 조회
+    @Transactional(readOnly = true)
+    public Slice<Long> getScrappedPostIds(Member member, Pageable pageable) {
+        return scrapRepository.findTargetIdsByMemberAndContentType(member, ContentType.POST, pageable);
     }
 }

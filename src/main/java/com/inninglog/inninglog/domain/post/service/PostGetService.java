@@ -49,5 +49,17 @@ public class PostGetService {
     public Slice<Post> getPopularPosts(long minLikeCount, Pageable pageable) {
         return postRepository.findPopularPostsWithMember(minLikeCount, pageable);
     }
+
+    //마이페이지: 내가 쓴 글 조회
+    @Transactional(readOnly = true)
+    public Slice<Post> getMyPosts(Member member, Pageable pageable) {
+        return postRepository.findByMemberWithMember(member, pageable);
+    }
+
+    //마이페이지: ID 목록으로 게시글 조회 (순서 유지)
+    @Transactional(readOnly = true)
+    public List<Post> findAllByIds(List<Long> ids) {
+        return postRepository.findAllByIdInWithMember(ids);
+    }
 }
 

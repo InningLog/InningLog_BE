@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,5 +72,11 @@ public class CommentGetService {
         }
 
         return roots;
+    }
+
+    //마이페이지: 내가 댓글 단 게시글 ID 조회
+    @Transactional(readOnly = true)
+    public Slice<Long> getCommentedPostIds(Member member, Pageable pageable) {
+        return commentRepository.findDistinctTargetIdsByMemberAndContentType(member, ContentType.POST, pageable);
     }
 }
