@@ -314,7 +314,9 @@ public class PostGetController {
                                                 "commentCount": 8,
                                                 "thumbImageUrl": "https://s3.amazonaws.com/.../thumb.jpg",
                                                 "imageCount": 3,
-                                                "postAt": "2025-06-03 18:30"
+                                                "postAt": "2025-06-03 18:30",
+                                                "likedByMe": true,
+                                                "scrapedByMe": false
                                               }
                                             ],
                                             "hasNext": true,
@@ -385,7 +387,9 @@ public class PostGetController {
                                                 "commentCount": 15,
                                                 "thumbImageUrl": null,
                                                 "imageCount": 0,
-                                                "postAt": "2025-06-02 20:15"
+                                                "postAt": "2025-06-02 20:15",
+                                                "likedByMe": false,
+                                                "scrapedByMe": true
                                               }
                                             ],
                                             "hasNext": false,
@@ -455,7 +459,9 @@ public class PostGetController {
                                                 "commentCount": 7,
                                                 "thumbImageUrl": "https://s3.amazonaws.com/.../view.jpg",
                                                 "imageCount": 5,
-                                                "postAt": "2025-06-01 14:00"
+                                                "postAt": "2025-06-01 14:00",
+                                                "likedByMe": true,
+                                                "scrapedByMe": true
                                               }
                                             ],
                                             "hasNext": true,

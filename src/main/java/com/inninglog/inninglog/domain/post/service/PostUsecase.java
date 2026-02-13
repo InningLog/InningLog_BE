@@ -27,6 +27,7 @@ import com.inninglog.inninglog.domain.scrap.service.ScrapValidateService;
 import com.inninglog.inninglog.global.dto.SliceResponse;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -156,8 +157,22 @@ public class PostUsecase {
     @Transactional(readOnly = true)
     public SliceResponse<PostSummaryResDto> getMyPosts(Member member, Pageable pageable) {
         Slice<Post> posts = postGetService.getMyPosts(member, pageable);
-        Slice<PostSummaryResDto> dtos = getPostsByTeam(posts);
-        return SliceResponse.of(dtos);
+        List<Long> postIds = posts.stream().map(Post::getId).toList();
+
+        // N+1 최적화: 배치 조회
+        Set<Long> likedPostIds = likeValidateService.findLikedTargetIds(ContentType.POST, postIds, member);
+        Set<Long> scrapedPostIds = scrapValidateService.findScrapedTargetIds(ContentType.POST, postIds, member);
+
+        List<PostSummaryResDto> dtos = posts.stream()
+                .map(post -> PostSummaryResDto.of(
+                        post,
+                        memberGetService.toMemberShortResDto(post.getMember()),
+                        likedPostIds.contains(post.getId()),
+                        scrapedPostIds.contains(post.getId())
+                ))
+                .toList();
+
+        return SliceResponse.of(dtos, posts.hasNext(), pageable);
     }
 
     //마이페이지: 내가 댓글 단 글 목록
@@ -171,14 +186,22 @@ public class PostUsecase {
         }
 
         List<Post> posts = postGetService.findAllByIds(postIds);
-        // ID 순서 유지를 위한 Map 생성
         Map<Long, Post> postMap = posts.stream()
                 .collect(Collectors.toMap(Post::getId, Function.identity()));
-        // 원래 순서대로 정렬
+
+        // N+1 최적화: 배치 조회
+        Set<Long> likedPostIds = likeValidateService.findLikedTargetIds(ContentType.POST, postIds, member);
+        Set<Long> scrapedPostIds = scrapValidateService.findScrapedTargetIds(ContentType.POST, postIds, member);
+
         List<PostSummaryResDto> dtos = postIds.stream()
                 .map(postMap::get)
                 .filter(post -> post != null)
-                .map(post -> PostSummaryResDto.of(post, memberGetService.toMemberShortResDto(post.getMember())))
+                .map(post -> PostSummaryResDto.of(
+                        post,
+                        memberGetService.toMemberShortResDto(post.getMember()),
+                        likedPostIds.contains(post.getId()),
+                        scrapedPostIds.contains(post.getId())
+                ))
                 .toList();
 
         return SliceResponse.of(dtos, postIdSlice.hasNext(), pageable);
@@ -195,14 +218,22 @@ public class PostUsecase {
         }
 
         List<Post> posts = postGetService.findAllByIds(postIds);
-        // ID 순서 유지를 위한 Map 생성
         Map<Long, Post> postMap = posts.stream()
                 .collect(Collectors.toMap(Post::getId, Function.identity()));
-        // 원래 순서대로 정렬
+
+        // N+1 최적화: 배치 조회
+        Set<Long> likedPostIds = likeValidateService.findLikedTargetIds(ContentType.POST, postIds, member);
+        Set<Long> scrapedPostIds = scrapValidateService.findScrapedTargetIds(ContentType.POST, postIds, member);
+
         List<PostSummaryResDto> dtos = postIds.stream()
                 .map(postMap::get)
                 .filter(post -> post != null)
-                .map(post -> PostSummaryResDto.of(post, memberGetService.toMemberShortResDto(post.getMember())))
+                .map(post -> PostSummaryResDto.of(
+                        post,
+                        memberGetService.toMemberShortResDto(post.getMember()),
+                        likedPostIds.contains(post.getId()),
+                        scrapedPostIds.contains(post.getId())
+                ))
                 .toList();
 
         return SliceResponse.of(dtos, postIdSlice.hasNext(), pageable);
