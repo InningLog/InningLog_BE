@@ -215,7 +215,9 @@ public class JournalController {
         "gameDate": "2025-06-03 18:30",
         "supportTeamSC": "OB",
         "opponentTeamSC": "SS",
-        "stadiumSC": "JAM"
+        "stadiumSC": "JAM",
+        "likedByMe": true,
+        "scrapedByMe": false
       }
     ],
     "pageNumber": 0,
