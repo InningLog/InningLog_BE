@@ -215,7 +215,9 @@ public class JournalController {
         "gameDate": "2025-06-03 18:30",
         "supportTeamSC": "OB",
         "opponentTeamSC": "SS",
-        "stadiumSC": "JAM"
+        "stadiumSC": "JAM",
+        "likedByMe": true,
+        "scrapedByMe": false
       }
     ],
     "pageNumber": 0,
@@ -632,6 +634,72 @@ public class JournalController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         SliceResponse<JournalFeedResDto> result = journalUsecase.getPublicJournalFeed(user.getMemberId(), teamShortCode, pageable);
+
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, result));
+    }
+
+    @Operation(
+            summary = "내가 쓴 직관 일지 목록 조회",
+            description = """
+                내가 작성한 직관 일지 목록을 조회합니다.
+
+                ✔ 최신순(date DESC)으로 정렬되어 반환됩니다.
+                ✔ page는 0부터 시작합니다. (0=첫 페이지)
+                ✔ size는 한 페이지에서 가져올 일지 수를 의미합니다.
+                ✔ hasNext가 true이면 다음 페이지 요청이 가능합니다.
+                """,
+            tags = {"마이페이지"}
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "내가 쓴 직관 일지 목록 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SliceResponse.class),
+                            examples = {
+                                    @ExampleObject(name = "내가 쓴 직관 일지 목록", value = """
+                                        {
+                                          "code": "SUCCESS",
+                                          "message": "요청이 정상적으로 처리되었습니다.",
+                                          "data": {
+                                            "content": [
+                                              {
+                                                "journalId": 7,
+                                                "media_url": "https://inninglog-bucket.s3.ap-northeast-2.amazonaws.com/journal/1/photo123.jpeg?X-Amz-Expires=600",
+                                                "resultScore": "WIN",
+                                                "emotion": "감동",
+                                                "gameDate": "2025-06-03 18:30",
+                                                "supportTeamSC": "OB",
+                                                "opponentTeamSC": "SS",
+                                                "stadiumSC": "JAM",
+                                                "likedByMe": true,
+                                                "scrapedByMe": false
+                                              }
+                                            ],
+                                            "hasNext": true,
+                                            "page": 0,
+                                            "size": 10
+                                          }
+                                        }
+                                        """)
+                            }
+                    )
+            )
+    })
+    @GetMapping("/my")
+    public ResponseEntity<SuccessResponse<SliceResponse<JournalSumListResDto>>> getMyJournals(
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal CustomUserDetails user,
+
+            @Parameter(description = "조회할 페이지 번호 (0부터 시작)", example = "0")
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(description = "한 페이지당 일지 개수", example = "10")
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        SliceResponse<JournalSumListResDto> result = journalUsecase.getMyJournals(user.getMember(), pageable);
 
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, result));
     }

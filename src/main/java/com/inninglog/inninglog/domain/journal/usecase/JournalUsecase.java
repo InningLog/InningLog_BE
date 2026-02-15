@@ -81,8 +81,21 @@ public class JournalUsecase {
         Member member = memberValidateService.findById(memberId);
         Page<Journal> journals = journalService.getJournalsByMemberSum(member, pageable, resultScore);
 
+        // N+1 최적화: 좋아요/스크랩 여부를 한 번에 조회
+        List<Long> journalIds = journals.getContent().stream()
+                .map(Journal::getId)
+                .toList();
+        Set<Long> likedIds = likeValidateService.findLikedTargetIds(ContentType.JOURNAL, journalIds, member);
+        Set<Long> scrapedIds = scrapValidateService.findScrapedTargetIds(ContentType.JOURNAL, journalIds, member);
+
         return journals.map(
-                journal -> JournalSumListResDto.from(journal, s3Uploader.generatePresignedGetUrl(journal.getMedia_url()), member.getTeam().getShortCode())
+                journal -> JournalSumListResDto.from(
+                        journal,
+                        s3Uploader.generatePresignedGetUrl(journal.getMedia_url()),
+                        member.getTeam().getShortCode(),
+                        likedIds.contains(journal.getId()),
+                        scrapedIds.contains(journal.getId())
+                )
         );
     }
 
@@ -172,6 +185,31 @@ public class JournalUsecase {
                     scrapedByMe
             );
         });
+
+        return SliceResponse.of(dtoSlice);
+    }
+
+    // 마이페이지: 내가 쓴 직관 일지 목록
+    @Transactional(readOnly = true)
+    public SliceResponse<JournalSumListResDto> getMyJournals(Member member, Pageable pageable) {
+        Slice<Journal> journals = journalGetService.getMyJournals(member, pageable);
+
+        // N+1 최적화: 좋아요/스크랩 여부를 한 번에 조회
+        List<Long> journalIds = journals.getContent().stream()
+                .map(Journal::getId)
+                .toList();
+        Set<Long> likedIds = likeValidateService.findLikedTargetIds(ContentType.JOURNAL, journalIds, member);
+        Set<Long> scrapedIds = scrapValidateService.findScrapedTargetIds(ContentType.JOURNAL, journalIds, member);
+
+        Slice<JournalSumListResDto> dtoSlice = journals.map(
+                journal -> JournalSumListResDto.from(
+                        journal,
+                        s3Uploader.generatePresignedGetUrl(journal.getMedia_url()),
+                        member.getTeam().getShortCode(),
+                        likedIds.contains(journal.getId()),
+                        scrapedIds.contains(journal.getId())
+                )
+        );
 
         return SliceResponse.of(dtoSlice);
     }
