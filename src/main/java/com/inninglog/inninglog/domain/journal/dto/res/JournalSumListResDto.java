@@ -42,6 +42,15 @@ public class JournalSumListResDto {
     @Schema(description = "경기장 숏코드", example = "JAM")
     private String stadiumSC;
 
+    @Schema(description = "좋아요 수", example = "15")
+    private Long likeCount;
+
+    @Schema(description = "댓글 수", example = "8")
+    private Long commentCount;
+
+    @Schema(description = "스크랩 수", example = "3")
+    private Long scrapCount;
+
     @Schema(description = "내가 좋아요 눌렀는지 여부", example = "true")
     private Boolean likedByMe;
 
@@ -60,6 +69,9 @@ public class JournalSumListResDto {
                 supportTeamSC,
                 journal.getOpponentTeam().getShortCode(),
                 journal.getStadium().getShortCode(),
+                journal.getLikeCount(),
+                journal.getCommentCount(),
+                journal.getScrapCount(),
                 null,
                 null
         );
@@ -76,6 +88,9 @@ public class JournalSumListResDto {
                 supportTeamSC,
                 journal.getOpponentTeam().getShortCode(),
                 journal.getStadium().getShortCode(),
+                journal.getLikeCount(),
+                journal.getCommentCount(),
+                journal.getScrapCount(),
                 likedByMe,
                 scrapedByMe
         );

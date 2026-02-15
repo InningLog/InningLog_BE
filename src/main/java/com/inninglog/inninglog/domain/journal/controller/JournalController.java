@@ -216,6 +216,9 @@ public class JournalController {
         "supportTeamSC": "OB",
         "opponentTeamSC": "SS",
         "stadiumSC": "JAM",
+        "likeCount": 15,
+        "commentCount": 8,
+        "scrapCount": 3,
         "likedByMe": true,
         "scrapedByMe": false
       }
@@ -673,6 +676,9 @@ public class JournalController {
                                                 "supportTeamSC": "OB",
                                                 "opponentTeamSC": "SS",
                                                 "stadiumSC": "JAM",
+                                                "likeCount": 15,
+                                                "commentCount": 8,
+                                                "scrapCount": 3,
                                                 "likedByMe": true,
                                                 "scrapedByMe": false
                                               }
