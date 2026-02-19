@@ -139,7 +139,8 @@ public class PostUsecase {
     //커뮤니티 홈 조회
     @Transactional(readOnly = true)
     public CommunityHomeResDto getCommunityHome(Member member) {
-        String teamShortCode = member.getTeam().getShortCode();
+        Member memberWithTeam = memberGetService.getMemberWithTeam(member.getId());
+        String teamShortCode = memberWithTeam.getTeam().getShortCode();
         Slice<Post> posts = postGetService.getPopularPosts(10L, PageRequest.of(0, 2));
 
         List<CommunityHomePostResDto> popularPosts = posts.stream()
