@@ -10,10 +10,10 @@ public class PreSginedGetService {
     private final S3Uploader s3Uploader;
 
     public String journalGetPreUrl(String key){
-        return s3Uploader.generatePresignedGetUrl(key);
+        return s3Uploader.getDirectUrl(key);
     }
 
     public String SeatViewGetPreUrl(String key){
-        return s3Uploader.generatePresignedGetUrl(key);
+        return s3Uploader.getDirectUrl(key);
     }
 }

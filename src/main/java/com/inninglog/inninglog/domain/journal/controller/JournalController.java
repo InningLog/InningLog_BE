@@ -93,7 +93,7 @@ public class JournalController {
     })
     @PostMapping("/contents")
     public ResponseEntity<SuccessResponse<JourCreateResDto>> createContents(
-            @RequestParam Long memberId,
+            @AuthenticationPrincipal CustomUserDetails user,
 
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
@@ -101,7 +101,7 @@ public class JournalController {
             )
             @RequestBody JourCreateReqDto request)
     {
-        JourCreateResDto resDto = journalUsecase.createJournal(memberId, request);
+        JourCreateResDto resDto = journalUsecase.createJournal(user.getMember().getId(), request);
 
         return ResponseEntity.ok(
                 SuccessResponse.success(SuccessCode.JOURNAL_CREATED, resDto)

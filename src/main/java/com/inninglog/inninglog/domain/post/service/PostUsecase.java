@@ -3,6 +3,7 @@ package com.inninglog.inninglog.domain.post.service;
 import com.inninglog.inninglog.domain.comment.service.CommentDeleteService;
 import com.inninglog.inninglog.domain.comment.service.CommentGetService;
 import com.inninglog.inninglog.domain.contentImage.domain.ContentImage;
+import com.inninglog.inninglog.domain.contentImage.dto.req.ImageCreateReqDto;
 import com.inninglog.inninglog.domain.contentImage.dto.res.ImageListResDto;
 import com.inninglog.inninglog.domain.contentImage.repository.ContentImageRepository;
 import com.inninglog.inninglog.domain.contentImage.service.ImageGetService;
@@ -25,6 +26,8 @@ import com.inninglog.inninglog.domain.post.dto.res.PostSummaryResDto;
 import com.inninglog.inninglog.domain.scrap.service.ScrapDeleteService;
 import com.inninglog.inninglog.domain.scrap.service.ScrapValidateService;
 import com.inninglog.inninglog.global.dto.SliceResponse;
+import com.inninglog.inninglog.global.s3.ThumbnailUrlGenerator;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -63,11 +66,13 @@ public class PostUsecase {
     private final CommentGetService commentGetService;
 
     private final ContentImageRepository contentImageRepository;
+    private final ThumbnailUrlGenerator thumbnailUrlGenerator;
 
     //게시글 업로드 + 이미지 저장
     @Transactional
     public void uploadPost (PostCreateReqDto dto,String team_Shortcode, Member member){
-        Long postId = postCreateService.createPost(dto,team_Shortcode,member);
+        String thumbnailUrl = resolveFirstImageThumbnailUrl(dto.imageCreateReqDto());
+        Long postId = postCreateService.createPost(dto, team_Shortcode, member, thumbnailUrl);
         postImageCreateService.createPostImageList(postId, dto.imageCreateReqDto());
     }
 
@@ -108,6 +113,11 @@ public class PostUsecase {
         List<ContentImage> existingImages = imageGetService.getImageList(ContentType.POST, postId);
         postImageUpdateService.updateImages(dto.remainImages(), existingImages);
         postImageCreateService.createPostImageList(postId, dto.newImages());
+
+        // 이미지 변경 후 썸네일 재계산
+        List<ContentImage> updatedImages = imageGetService.getImageList(ContentType.POST, postId);
+        String thumbnailUrl = resolveFirstContentImageThumbnailUrl(updatedImages);
+        post.updateThumbnailUrl(thumbnailUrl);
     }
 
     //게시글 조회
@@ -238,5 +248,37 @@ public class PostUsecase {
                 .toList();
 
         return SliceResponse.of(dtos, postIdSlice.hasNext(), pageable);
+    }
+
+    // 생성 시: ImageCreateReqDto 리스트에서 sequence 최소인 이미지의 key로 썸네일 URL 생성
+    private String resolveFirstImageThumbnailUrl(List<ImageCreateReqDto> images) {
+        if (images == null || images.isEmpty()) {
+            return null;
+        }
+        return images.stream()
+                .min(Comparator.comparingInt(ImageCreateReqDto::sequence))
+                .map(img -> thumbnailUrlGenerator.generateThumbnailUrl(img.key()))
+                .orElse(null);
+    }
+
+    // 수정 시: ContentImage 리스트에서 sequence 최소인 이미지의 originalUrl로 썸네일 URL 생성
+    private String resolveFirstContentImageThumbnailUrl(List<ContentImage> images) {
+        if (images == null || images.isEmpty()) {
+            return null;
+        }
+        return images.stream()
+                .min(Comparator.comparingInt(ContentImage::getSequence))
+                .map(img -> thumbnailUrlGenerator.generateThumbnailUrl(extractKeyFromUrl(img.getOriginalUrl())))
+                .orElse(null);
+    }
+
+    // originalUrl에서 S3 key 추출 (baseUrl 이후 부분)
+    private String extractKeyFromUrl(String originalUrl) {
+        // originalUrl: https://{bucket}.s3.{region}.amazonaws.com/{key}
+        int idx = originalUrl.indexOf(".amazonaws.com/");
+        if (idx == -1) {
+            return originalUrl;
+        }
+        return originalUrl.substring(idx + ".amazonaws.com/".length());
     }
 }

@@ -61,7 +61,7 @@ public class Post extends BaseTimeEntity implements LikeableContent, ScrapableCo
     @Column(nullable = false)
     private Long version = 0L;
 
-    public static Post of(PostCreateReqDto dto, String teamShortCode, Member member) {
+    public static Post of(PostCreateReqDto dto, String teamShortCode, Member member, String thumbnailUrl) {
         return Post.builder()
                 .title(dto.title())
                 .content(dto.content())
@@ -70,6 +70,7 @@ public class Post extends BaseTimeEntity implements LikeableContent, ScrapableCo
                 .scrapCount(0L)
                 .commentCount(0L)
                 .imageCount(dto.imageCount())
+                .thumbnailUrl(thumbnailUrl)
                 .postAt(LocalDateTime.now())
                 .isEdit(false)
                 .member(member)
@@ -117,5 +118,9 @@ public class Post extends BaseTimeEntity implements LikeableContent, ScrapableCo
         this.title = dto.title();
         this.content = dto.content();
         this.isEdit = true;
+    }
+
+    public void updateThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
     }
 }

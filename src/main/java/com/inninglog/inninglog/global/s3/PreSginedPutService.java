@@ -17,10 +17,8 @@ public class PreSginedPutService {
             throw new CustomException(ErrorCode.INVALID_FILE_NAME);
         }
 
-        String url = s3Uploader.generatePresignedUrl(
+        return s3Uploader.generatePresignedUrl(
                 "journal/" + memebrId +"/" +  fileName, contentType);
-
-        return url;
     }
 
     public String seatViewPutPreUrl(Long memebrId, String fileName, String contentType){
@@ -29,10 +27,8 @@ public class PreSginedPutService {
             throw new CustomException(ErrorCode.INVALID_FILE_NAME);
         }
 
-        String url = s3Uploader.generatePresignedUrl(
+        return s3Uploader.generatePresignedUrl(
                 "seatView/" + memebrId +"/" +  fileName, contentType);
-
-        return url;
     }
 
     public String postPutPreUrl(Long memebrId, String fileName, String contentType){
@@ -41,10 +37,8 @@ public class PreSginedPutService {
             throw new CustomException(ErrorCode.INVALID_FILE_NAME);
         }
 
-        String url = s3Uploader.generatePresignedUrl(
+        return s3Uploader.generatePresignedUrl(
                 "post/" + memebrId +"/" +  fileName, contentType);
-
-        return url;
     }
 
 }

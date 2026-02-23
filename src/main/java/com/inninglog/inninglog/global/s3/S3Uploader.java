@@ -5,11 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
-import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
@@ -22,8 +19,10 @@ public class S3Uploader {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    // ✅ 오사카 리전
-    private final Region region = Region.AP_NORTHEAST_3;
+    private final S3UrlProperties s3UrlProperties;
+
+    // ✅ 서울 리전
+    private final Region region = Region.AP_NORTHEAST_2;
 
     /**
      * Presigned PUT URL (업로드용)
@@ -31,7 +30,7 @@ public class S3Uploader {
     public String generatePresignedUrl(String key, String contentType) {
         try (S3Presigner presigner = S3Presigner.builder()
                 .region(region)
-                .credentialsProvider(DefaultCredentialsProvider.create()) // ✅ 키 대신 Role/환경변수 자동탐색
+                .credentialsProvider(DefaultCredentialsProvider.create())
                 .build()) {
 
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
@@ -51,30 +50,12 @@ public class S3Uploader {
     }
 
     /**
-     * Presigned GET URL (다운로드용)
+     * S3 직접 GET URL (공개 접근)
      */
-    public String generatePresignedGetUrl(String key) {
+    public String getDirectUrl(String key) {
         if (key == null || key.isBlank()) {
             return null;
         }
-
-        try (S3Presigner presigner = S3Presigner.builder()
-                .region(region)
-                .credentialsProvider(DefaultCredentialsProvider.create()) // ✅ 자동 인증
-                .build()) {
-
-            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                    .bucket(bucket)
-                    .key(key)
-                    .build();
-
-            GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                    .signatureDuration(Duration.ofMinutes(10))
-                    .getObjectRequest(getObjectRequest)
-                    .build();
-
-            PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
-            return presignedRequest.url().toString();
-        }
+        return s3UrlProperties.getBaseUrl() + "/" + key;
     }
 }
