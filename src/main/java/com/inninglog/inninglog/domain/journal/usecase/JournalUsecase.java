@@ -91,7 +91,7 @@ public class JournalUsecase {
         return journals.map(
                 journal -> JournalSumListResDto.from(
                         journal,
-                        s3Uploader.generatePresignedGetUrl(journal.getMedia_url()),
+                        s3Uploader.getDirectUrl(journal.getMedia_url()),
                         member.getTeam().getShortCode(),
                         likedIds.contains(journal.getId()),
                         scrapedIds.contains(journal.getId())
@@ -124,10 +124,10 @@ public class JournalUsecase {
     public JourUpdateResDto getDetailJournal(Long memberId, Long journalId){
         Member member = memberValidateService.findById(memberId);
         Journal journal = journalGetService.getJournalById(journalId);
-        String presignedUrl = s3Uploader.generatePresignedGetUrl(journal.getMedia_url());
+        String mediaUrl = s3Uploader.getDirectUrl(journal.getMedia_url());
         boolean likedByMe = likeValidateService.likedByMe(ContentType.JOURNAL, journalId, member);
         boolean scrapedByMe = scrapValidateService.scrapedByMe(ContentType.JOURNAL, journalId, member);
-        JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal, presignedUrl, likedByMe, scrapedByMe);
+        JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal, mediaUrl, likedByMe, scrapedByMe);
         if(journal.getSeatView() == null){
             return JourUpdateResDto.from(jourDetailResDto, null);
         }
@@ -142,11 +142,11 @@ public class JournalUsecase {
         Journal journal = journalGetService.getJournalById(journalId);
         journalService.accessToJournal(memberId, journal.getMember().getId());
         journalService.updateJournal(journal, dto);
-        String presignedUrl = s3Uploader.generatePresignedGetUrl(journal.getMedia_url());
+        String mediaUrl = s3Uploader.getDirectUrl(journal.getMedia_url());
         boolean likedByMe = likeValidateService.likedByMe(ContentType.JOURNAL, journalId, member);
         boolean scrapedByMe = scrapValidateService.scrapedByMe(ContentType.JOURNAL, journalId, member);
 
-        JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal, presignedUrl, likedByMe, scrapedByMe);
+        JourDetailResDto jourDetailResDto = JourDetailResDto.from(member, journal, mediaUrl, likedByMe, scrapedByMe);
 
         return JourUpdateResDto.from(jourDetailResDto, journal.getSeatView().getId());
     }
@@ -179,7 +179,7 @@ public class JournalUsecase {
 
             return JournalFeedResDto.from(
                     journal,
-                    s3Uploader.generatePresignedGetUrl(journal.getMedia_url()),
+                    s3Uploader.getDirectUrl(journal.getMedia_url()),
                     writedByMe,
                     likedByMe,
                     scrapedByMe
@@ -204,7 +204,7 @@ public class JournalUsecase {
         Slice<JournalSumListResDto> dtoSlice = journals.map(
                 journal -> JournalSumListResDto.from(
                         journal,
-                        s3Uploader.generatePresignedGetUrl(journal.getMedia_url()),
+                        s3Uploader.getDirectUrl(journal.getMedia_url()),
                         member.getTeam().getShortCode(),
                         likedIds.contains(journal.getId()),
                         scrapedIds.contains(journal.getId())

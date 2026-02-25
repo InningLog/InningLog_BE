@@ -2,11 +2,11 @@ version: "3.8"
 
 services:
   inninglog-rest-server:
-    image: 715841360397.dkr.ecr.ap-northeast-2.amazonaws.com/inninglog/rest
-    container_name: inninglog-rest
+    image: 827762016815.dkr.ecr.ap-northeast-2.amazonaws.com/inninglog-dev:latest
+    container_name: inninlog-dev
     ports:
       - "8080:8080"
     env_file:
-      - /home/ubuntu/.env
+      - /home/ubuntu/InningLog_BE/.env.dev
     environment:
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_PROFILES_ACTIVE: dev

@@ -15,6 +15,10 @@ public enum ResultScore {
     }
 
     @JsonValue
+    public String getJsonValue() {
+        return name();
+    }
+
     public String getLabel() {
         return label;
     }

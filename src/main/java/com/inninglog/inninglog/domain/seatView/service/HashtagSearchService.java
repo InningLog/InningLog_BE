@@ -50,7 +50,7 @@ public class HashtagSearchService {
 
         return seatViewPage.map(sv -> SeatViewImageResult.builder()
                 .seatViewId(sv.getId())
-                .viewMediaUrl(s3Uploader.generatePresignedGetUrl(sv.getView_media_url()))
+                .viewMediaUrl(s3Uploader.getDirectUrl(sv.getView_media_url()))
                 .build());
     }
 
