@@ -5,6 +5,7 @@ import com.inninglog.inninglog.domain.post.dto.res.CommunityHomeResDto;
 import com.inninglog.inninglog.domain.post.dto.res.PostSingleResDto;
 import com.inninglog.inninglog.domain.post.dto.res.PostSummaryResDto;
 import com.inninglog.inninglog.domain.post.service.PostUsecase;
+import com.inninglog.inninglog.domain.searchHistory.service.SearchHistoryService;
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.global.dto.SliceResponse;
 import com.inninglog.inninglog.global.response.SuccessCode;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "커뮤니티 - 게시글", description = "게시글 관련 API")
 public class PostGetController {
     private final PostUsecase postUsecase;
+    private final SearchHistoryService searchHistoryService;
 
     @Operation(
             summary = "커뮤니티 홈 조회",
@@ -311,6 +313,7 @@ public class PostGetController {
             @AuthenticationPrincipal CustomUserDetails user
     ) {
         Pageable pageable = PageRequest.of(page, size);
+        searchHistoryService.saveSearchKeyword(user.getMember(), keyword);
         SliceResponse<PostSummaryResDto> result = postUsecase.searchPosts(user.getMember(), keyword, pageable);
 
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, result));

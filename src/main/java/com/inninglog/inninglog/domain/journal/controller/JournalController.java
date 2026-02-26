@@ -15,6 +15,7 @@ import com.inninglog.inninglog.domain.journal.dto.req.JourUpdateReqDto;
 
 import com.inninglog.inninglog.domain.journal.service.JournalService;
 import com.inninglog.inninglog.domain.kbo.dto.gameSchdule.GameSchResDto;
+import com.inninglog.inninglog.domain.searchHistory.service.SearchHistoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 
@@ -47,6 +48,7 @@ public class JournalController {
 
     private final JournalService journalService;
     private final JournalUsecase journalUsecase;
+    private final SearchHistoryService searchHistoryService;
 
     //직관 일지 콘텐츠 업로드
     @Operation(
@@ -676,6 +678,7 @@ public class JournalController {
             @AuthenticationPrincipal CustomUserDetails user
     ) {
         Pageable pageable = PageRequest.of(page, size);
+        searchHistoryService.saveSearchKeyword(user.getMember(), keyword);
         SliceResponse<JournalFeedResDto> result = journalUsecase.searchPublicJournals(user.getMemberId(), keyword, pageable);
 
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, result));
