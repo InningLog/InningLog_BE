@@ -44,4 +44,10 @@ public class JournalGetService {
     public Slice<Journal> getMyJournals(Member member, Pageable pageable) {
         return journalRepository.findByMemberOrderByDateDesc(member, pageable);
     }
+
+    // 커뮤니티 검색: 공개 일지 키워드 검색
+    @Transactional(readOnly = true)
+    public Slice<Journal> searchPublicJournals(String keyword, Pageable pageable) {
+        return journalRepository.searchPublicJournals(keyword, pageable);
+    }
 }

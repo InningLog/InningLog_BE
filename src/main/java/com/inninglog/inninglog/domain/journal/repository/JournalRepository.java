@@ -33,4 +33,8 @@ public interface JournalRepository extends JpaRepository<Journal, Long> {
     // 마이페이지: 내가 쓴 직관 일지 (Slice 기반)
     @Query("SELECT j FROM Journal j WHERE j.member = :member ORDER BY j.date DESC")
     Slice<Journal> findByMemberOrderByDateDesc(@Param("member") Member member, Pageable pageable);
+
+    // 커뮤니티 검색: 공개 일지 중 review_text 키워드 검색 (작성순)
+    @Query("SELECT j FROM Journal j JOIN FETCH j.member WHERE j.isPublic = true AND j.review_text LIKE %:keyword% ORDER BY j.createdAt DESC")
+    Slice<Journal> searchPublicJournals(@Param("keyword") String keyword, Pageable pageable);
 }

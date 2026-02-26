@@ -15,6 +15,7 @@ import com.inninglog.inninglog.domain.journal.dto.req.JourUpdateReqDto;
 
 import com.inninglog.inninglog.domain.journal.service.JournalService;
 import com.inninglog.inninglog.domain.kbo.dto.gameSchdule.GameSchResDto;
+import com.inninglog.inninglog.domain.searchHistory.service.SearchHistoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 
@@ -47,6 +48,7 @@ public class JournalController {
 
     private final JournalService journalService;
     private final JournalUsecase journalUsecase;
+    private final SearchHistoryService searchHistoryService;
 
     //직관 일지 콘텐츠 업로드
     @Operation(
@@ -637,6 +639,47 @@ public class JournalController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         SliceResponse<JournalFeedResDto> result = journalUsecase.getPublicJournalFeed(user.getMemberId(), teamShortCode, pageable);
+
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, result));
+    }
+
+    @Operation(
+            summary = "공개 직관 일지 검색",
+            description = """
+                키워드로 공개 직관 일지를 검색합니다.
+
+                📌 **검색 대상**: 후기 본문 (review_text)
+                📌 **정렬**: 작성순 (createdAt DESC)
+                📌 **페이지네이션**: Slice 기반 무한 스크롤
+
+                ✅ 예시: `/journals/search?keyword=역전승&page=0&size=10`
+                """
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "검색 성공",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = SliceResponse.class)
+            )
+    )
+    @GetMapping("/search")
+    public ResponseEntity<SuccessResponse<SliceResponse<JournalFeedResDto>>> searchJournals(
+            @Parameter(description = "검색 키워드", example = "역전승")
+            @RequestParam String keyword,
+
+            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(description = "페이지 크기", example = "10")
+            @RequestParam(defaultValue = "10") int size,
+
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        searchHistoryService.saveSearchKeyword(user.getMember(), keyword);
+        SliceResponse<JournalFeedResDto> result = journalUsecase.searchPublicJournals(user.getMemberId(), keyword, pageable);
 
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, result));
     }

@@ -164,6 +164,27 @@ public class PostUsecase {
         return CommunityHomeResDto.of(teamShortCode, popularPosts);
     }
 
+    //커뮤니티 검색: 키워드로 게시글 검색
+    @Transactional(readOnly = true)
+    public SliceResponse<PostSummaryResDto> searchPosts(Member member, String keyword, Pageable pageable) {
+        Slice<Post> posts = postGetService.searchByKeyword(keyword, pageable);
+        List<Long> postIds = posts.stream().map(Post::getId).toList();
+
+        Set<Long> likedPostIds = likeValidateService.findLikedTargetIds(ContentType.POST, postIds, member);
+        Set<Long> scrapedPostIds = scrapValidateService.findScrapedTargetIds(ContentType.POST, postIds, member);
+
+        List<PostSummaryResDto> dtos = posts.stream()
+                .map(post -> PostSummaryResDto.of(
+                        post,
+                        memberGetService.toMemberShortResDto(post.getMember()),
+                        likedPostIds.contains(post.getId()),
+                        scrapedPostIds.contains(post.getId())
+                ))
+                .toList();
+
+        return SliceResponse.of(dtos, posts.hasNext(), pageable);
+    }
+
     //마이페이지: 내가 쓴 글 목록
     @Transactional(readOnly = true)
     public SliceResponse<PostSummaryResDto> getMyPosts(Member member, Pageable pageable) {
