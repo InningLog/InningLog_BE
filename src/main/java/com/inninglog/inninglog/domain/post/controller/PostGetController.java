@@ -275,6 +275,48 @@ public class PostGetController {
     }
 
     @Operation(
+            summary = "게시글 검색",
+            description = """
+                키워드로 게시글을 검색합니다.
+
+                📌 **검색 대상**: 제목 (title) + 본문 (content)
+                📌 **정렬**: 최신순 (postAt DESC)
+                📌 **페이지네이션**: Slice 기반 무한 스크롤
+
+                ✅ 예시: `/community/posts/search?keyword=직관&page=0&size=10`
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "게시글 검색 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SliceResponse.class)
+                    )
+            )
+    })
+    @GetMapping("/posts/search")
+    public ResponseEntity<SuccessResponse<SliceResponse<PostSummaryResDto>>> searchPosts(
+            @Parameter(description = "검색 키워드", example = "직관")
+            @RequestParam String keyword,
+
+            @Parameter(description = "조회할 페이지 번호 (0부터 시작)", example = "0")
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(description = "한 페이지당 게시글 개수", example = "10")
+            @RequestParam(defaultValue = "10") int size,
+
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        SliceResponse<PostSummaryResDto> result = postUsecase.searchPosts(user.getMember(), keyword, pageable);
+
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, result));
+    }
+
+    @Operation(
             summary = "내가 쓴 글 목록 조회",
             description = """
                 내가 작성한 게시글 목록을 조회합니다.
