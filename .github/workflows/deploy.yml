@@ -114,11 +114,15 @@ jobs:
         run: |
           BRANCH="auto/api-docs-update"
           if git rev-parse --verify "origin/$BRANCH" >/dev/null 2>&1; then
-            git diff --name-only origin/main "origin/$BRANCH" | while IFS= read -r file; do
-              mkdir -p "$(dirname "$file")"
-              git show "origin/$BRANCH:$file" > "$file" 2>/dev/null || true
-            done
-            echo "Restored files from previous auto branch"
+            if git show "origin/$BRANCH:.openapi-snapshot.json" >/dev/null 2>&1; then
+              git diff --name-only origin/main "origin/$BRANCH" | while IFS= read -r file; do
+                mkdir -p "$(dirname "$file")"
+                git show "origin/$BRANCH:$file" > "$file" 2>/dev/null || true
+              done
+              echo "Restored files from previous auto branch"
+            else
+              echo "No snapshot in auto branch, skipping restore (legacy branch)"
+            fi
           else
             echo "No previous auto branch found"
           fi
