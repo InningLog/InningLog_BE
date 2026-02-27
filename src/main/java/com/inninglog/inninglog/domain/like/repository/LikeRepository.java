@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -26,4 +28,8 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     @Modifying
     @Query("DELETE FROM Like l WHERE l.contentType = :contentType AND l.targetId = :targetId")
     void deleteAllByContent(ContentType contentType, Long targetId);
+
+    // 마이페이지: 내가 좋아요 누른 콘텐츠 ID 조회 (최신순)
+    @Query("SELECT l.targetId FROM Like l WHERE l.member = :member AND l.contentType = :contentType ORDER BY l.createdAt DESC")
+    Slice<Long> findTargetIdsByMemberAndContentType(Member member, ContentType contentType, Pageable pageable);
 }

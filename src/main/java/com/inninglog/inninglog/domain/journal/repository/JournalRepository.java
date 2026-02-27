@@ -42,4 +42,12 @@ public interface JournalRepository extends JpaRepository<Journal, Long> {
     @Query("SELECT j FROM Journal j JOIN FETCH j.member m JOIN FETCH m.team t " +
            "WHERE j.isPublic = true AND t.shortCode = :teamShortCode AND j.review_text LIKE %:keyword% ORDER BY j.createdAt DESC")
     Slice<Journal> searchPublicJournalsByTeam(@Param("keyword") String keyword, @Param("teamShortCode") String teamShortCode, Pageable pageable);
+
+    // 마이페이지: ID 목록으로 일지 조회 (N+1 최적화)
+    @Query("SELECT j FROM Journal j JOIN FETCH j.member WHERE j.id IN :ids")
+    List<Journal> findAllByIdInWithMember(@Param("ids") List<Long> ids);
+
+    // 인기 직관일지 조회: 좋아요 수 기준, 공개 일지만 (N+1 최적화)
+    @Query("SELECT j FROM Journal j JOIN FETCH j.member WHERE j.likeCount >= :minLikeCount AND j.isPublic = true ORDER BY j.createdAt DESC")
+    Slice<Journal> findPopularJournalsWithMember(@Param("minLikeCount") long minLikeCount, Pageable pageable);
 }

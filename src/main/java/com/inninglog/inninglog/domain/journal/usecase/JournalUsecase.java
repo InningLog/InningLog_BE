@@ -1,5 +1,6 @@
 package com.inninglog.inninglog.domain.journal.usecase;
 
+import com.inninglog.inninglog.domain.comment.service.CommentGetService;
 import com.inninglog.inninglog.domain.contentType.ContentType;
 import com.inninglog.inninglog.domain.journal.domain.Journal;
 import com.inninglog.inninglog.domain.journal.domain.ResultScore;
@@ -25,6 +26,7 @@ import com.inninglog.inninglog.global.s3.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +34,9 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,6 +53,7 @@ public class JournalUsecase {
     private final S3Uploader s3Uploader;
     private final LikeValidateService likeValidateService;
     private final ScrapValidateService scrapValidateService;
+    private final CommentGetService commentGetService;
 
 
     //직관 일지 생성
@@ -247,5 +252,95 @@ public class JournalUsecase {
         );
 
         return SliceResponse.of(dtoSlice);
+    }
+
+    // 마이페이지: 내가 댓글 단 직관일지
+    @Transactional(readOnly = true)
+    public SliceResponse<JournalFeedResDto> getMyCommentedJournals(Long memberId, Pageable pageable) {
+        Member member = memberValidateService.findById(memberId);
+        Slice<Long> journalIdSlice = commentGetService.getCommentedContentIds(member, ContentType.JOURNAL, pageable);
+        return toFeedPage(journalIdSlice, member, pageable);
+    }
+
+    // 마이페이지: 내가 스크랩한 직관일지
+    @Transactional(readOnly = true)
+    public SliceResponse<JournalFeedResDto> getMyScrappedJournals(Long memberId, Pageable pageable) {
+        Member member = memberValidateService.findById(memberId);
+        Slice<Long> journalIdSlice = scrapValidateService.getScrappedContentIds(member, ContentType.JOURNAL, pageable);
+        return toFeedPage(journalIdSlice, member, pageable);
+    }
+
+    // 마이페이지: 내가 좋아요 누른 직관일지
+    @Transactional(readOnly = true)
+    public SliceResponse<JournalFeedResDto> getMyLikedJournals(Long memberId, Pageable pageable) {
+        Member member = memberValidateService.findById(memberId);
+        Slice<Long> journalIdSlice = likeValidateService.getLikedContentIds(member, ContentType.JOURNAL, pageable);
+        return toFeedPage(journalIdSlice, member, pageable);
+    }
+
+    // 인기 직관일지 조회 (좋아요 10개 이상, 공개)
+    @Transactional(readOnly = true)
+    public SliceResponse<JournalFeedResDto> getPopularJournals(Long memberId, Pageable pageable) {
+        Member member = memberValidateService.findById(memberId);
+        Slice<Journal> journals = journalGetService.getPopularJournals(10L, pageable);
+
+        List<Long> journalIds = journals.getContent().stream()
+                .map(Journal::getId)
+                .toList();
+
+        Set<Long> likedIds = likeValidateService.findLikedTargetIds(ContentType.JOURNAL, journalIds, member);
+        Set<Long> scrapedIds = scrapValidateService.findScrapedTargetIds(ContentType.JOURNAL, journalIds, member);
+
+        Slice<JournalFeedResDto> dtoSlice = journals.map(journal -> {
+            boolean writedByMe = journal.getMember().getId().equals(memberId);
+            boolean likedByMe = likedIds.contains(journal.getId());
+            boolean scrapedByMe = scrapedIds.contains(journal.getId());
+
+            return JournalFeedResDto.from(
+                    journal,
+                    s3Uploader.getDirectUrl(journal.getMedia_url()),
+                    writedByMe,
+                    likedByMe,
+                    scrapedByMe
+            );
+        });
+
+        return SliceResponse.of(dtoSlice);
+    }
+
+    // ID Slice → JournalFeedResDto Slice 변환 헬퍼 (N+1 최적화)
+    private SliceResponse<JournalFeedResDto> toFeedPage(Slice<Long> journalIdSlice, Member member, Pageable pageable) {
+        List<Long> journalIds = journalIdSlice.getContent();
+
+        if (journalIds.isEmpty()) {
+            return SliceResponse.empty(pageable);
+        }
+
+        List<Journal> journals = journalGetService.findAllByIds(journalIds);
+        Map<Long, Journal> journalMap = journals.stream()
+                .collect(Collectors.toMap(Journal::getId, Function.identity()));
+
+        Set<Long> likedIds = likeValidateService.findLikedTargetIds(ContentType.JOURNAL, journalIds, member);
+        Set<Long> scrapedIds = scrapValidateService.findScrapedTargetIds(ContentType.JOURNAL, journalIds, member);
+
+        List<JournalFeedResDto> dtos = journalIds.stream()
+                .map(journalMap::get)
+                .filter(journal -> journal != null)
+                .map(journal -> {
+                    boolean writedByMe = journal.getMember().getId().equals(member.getId());
+                    boolean likedByMe = likedIds.contains(journal.getId());
+                    boolean scrapedByMe = scrapedIds.contains(journal.getId());
+
+                    return JournalFeedResDto.from(
+                            journal,
+                            s3Uploader.getDirectUrl(journal.getMedia_url()),
+                            writedByMe,
+                            likedByMe,
+                            scrapedByMe
+                    );
+                })
+                .toList();
+
+        return SliceResponse.of(dtos, journalIdSlice.hasNext(), pageable);
     }
 }
