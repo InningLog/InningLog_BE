@@ -63,3 +63,80 @@ jobs:
             docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
             docker compose down
             docker compose up -d
+
+  update-api-docs:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SERVER_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Wait for server and fetch OpenAPI spec
+        run: |
+          SSH_CMD="ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}"
+          for i in $(seq 1 30); do
+            if $SSH_CMD "curl -sf -u '${{ secrets.SWAGGER_NAME }}:${{ secrets.SWAGGER_PW }}' http://localhost:8080/v3/api-docs" > openapi.json 2>/dev/null; then
+              if [ -s openapi.json ]; then
+                echo "OpenAPI spec fetched successfully"
+                exit 0
+              fi
+            fi
+            echo "Waiting for server... ($i/30)"
+            sleep 5
+          done
+          echo "Failed to fetch OpenAPI spec after 150s"
+          exit 1
+
+      - name: Checkout docs repo
+        uses: actions/checkout@v4
+        with:
+          repository: InningLog/inninglog-api-docs
+          token: ${{ secrets.DOCS_REPO_TOKEN }}
+          path: docs-repo
+
+      - name: Run converter
+        run: node scripts/openapi-to-gitbook/src/index.js -i openapi.json -o docs-repo
+
+      - name: Create or update PR
+        working-directory: docs-repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes detected"
+            exit 0
+          fi
+
+          BRANCH="auto/api-docs-update"
+          git checkout -B "$BRANCH"
+          git add -A
+          git commit -m "docs : API 문서 자동 업데이트"
+          git push -f origin "$BRANCH"
+
+          PR_EXISTS=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number' 2>/dev/null || echo "")
+          if [ -z "$PR_EXISTS" ]; then
+            gh pr create \
+              --title "docs : API 문서 자동 업데이트" \
+              --body "dev 서버 배포에 따른 API 문서 자동 업데이트입니다." \
+              --head "$BRANCH" \
+              --base main
+          else
+            echo "PR #$PR_EXISTS already exists, updated with force push"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.DOCS_REPO_TOKEN }}
