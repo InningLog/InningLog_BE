@@ -757,5 +757,161 @@ public class JournalController {
 
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, result));
     }
+
+    @Operation(
+            summary = "내가 댓글 단 직관 일지 목록 조회",
+            description = """
+                내가 댓글을 작성한 직관 일지 목록을 조회합니다.
+
+                ✔ 최근 댓글 단 순으로 정렬되어 반환됩니다.
+                ✔ page는 0부터 시작합니다. (0=첫 페이지)
+                ✔ size는 한 페이지에서 가져올 일지 수를 의미합니다.
+                ✔ hasNext가 true이면 다음 페이지 요청이 가능합니다.
+                """,
+            tags = {"마이페이지"}
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "내가 댓글 단 직관 일지 목록 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SliceResponse.class)
+                    )
+            )
+    })
+    @GetMapping("/my/commented")
+    public ResponseEntity<SuccessResponse<SliceResponse<JournalFeedResDto>>> getMyCommentedJournals(
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal CustomUserDetails user,
+
+            @Parameter(description = "조회할 페이지 번호 (0부터 시작)", example = "0")
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(description = "한 페이지당 일지 개수", example = "10")
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        SliceResponse<JournalFeedResDto> result = journalUsecase.getMyCommentedJournals(user.getMemberId(), pageable);
+
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, result));
+    }
+
+    @Operation(
+            summary = "내가 스크랩한 직관 일지 목록 조회",
+            description = """
+                내가 스크랩한 직관 일지 목록을 조회합니다.
+
+                ✔ 최근 스크랩한 순으로 정렬되어 반환됩니다.
+                ✔ page는 0부터 시작합니다. (0=첫 페이지)
+                ✔ size는 한 페이지에서 가져올 일지 수를 의미합니다.
+                ✔ hasNext가 true이면 다음 페이지 요청이 가능합니다.
+                """,
+            tags = {"마이페이지"}
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "내가 스크랩한 직관 일지 목록 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SliceResponse.class)
+                    )
+            )
+    })
+    @GetMapping("/my/scrapped")
+    public ResponseEntity<SuccessResponse<SliceResponse<JournalFeedResDto>>> getMyScrappedJournals(
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal CustomUserDetails user,
+
+            @Parameter(description = "조회할 페이지 번호 (0부터 시작)", example = "0")
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(description = "한 페이지당 일지 개수", example = "10")
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        SliceResponse<JournalFeedResDto> result = journalUsecase.getMyScrappedJournals(user.getMemberId(), pageable);
+
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, result));
+    }
+
+    @Operation(
+            summary = "내가 좋아요 누른 직관 일지 목록 조회",
+            description = """
+                내가 좋아요를 누른 직관 일지 목록을 조회합니다.
+
+                ✔ 최근 좋아요 누른 순으로 정렬되어 반환됩니다.
+                ✔ page는 0부터 시작합니다. (0=첫 페이지)
+                ✔ size는 한 페이지에서 가져올 일지 수를 의미합니다.
+                ✔ hasNext가 true이면 다음 페이지 요청이 가능합니다.
+                """,
+            tags = {"마이페이지"}
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "내가 좋아요 누른 직관 일지 목록 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SliceResponse.class)
+                    )
+            )
+    })
+    @GetMapping("/my/liked")
+    public ResponseEntity<SuccessResponse<SliceResponse<JournalFeedResDto>>> getMyLikedJournals(
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal CustomUserDetails user,
+
+            @Parameter(description = "조회할 페이지 번호 (0부터 시작)", example = "0")
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(description = "한 페이지당 일지 개수", example = "10")
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        SliceResponse<JournalFeedResDto> result = journalUsecase.getMyLikedJournals(user.getMemberId(), pageable);
+
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, result));
+    }
+
+    @Operation(
+            summary = "인기 직관 일지 목록 조회",
+            description = """
+                좋아요 10개 이상인 공개 직관 일지 목록을 조회합니다.
+
+                ✔ 최신순(createdAt DESC)으로 정렬되어 반환됩니다.
+                ✔ page는 0부터 시작합니다. (0=첫 페이지)
+                ✔ size는 한 페이지에서 가져올 일지 수를 의미합니다.
+                ✔ hasNext가 true이면 다음 페이지 요청이 가능합니다.
+                """,
+            tags = {"마이페이지"}
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "인기 직관 일지 목록 조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = SliceResponse.class)
+                    )
+            )
+    })
+    @GetMapping("/popular")
+    public ResponseEntity<SuccessResponse<SliceResponse<JournalFeedResDto>>> getPopularJournals(
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal CustomUserDetails user,
+
+            @Parameter(description = "조회할 페이지 번호 (0부터 시작)", example = "0")
+            @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(description = "한 페이지당 일지 개수", example = "10")
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        SliceResponse<JournalFeedResDto> result = journalUsecase.getPopularJournals(user.getMemberId(), pageable);
+
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, result));
+    }
 }
 
