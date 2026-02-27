@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -28,4 +29,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // 마이페이지: ID 목록으로 게시글 조회 (N+1 최적화)
     @Query("SELECT p FROM Post p JOIN FETCH p.member WHERE p.id IN :ids")
     List<Post> findAllByIdInWithMember(List<Long> ids);
+
+    // 커뮤니티 검색: 제목 또는 본문 키워드 검색 (최신순)
+    @Query("SELECT p FROM Post p JOIN FETCH p.member WHERE p.title LIKE %:keyword% OR p.content LIKE %:keyword% ORDER BY p.postAt DESC")
+    Slice<Post> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 }

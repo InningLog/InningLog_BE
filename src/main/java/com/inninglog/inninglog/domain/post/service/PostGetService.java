@@ -61,5 +61,11 @@ public class PostGetService {
     public List<Post> findAllByIds(List<Long> ids) {
         return postRepository.findAllByIdInWithMember(ids);
     }
+
+    //커뮤니티 검색: 키워드로 게시글 검색
+    @Transactional(readOnly = true)
+    public Slice<Post> searchByKeyword(String keyword, Pageable pageable) {
+        return postRepository.searchByKeyword(keyword, pageable);
+    }
 }
 

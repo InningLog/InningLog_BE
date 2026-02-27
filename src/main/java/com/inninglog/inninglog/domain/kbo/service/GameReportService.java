@@ -11,6 +11,7 @@ import com.inninglog.inninglog.domain.kbo.domain.VisitedGame;
 import com.inninglog.inninglog.domain.kbo.dto.PlayerRankingDto;
 import com.inninglog.inninglog.domain.kbo.dto.gameReport.GameReportResDto;
 import com.inninglog.inninglog.domain.kbo.dto.gameReport.PlayerRankingResult;
+import com.inninglog.inninglog.domain.kbo.dto.gameReport.WinningRateProjection;
 import com.inninglog.inninglog.domain.kbo.dto.gameReport.WinningRateResult;
 import com.inninglog.inninglog.domain.kbo.repository.GameRepository;
 import com.inninglog.inninglog.domain.kbo.repository.PlayerStatRepository;
@@ -73,24 +74,21 @@ public class GameReportService {
 
     // 나의 직관 승률 계산
     public WinningRateResult caculateWin(Member member) {
-        List<VisitedGame> visitedGames = visitedGameRepository.findByMember(member);
+        WinningRateProjection projection = visitedGameRepository.countWinningRate(member)
+                .orElseThrow(() -> {
+                    log.info("📌 [caculateWin] memberId={} 직관 기록이 없습니다", member.getId());
+                    return new CustomException(ErrorCode.NO_VISITED_GAMES);
+                });
 
-        if (visitedGames.isEmpty()) {
+        if (projection.getTotalGames() == 0) {
             log.info("📌 [caculateWin] memberId={} 직관 기록이 없습니다", member.getId());
             throw new CustomException(ErrorCode.NO_VISITED_GAMES);
         }
 
-        int totalVisitedGames = visitedGames.size();
-        int winGames = 0, lossGames = 0, drawGames = 0;
-
-        for (VisitedGame vg : visitedGames) {
-            switch (vg.getResultScore()) {
-                case WIN -> winGames++;
-                case LOSE -> lossGames++;
-                case DRAW -> drawGames++;
-            }
-        }
-
+        int totalVisitedGames = projection.getTotalGames();
+        int winGames = projection.getWinGames();
+        int lossGames = projection.getLoseGames();
+        int drawGames = projection.getDrawGames();
         int winningRateHalPoongRi = (int) Math.round(((double) winGames / totalVisitedGames) * 1000);
 
         log.info("📌 [caculateWin] memberId={} 직관 승률 계산 완료: total={}, win={}, lose={}, draw={}, rate={}",
@@ -101,24 +99,18 @@ public class GameReportService {
 
     // 홈 화면 용 승률 계산
     public WinningRateResult forHomeCaculateWin(Member member) {
-        List<VisitedGame> visitedGames = visitedGameRepository.findByMember(member);
+        WinningRateProjection projection = visitedGameRepository.countWinningRate(member)
+                .orElse(null);
 
-        if (visitedGames.isEmpty()) {
+        if (projection == null || projection.getTotalGames() == 0) {
             log.info("📌 [forHomeCaculateWin] memberId={} 홈화면용 직관 기록 없음", member.getId());
             return WinningRateResult.empty();
         }
 
-        int totalVisitedGames = visitedGames.size();
-        int winGames = 0, lossGames = 0, drawGames = 0;
-
-        for (VisitedGame vg : visitedGames) {
-            switch (vg.getResultScore()) {
-                case WIN -> winGames++;
-                case LOSE -> lossGames++;
-                case DRAW -> drawGames++;
-            }
-        }
-
+        int totalVisitedGames = projection.getTotalGames();
+        int winGames = projection.getWinGames();
+        int lossGames = projection.getLoseGames();
+        int drawGames = projection.getDrawGames();
         int winningRateHalPoongRi = (int) Math.round(((double) winGames / totalVisitedGames) * 1000);
 
         log.info("📌 [forHomeCaculateWin] memberId={} 홈화면 승률 계산 완료: rate={}",

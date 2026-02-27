@@ -189,6 +189,36 @@ public class JournalUsecase {
         return SliceResponse.of(dtoSlice);
     }
 
+    // 커뮤니티 검색: 공개 일지 키워드 검색
+    @Transactional(readOnly = true)
+    public SliceResponse<JournalFeedResDto> searchPublicJournals(Long memberId, String keyword, Pageable pageable) {
+        Member member = memberValidateService.findById(memberId);
+        Slice<Journal> journals = journalGetService.searchPublicJournals(keyword, pageable);
+
+        List<Long> journalIds = journals.getContent().stream()
+                .map(Journal::getId)
+                .toList();
+
+        Set<Long> likedIds = likeValidateService.findLikedTargetIds(ContentType.JOURNAL, journalIds, member);
+        Set<Long> scrapedIds = scrapValidateService.findScrapedTargetIds(ContentType.JOURNAL, journalIds, member);
+
+        Slice<JournalFeedResDto> dtoSlice = journals.map(journal -> {
+            boolean writedByMe = journal.getMember().getId().equals(memberId);
+            boolean likedByMe = likedIds.contains(journal.getId());
+            boolean scrapedByMe = scrapedIds.contains(journal.getId());
+
+            return JournalFeedResDto.from(
+                    journal,
+                    s3Uploader.getDirectUrl(journal.getMedia_url()),
+                    writedByMe,
+                    likedByMe,
+                    scrapedByMe
+            );
+        });
+
+        return SliceResponse.of(dtoSlice);
+    }
+
     // 마이페이지: 내가 쓴 직관 일지 목록
     @Transactional(readOnly = true)
     public SliceResponse<JournalSumListResDto> getMyJournals(Member member, Pageable pageable) {
