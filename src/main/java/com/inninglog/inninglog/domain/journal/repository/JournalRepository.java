@@ -19,6 +19,10 @@ public interface JournalRepository extends JpaRepository<Journal, Long> {
 
     List<Journal> findAllByMemberAndResultScore(Member member, ResultScore resultScore);
 
+    long countByMember(Member member);
+
+    long countByMemberAndResultScore(Member member, ResultScore resultScore);
+
     Page<Journal> findAllByMember(Member member, Pageable pageable);
 
     Page<Journal> findAllByMemberAndResultScore(Member member, ResultScore resultScore, Pageable pageable);
