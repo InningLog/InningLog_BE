@@ -282,10 +282,12 @@ public class PostGetController {
                 키워드로 게시글을 검색합니다.
 
                 📌 **검색 대상**: 제목 (title) + 본문 (content)
+                📌 **팀 필터링**: teamShortCode로 팀별 필터링 가능 (기본값: ALL = 전체)
                 📌 **정렬**: 최신순 (postAt DESC)
                 📌 **페이지네이션**: Slice 기반 무한 스크롤
 
                 ✅ 예시: `/community/posts/search?keyword=직관&page=0&size=10`
+                ✅ 팀 필터: `/community/posts/search?keyword=직관&teamShortCode=LG&page=0&size=10`
                 """
     )
     @ApiResponses({
@@ -303,6 +305,9 @@ public class PostGetController {
             @Parameter(description = "검색 키워드", example = "직관")
             @RequestParam String keyword,
 
+            @Parameter(description = "팀 숏코드 (ALL: 전체, LG/OB 등: 팀별 필터)", example = "ALL")
+            @RequestParam(defaultValue = "ALL") String teamShortCode,
+
             @Parameter(description = "조회할 페이지 번호 (0부터 시작)", example = "0")
             @RequestParam(defaultValue = "0") int page,
 
@@ -314,7 +319,7 @@ public class PostGetController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         searchHistoryService.saveSearchKeyword(user.getMember(), keyword);
-        SliceResponse<PostSummaryResDto> result = postUsecase.searchPosts(user.getMember(), keyword, pageable);
+        SliceResponse<PostSummaryResDto> result = postUsecase.searchPosts(user.getMember(), keyword, teamShortCode, pageable);
 
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, result));
     }

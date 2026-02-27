@@ -67,5 +67,11 @@ public class PostGetService {
     public Slice<Post> searchByKeyword(String keyword, Pageable pageable) {
         return postRepository.searchByKeyword(keyword, pageable);
     }
+
+    //커뮤니티 검색: 팀별 키워드로 게시글 검색
+    @Transactional(readOnly = true)
+    public Slice<Post> searchByKeywordAndTeam(String keyword, String teamShortCode, Pageable pageable) {
+        return postRepository.searchByKeywordAndTeam(keyword, teamShortCode, pageable);
+    }
 }
 

@@ -649,10 +649,12 @@ public class JournalController {
                 키워드로 공개 직관 일지를 검색합니다.
 
                 📌 **검색 대상**: 후기 본문 (review_text)
+                📌 **팀 필터링**: teamShortCode로 팀별 필터링 가능 (기본값: ALL = 전체)
                 📌 **정렬**: 작성순 (createdAt DESC)
                 📌 **페이지네이션**: Slice 기반 무한 스크롤
 
                 ✅ 예시: `/journals/search?keyword=역전승&page=0&size=10`
+                ✅ 팀 필터: `/journals/search?keyword=역전승&teamShortCode=LG&page=0&size=10`
                 """
     )
     @ApiResponse(
@@ -668,6 +670,9 @@ public class JournalController {
             @Parameter(description = "검색 키워드", example = "역전승")
             @RequestParam String keyword,
 
+            @Parameter(description = "팀 숏코드 (ALL: 전체, LG/OB 등: 팀별 필터)", example = "ALL")
+            @RequestParam(defaultValue = "ALL") String teamShortCode,
+
             @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
             @RequestParam(defaultValue = "0") int page,
 
@@ -679,7 +684,7 @@ public class JournalController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         searchHistoryService.saveSearchKeyword(user.getMember(), keyword);
-        SliceResponse<JournalFeedResDto> result = journalUsecase.searchPublicJournals(user.getMemberId(), keyword, pageable);
+        SliceResponse<JournalFeedResDto> result = journalUsecase.searchPublicJournals(user.getMemberId(), keyword, teamShortCode, pageable);
 
         return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, result));
     }
