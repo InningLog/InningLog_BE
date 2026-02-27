@@ -107,6 +107,21 @@ jobs:
           repository: InningLog/inninglog-api-docs
           token: ${{ secrets.DOCS_REPO_TOKEN }}
           path: docs-repo
+          fetch-depth: 0
+
+      - name: Restore previous auto-generated files
+        working-directory: docs-repo
+        run: |
+          BRANCH="auto/api-docs-update"
+          if git rev-parse --verify "origin/$BRANCH" >/dev/null 2>&1; then
+            git diff --name-only origin/main "origin/$BRANCH" | while IFS= read -r file; do
+              mkdir -p "$(dirname "$file")"
+              git show "origin/$BRANCH:$file" > "$file" 2>/dev/null || true
+            done
+            echo "Restored files from previous auto branch"
+          else
+            echo "No previous auto branch found"
+          fi
 
       - name: Run converter
         run: node scripts/openapi-to-gitbook/src/index.js -i openapi.json -o docs-repo
