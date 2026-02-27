@@ -263,4 +263,4 @@ function generateEndpointMarkdown(method, pathStr, operation, spec) {
   return lines.join('\n');
 }
 
-module.exports = { generateEndpointMarkdown, AUTO_MARKER };
+module.exports = { generateEndpointMarkdown, AUTO_MARKER, resolveRef };
