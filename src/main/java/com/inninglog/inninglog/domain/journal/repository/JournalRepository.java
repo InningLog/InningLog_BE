@@ -37,4 +37,9 @@ public interface JournalRepository extends JpaRepository<Journal, Long> {
     // 커뮤니티 검색: 공개 일지 중 review_text 키워드 검색 (작성순)
     @Query("SELECT j FROM Journal j JOIN FETCH j.member WHERE j.isPublic = true AND j.review_text LIKE %:keyword% ORDER BY j.createdAt DESC")
     Slice<Journal> searchPublicJournals(@Param("keyword") String keyword, Pageable pageable);
+
+    // 커뮤니티 검색: 팀별 공개 일지 키워드 검색 (작성순)
+    @Query("SELECT j FROM Journal j JOIN FETCH j.member m JOIN FETCH m.team t " +
+           "WHERE j.isPublic = true AND t.shortCode = :teamShortCode AND j.review_text LIKE %:keyword% ORDER BY j.createdAt DESC")
+    Slice<Journal> searchPublicJournalsByTeam(@Param("keyword") String keyword, @Param("teamShortCode") String teamShortCode, Pageable pageable);
 }

@@ -50,4 +50,10 @@ public class JournalGetService {
     public Slice<Journal> searchPublicJournals(String keyword, Pageable pageable) {
         return journalRepository.searchPublicJournals(keyword, pageable);
     }
+
+    // 커뮤니티 검색: 팀별 공개 일지 키워드 검색
+    @Transactional(readOnly = true)
+    public Slice<Journal> searchPublicJournalsByTeam(String keyword, String teamShortCode, Pageable pageable) {
+        return journalRepository.searchPublicJournalsByTeam(keyword, teamShortCode, pageable);
+    }
 }

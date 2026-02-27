@@ -189,11 +189,16 @@ public class JournalUsecase {
         return SliceResponse.of(dtoSlice);
     }
 
-    // 커뮤니티 검색: 공개 일지 키워드 검색
+    // 커뮤니티 검색: 공개 일지 키워드 검색 (팀별 필터링 지원)
     @Transactional(readOnly = true)
-    public SliceResponse<JournalFeedResDto> searchPublicJournals(Long memberId, String keyword, Pageable pageable) {
+    public SliceResponse<JournalFeedResDto> searchPublicJournals(Long memberId, String keyword, String teamShortCode, Pageable pageable) {
         Member member = memberValidateService.findById(memberId);
-        Slice<Journal> journals = journalGetService.searchPublicJournals(keyword, pageable);
+        Slice<Journal> journals;
+        if ("ALL".equalsIgnoreCase(teamShortCode)) {
+            journals = journalGetService.searchPublicJournals(keyword, pageable);
+        } else {
+            journals = journalGetService.searchPublicJournalsByTeam(keyword, teamShortCode, pageable);
+        }
 
         List<Long> journalIds = journals.getContent().stream()
                 .map(Journal::getId)
