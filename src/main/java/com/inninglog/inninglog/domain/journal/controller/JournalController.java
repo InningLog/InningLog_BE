@@ -884,8 +884,7 @@ public class JournalController {
                 ✔ page는 0부터 시작합니다. (0=첫 페이지)
                 ✔ size는 한 페이지에서 가져올 일지 수를 의미합니다.
                 ✔ hasNext가 true이면 다음 페이지 요청이 가능합니다.
-                """,
-            tags = {"마이페이지"}
+                """
     )
     @ApiResponses({
             @ApiResponse(
