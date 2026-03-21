@@ -17,6 +17,7 @@ spring:
 kakao:
   client_id: ${KAKAO_CLIENT_ID}
   redirect_uri: ${KAKAO_REDIRECT_URI}
+  admin_key: ${KAKAO_ADMIN_KEY}
 
 cloud:
   aws:

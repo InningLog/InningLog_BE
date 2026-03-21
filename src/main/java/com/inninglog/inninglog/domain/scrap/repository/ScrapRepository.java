@@ -30,4 +30,7 @@ public interface ScrapRepository extends JpaRepository<Scrap, Long> {
     // 마이페이지: 내가 스크랩한 게시글 ID 조회 (최신순)
     @Query("SELECT s.targetId FROM Scrap s WHERE s.member = :member AND s.contentType = :contentType ORDER BY s.createdAt DESC")
     Slice<Long> findTargetIdsByMemberAndContentType(Member member, ContentType contentType, Pageable pageable);
+
+    // 회원 탈퇴: 해당 회원의 스크랩 전체 삭제
+    void deleteByMember(Member member);
 }

@@ -26,6 +26,11 @@ jwt:
   secretKey: testsecretkeytestsecretkeytestsecretkeytestsecretkey
   expiration: 3600000
 
+kakao:
+  client_id: test-client-id
+  redirect_uri: http://localhost:8080/test
+  admin_key: test-admin-key
+
 cloud:
   aws:
     s3:

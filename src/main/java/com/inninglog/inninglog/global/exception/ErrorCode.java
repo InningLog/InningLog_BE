@@ -12,6 +12,8 @@ public enum ErrorCode {
 
     // 인증 / 회원 관련
     USER_NOT_FOUND("USER_NOT_FOUND", HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
+    ALREADY_DELETED_MEMBER("ALREADY_DELETED_MEMBER", HttpStatus.BAD_REQUEST, "이미 탈퇴한 회원입니다."),
+    KAKAO_UNLINK_FAILED("KAKAO_UNLINK_FAILED", HttpStatus.INTERNAL_SERVER_ERROR, "카카오 연동 해제에 실패했습니다."),
     DUPLICATE_NICKNAME("DUPLICATE_NICKNAME", HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다."),
     INVALID_NICKNAME("INVALID_NICKNAME", HttpStatus.BAD_REQUEST, "닉네임 형식이 올바르지 않습니다."),
     ALREADY_SET("ALREADY_SET", HttpStatus.CONFLICT, "이미 팀이 설정되었습니다."),

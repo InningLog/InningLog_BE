@@ -1,11 +1,20 @@
 package com.inninglog.inninglog.domain.kakao.service;
 
 import com.inninglog.inninglog.domain.kakao.dto.KakaoUserInfoResDTO;
+import com.inninglog.inninglog.global.exception.CustomException;
+import com.inninglog.inninglog.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KakaoService {
@@ -15,6 +24,9 @@ public class KakaoService {
 
     @Value("${kakao.redirect_uri}")
     private String redirectUri;
+
+    @Value("${kakao.admin_key}")
+    private String adminKey;
 
     private final WebClient kakaoWebClient;   // https://kauth.kakao.com
     private final WebClient kakaoApiClient;   // https://kapi.kakao.com
@@ -43,5 +55,27 @@ public class KakaoService {
                 .retrieve()
                 .bodyToMono(KakaoUserInfoResDTO.class)
                 .block();
+    }
+
+    public void unlinkKakaoUser(Long kakaoId) {
+        try {
+            MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+            body.add("target_id_type", "user_id");
+            body.add("target_id", String.valueOf(kakaoId));
+
+            kakaoApiClient.post()
+                    .uri("/v1/user/unlink")
+                    .header("Authorization", "KakaoAK " + adminKey)
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .body(BodyInserters.fromFormData(body))
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+
+            log.info("📌 [unlinkKakaoUser] kakaoId={} 카카오 연동 해제 완료", kakaoId);
+        } catch (WebClientResponseException e) {
+            log.error("📌 [unlinkKakaoUser] kakaoId={} 카카오 연동 해제 실패: {}", kakaoId, e.getMessage());
+            throw new CustomException(ErrorCode.KAKAO_UNLINK_FAILED);
+        }
     }
 }
