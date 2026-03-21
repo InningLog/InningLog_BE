@@ -13,6 +13,9 @@ public record MemberShortResDto(
         String profile_url
 ) {
     public static MemberShortResDto from(Member member){
+        if (member == null || member.isDeleted()) {
+            return new MemberShortResDto("알 수 없는 사용자", null);
+        }
         return new MemberShortResDto(
                 member.getNickname(),
                 member.getKakao_profile_url()

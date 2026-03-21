@@ -25,7 +25,8 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return member.getKakaoId().toString(); // 또는 nickname 등
+        Long kakaoId = member.getKakaoId();
+        return kakaoId != null ? kakaoId.toString() : String.valueOf(memberId);
     }
 
     @Override

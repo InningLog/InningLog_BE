@@ -6,6 +6,8 @@ import com.inninglog.inninglog.domain.team.domain.Team;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Builder
 @AllArgsConstructor //모든 필드를 매개변수로 받는 생성자 생성
@@ -51,6 +53,15 @@ public class Member extends BaseTimeEntity {
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private MemberCredential credential;
 
+    private LocalDateTime deletedAt;
+
+    public void softDelete() {
+        this.deletedAt = LocalDateTime.now();
+    }
+
+    public boolean isDeleted() {
+        return this.deletedAt != null;
+    }
 
     //기존 멤버 업데이트
     public void updateInfo(KakaoUserInfoResDTO dto) {
