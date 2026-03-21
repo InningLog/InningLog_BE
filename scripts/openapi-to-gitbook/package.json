@@ -1,0 +1,9 @@
+{
+  "name": "openapi-to-gitbook",
+  "version": "1.0.0",
+  "description": "Convert OpenAPI spec to GitBook markdown for InningLog API docs",
+  "main": "src/index.js",
+  "scripts": {
+    "convert": "node src/index.js"
+  }
+}

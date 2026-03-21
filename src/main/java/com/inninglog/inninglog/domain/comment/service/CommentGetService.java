@@ -79,4 +79,10 @@ public class CommentGetService {
     public Slice<Long> getCommentedPostIds(Member member, Pageable pageable) {
         return commentRepository.findDistinctTargetIdsByMemberAndContentType(member, ContentType.POST, pageable);
     }
+
+    //마이페이지: 내가 댓글 단 콘텐츠 ID 조회 (범용)
+    @Transactional(readOnly = true)
+    public Slice<Long> getCommentedContentIds(Member member, ContentType contentType, Pageable pageable) {
+        return commentRepository.findDistinctTargetIdsByMemberAndContentType(member, contentType, pageable);
+    }
 }

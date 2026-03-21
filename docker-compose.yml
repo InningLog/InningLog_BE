@@ -3,7 +3,7 @@ version: "3.8"
 services:
   inninglog-rest-server:
     image: 827762016815.dkr.ecr.ap-northeast-2.amazonaws.com/inninglog-dev:latest
-    container_name: inninlog-dev
+    container_name: inninglog-dev
     ports:
       - "8080:8080"
     env_file:

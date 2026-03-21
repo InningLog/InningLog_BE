@@ -48,4 +48,10 @@ public class ScrapValidateService {
     public Slice<Long> getScrappedPostIds(Member member, Pageable pageable) {
         return scrapRepository.findTargetIdsByMemberAndContentType(member, ContentType.POST, pageable);
     }
+
+    //마이페이지: 내가 스크랩한 콘텐츠 ID 조회 (범용)
+    @Transactional(readOnly = true)
+    public Slice<Long> getScrappedContentIds(Member member, ContentType contentType, Pageable pageable) {
+        return scrapRepository.findTargetIdsByMemberAndContentType(member, contentType, pageable);
+    }
 }

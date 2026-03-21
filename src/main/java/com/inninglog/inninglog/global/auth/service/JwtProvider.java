@@ -87,7 +87,7 @@ public class JwtProvider {
         Long userId = getUserIdFromToken(token);
 
         // MemberService 통해 사용자 정보 조회
-        Member member = memberRepository.findById(userId)
+        Member member = memberRepository.findByIdWithTeam(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         UserDetails userDetails = new CustomUserDetails(member, member.getId());

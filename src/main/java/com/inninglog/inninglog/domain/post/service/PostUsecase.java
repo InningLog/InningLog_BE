@@ -164,10 +164,15 @@ public class PostUsecase {
         return CommunityHomeResDto.of(teamShortCode, popularPosts);
     }
 
-    //커뮤니티 검색: 키워드로 게시글 검색
+    //커뮤니티 검색: 키워드로 게시글 검색 (팀별 필터링 지원)
     @Transactional(readOnly = true)
-    public SliceResponse<PostSummaryResDto> searchPosts(Member member, String keyword, Pageable pageable) {
-        Slice<Post> posts = postGetService.searchByKeyword(keyword, pageable);
+    public SliceResponse<PostSummaryResDto> searchPosts(Member member, String keyword, String teamShortCode, Pageable pageable) {
+        Slice<Post> posts;
+        if ("ALL".equalsIgnoreCase(teamShortCode)) {
+            posts = postGetService.searchByKeyword(keyword, pageable);
+        } else {
+            posts = postGetService.searchByKeywordAndTeam(keyword, teamShortCode, pageable);
+        }
         List<Long> postIds = posts.stream().map(Post::getId).toList();
 
         Set<Long> likedPostIds = likeValidateService.findLikedTargetIds(ContentType.POST, postIds, member);

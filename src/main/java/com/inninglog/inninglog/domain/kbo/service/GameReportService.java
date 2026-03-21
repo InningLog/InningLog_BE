@@ -200,6 +200,7 @@ public class GameReportService {
         log.info("📌 [generateReport] memberId={}, team='{}' 직관 리포트 생성 완료",
                 memberId, team.getShortCode());
 
-        return GameReportResDto.from(member.getNickname(),winningRateResult, team.getWinRate(), rankingResult);
+        return GameReportResDto.from(member.getNickname(),winningRateResult,
+                team.getWinRate() != null ? team.getWinRate() : 0.0, rankingResult);
     }
 }

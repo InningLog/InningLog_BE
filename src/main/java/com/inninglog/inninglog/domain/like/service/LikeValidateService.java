@@ -11,6 +11,8 @@ import com.inninglog.inninglog.global.exception.CustomException;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +39,12 @@ public class LikeValidateService {
     @Transactional(readOnly = true)
     public Set<Long> findLikedTargetIds(ContentType contentType, List<Long> targetIds, Member member){
         return likeRepository.findLikedTargetIds(contentType, targetIds, member);
+    }
+
+    //마이페이지: 내가 좋아요 누른 콘텐츠 ID 조회
+    @Transactional(readOnly = true)
+    public Slice<Long> getLikedContentIds(Member member, ContentType contentType, Pageable pageable) {
+        return likeRepository.findTargetIdsByMemberAndContentType(member, contentType, pageable);
     }
 
     //이미 좋아요 누른건지 확인

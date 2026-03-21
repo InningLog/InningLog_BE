@@ -1,9 +1,9 @@
-name: CI/CD to Rented Server (Password SSH + ECR)
+name: CI/CD to Dev Server
 
 on:
   push:
     branches:
-      - deploy
+      - dev
 
 jobs:
   build-and-deploy:
@@ -14,16 +14,23 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: ${{ runner.os }}-gradle-
 
       - name: Build with Gradle
         run: ./gradlew build -x test
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -35,23 +42,120 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build & Push Multi-Arch Docker image
+      - name: Build & Push Docker image
         run: |
           docker buildx build \
-            --platform linux/amd64,linux/arm64 \
+            --platform linux/amd64 \
             -t ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest \
             --push \`
             .
 
-      - name: Deploy via SSH with key
+      - name: Deploy via SSH
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SERVER_HOST }}
-          port: 1100
+          port: 22
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_KEY }}
           script: |
-            echo "✅ SSH 접속 성공!"
-            cd /home/ubuntu 
+            cd /home/ubuntu/InningLog_BE
+            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
             docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
-            docker compose -f docker-compose.yml up -d --build
+            docker compose down
+            docker compose up -d
+
+  update-api-docs:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SERVER_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Wait for server and fetch OpenAPI spec
+        run: |
+          SSH_CMD="ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}"
+          for i in $(seq 1 30); do
+            if $SSH_CMD "curl -sf -u '${{ secrets.SWAGGER_NAME }}:${{ secrets.SWAGGER_PW }}' http://localhost:8080/v3/api-docs" > openapi.json 2>/dev/null; then
+              if [ -s openapi.json ]; then
+                echo "OpenAPI spec fetched successfully"
+                exit 0
+              fi
+            fi
+            echo "Waiting for server... ($i/30)"
+            sleep 5
+          done
+          echo "Failed to fetch OpenAPI spec after 150s"
+          exit 1
+
+      - name: Checkout docs repo
+        uses: actions/checkout@v4
+        with:
+          repository: InningLog/inninglog-api-docs
+          token: ${{ secrets.DOCS_REPO_TOKEN }}
+          path: docs-repo
+          fetch-depth: 0
+
+      - name: Restore previous auto-generated files
+        working-directory: docs-repo
+        run: |
+          BRANCH="auto/api-docs-update"
+          if git rev-parse --verify "origin/$BRANCH" >/dev/null 2>&1; then
+            if git show "origin/$BRANCH:.openapi-snapshot.json" >/dev/null 2>&1; then
+              git diff --name-only origin/main "origin/$BRANCH" | while IFS= read -r file; do
+                mkdir -p "$(dirname "$file")"
+                git show "origin/$BRANCH:$file" > "$file" 2>/dev/null || true
+              done
+              echo "Restored files from previous auto branch"
+            else
+              echo "No snapshot in auto branch, skipping restore (legacy branch)"
+            fi
+          else
+            echo "No previous auto branch found"
+          fi
+
+      - name: Run converter
+        run: node scripts/openapi-to-gitbook/src/index.js -i openapi.json -o docs-repo
+
+      - name: Create or update PR
+        working-directory: docs-repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes detected"
+            exit 0
+          fi
+
+          BRANCH="auto/api-docs-update"
+          git checkout -B "$BRANCH"
+          git add -A
+          git commit -m "docs : API 문서 자동 업데이트"
+          git push -f origin "$BRANCH"
+
+          PR_EXISTS=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number' 2>/dev/null || echo "")
+          if [ -z "$PR_EXISTS" ]; then
+            gh pr create \
+              --title "docs : API 문서 자동 업데이트" \
+              --body "dev 서버 배포에 따른 API 문서 자동 업데이트입니다." \
+              --head "$BRANCH" \
+              --base main
+          else
+            echo "PR #$PR_EXISTS already exists, updated with force push"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.DOCS_REPO_TOKEN }}

@@ -33,4 +33,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // 커뮤니티 검색: 제목 또는 본문 키워드 검색 (최신순)
     @Query("SELECT p FROM Post p JOIN FETCH p.member WHERE p.title LIKE %:keyword% OR p.content LIKE %:keyword% ORDER BY p.postAt DESC")
     Slice<Post> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
+    // 커뮤니티 검색: 팀별 키워드 검색 (최신순)
+    @Query("SELECT p FROM Post p JOIN FETCH p.member WHERE p.teamShortCode = :teamShortCode AND (p.title LIKE %:keyword% OR p.content LIKE %:keyword%) ORDER BY p.postAt DESC")
+    Slice<Post> searchByKeywordAndTeam(@Param("keyword") String keyword, @Param("teamShortCode") String teamShortCode, Pageable pageable);
 }

@@ -32,7 +32,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     // 마이페이지: 내가 좋아요 누른 콘텐츠 ID 조회 (최신순)
     @Query("SELECT l.targetId FROM Like l WHERE l.member = :member AND l.contentType = :contentType ORDER BY l.createdAt DESC")
     Slice<Long> findTargetIdsByMemberAndContentType(Member member, ContentType contentType, Pageable pageable);
-
+  
     // 회원 탈퇴: 해당 회원의 좋아요 전체 삭제
     void deleteByMember(Member member);
 }
