@@ -4,7 +4,9 @@ import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.global.pageable.SimplePageResponse;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.response.SuccessResponse;
+import com.inninglog.inninglog.domain.seatView.dto.res.RecentSeatSearchRes;
 import com.inninglog.inninglog.domain.seatView.dto.res.SeatViewImageResult;
+import com.inninglog.inninglog.domain.seatView.service.RecentSeatSearchService;
 import com.inninglog.inninglog.domain.seatView.service.SeatSearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,6 +25,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/seatViews/normal")
 @RequiredArgsConstructor
@@ -30,6 +34,7 @@ import org.springframework.web.bind.annotation.*;
 public class SeatSearchController {
 
     private final SeatSearchService seatSearchService;
+    private final RecentSeatSearchService recentSeatSearchService;
 
     @Operation(
             summary = "일반 좌석 검색",
@@ -154,9 +159,13 @@ public class SeatSearchController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
+        Long memberId = user.getMember().getId();
+
         Page<SeatViewImageResult> response = seatSearchService.searchSeats(
-                user.getMember().getId(), stadiumShortCode, section, seatRow, pageable
+                memberId, stadiumShortCode, section, seatRow, pageable
         );
+
+        recentSeatSearchService.saveRecentSearch(memberId, stadiumShortCode, section, seatRow);
 
         SuccessCode code = response.isEmpty() ? SuccessCode.SEATVIEW_EMPTY : SuccessCode.SEATVIEW_LIST_FETCHED;
 
@@ -170,5 +179,46 @@ public class SeatSearchController {
                 .build();
 
         return ResponseEntity.ok(SuccessResponse.success(code, simplePage));
+    }
+
+    @Operation(
+            summary = "최근 검색한 좌석 조회",
+            description = "구장별로 최근 검색한 좌석 목록을 최대 3개까지 반환합니다."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "최근 검색 좌석 조회 성공",
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = @ExampleObject(
+                            value = """
+                                    {
+                                      "code": "RECENT_SEAT_SEARCH_FETCHED",
+                                      "message": "최근 검색 좌석 조회 성공",
+                                      "data": [
+                                        { "stadiumShortCode": "JAM", "section": "13", "seatRow": "3" },
+                                        { "stadiumShortCode": "JAM", "section": "22", "seatRow": null }
+                                      ]
+                                    }
+                                    """
+                    )
+            )
+    )
+    @GetMapping("/recent")
+    public ResponseEntity<SuccessResponse<List<RecentSeatSearchRes>>> getRecentSearches(
+            @AuthenticationPrincipal CustomUserDetails user,
+
+            @Parameter(
+                    description = "구장 단축코드",
+                    required = true,
+                    example = "JAM"
+            )
+            @RequestParam String stadiumShortCode
+    ) {
+        List<RecentSeatSearchRes> result = recentSeatSearchService.getRecentSearches(
+                user.getMember().getId(), stadiumShortCode
+        );
+
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.RECENT_SEAT_SEARCH_FETCHED, result));
     }
 }

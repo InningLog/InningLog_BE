@@ -20,7 +20,8 @@ public enum SuccessCode {
     JOURNAL_EMPTY("JOURNAL_EMPTY", HttpStatus.OK, "해당 조건에 해당하는 직관 일지가 없습니다."),
     SEATVIEW_LIST_FETCHED("SEATVIEW_LIST_FETCHED", HttpStatus.OK, "시야 사진 조회 성공"),
     SEATVIEW_EMPTY("SEAT_VIEW_EMPTY", HttpStatus.OK, "해당 조건에 해당하는 시야 사진이 없습니다."),
-    WITHDRAW_SUCCESS("WITHDRAW_SUCCESS", HttpStatus.OK, "회원 탈퇴가 완료되었습니다.");
+    WITHDRAW_SUCCESS("WITHDRAW_SUCCESS", HttpStatus.OK, "회원 탈퇴가 완료되었습니다."),
+    RECENT_SEAT_SEARCH_FETCHED("RECENT_SEAT_SEARCH_FETCHED", HttpStatus.OK, "최근 검색 좌석 조회 성공");
 
 
 
