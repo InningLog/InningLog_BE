@@ -5,6 +5,8 @@ import com.inninglog.inninglog.domain.contentImage.repository.ContentImageReposi
 import com.inninglog.inninglog.domain.contentType.ContentType;
 import com.inninglog.inninglog.global.exception.CustomException;
 import com.inninglog.inninglog.global.exception.ErrorCode;
+import com.inninglog.inninglog.global.s3.S3UrlProperties;
+import com.inninglog.inninglog.global.s3.ThumbnailUrlGenerator;
 import com.inninglog.inninglog.domain.member.repository.MemberRepository;
 import com.inninglog.inninglog.domain.seatView.domain.SeatView;
 import com.inninglog.inninglog.domain.seatView.dto.res.SeatViewImageResult;
@@ -29,6 +31,8 @@ public class HashtagSearchService {
     private final SeatViewRepository seatViewRepository;
     private final ContentImageRepository contentImageRepository;
     private final MemberRepository memberRepository;
+    private final ThumbnailUrlGenerator thumbnailUrlGenerator;
+    private final S3UrlProperties s3UrlProperties;
 
     // 모아보기 형태 검색 (사진만)
     public Page<SeatViewImageResult> searchSeatViewsByHashtagsGallery(Long memberId, String stadiumShortCode, List<String> hashtagCodes, Pageable pageable) {
@@ -70,10 +74,15 @@ public class HashtagSearchService {
         List<ContentImage> images = contentImageRepository.findAllByContentTypeAndTargetIdIn(
                 ContentType.SEATVIEW, seatViewIds);
 
+        String baseUrlPrefix = s3UrlProperties.getBaseUrl() + "/";
+
         return images.stream()
                 .collect(Collectors.toMap(
                         ContentImage::getTargetId,
-                        ContentImage::getOriginalUrl,
+                        img -> {
+                            String key = img.getOriginalUrl().replace(baseUrlPrefix, "");
+                            return thumbnailUrlGenerator.generateThumbnailUrl(key);
+                        },
                         (existing, replacement) -> existing
                 ));
     }
