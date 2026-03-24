@@ -17,7 +17,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("""
         select m
         from Member m
-        join fetch m.team
+        left join fetch m.team
         where m.id = :memberId
     """)
     Optional<Member> findByIdWithTeam(@Param("memberId") Long memberId);

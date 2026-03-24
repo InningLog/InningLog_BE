@@ -34,10 +34,6 @@ public class SeatView extends BaseTimeEntity { //직관 일지
     @JoinColumn(name = "stadium_id")
     private Stadium stadium;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "zone_id")
-    private Zone zone;
-
     private String section;
 
     private String seatRow;
@@ -49,12 +45,11 @@ public class SeatView extends BaseTimeEntity { //직관 일지
     private String view_media_url;
 
 
-    public static SeatView from(SeatCreateReqDto dto, Member member, Journal journal, Stadium stadium, Zone zone) {
+    public static SeatView from(SeatCreateReqDto dto, Member member, Journal journal, Stadium stadium) {
         return SeatView.builder()
                 .member(member)
                 .journal(journal)
                 .stadium(stadium)
-                .zone(zone)
                 .section(dto.getSection())
                 .seatRow(dto.getSeatRow())
                 .build();

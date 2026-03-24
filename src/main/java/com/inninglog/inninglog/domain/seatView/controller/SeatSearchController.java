@@ -4,8 +4,7 @@ import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.global.pageable.SimplePageResponse;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.response.SuccessResponse;
-import com.inninglog.inninglog.domain.seatView.dto.res.SeatSearchRes;
-import com.inninglog.inninglog.domain.seatView.dto.res.SeatViewDetailResult;
+import com.inninglog.inninglog.domain.seatView.dto.res.SeatViewImageResult;
 import com.inninglog.inninglog.domain.seatView.service.SeatSearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,11 +32,11 @@ public class SeatSearchController {
     private final SeatSearchService seatSearchService;
 
     @Operation(
-            summary = "일반 좌석 검색 (게시물 형태)",
+            summary = "일반 좌석 검색",
             description = """
-                    구장, 존, 구역, 열 정보를 통해 좌석 시야 후기를 검색합니다.  
-                    모든 조건은 선택사항이지만, 열 정보만으로는 검색할 수 없습니다 (최소 존 정보 필요).
-                    
+                    구장, 구역, 열 정보를 통해 좌석 시야 후기를 검색합니다.
+                    구장과 구역은 필수이며, 열 정보는 선택사항입니다.
+
                     ※ 결과는 **최신순으로 정렬**됩니다.
                     """
     )
@@ -47,7 +46,7 @@ public class SeatSearchController {
                     description = "좌석 시야 검색 완료",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = SeatSearchRes.class),
+                            schema = @Schema(implementation = SeatViewImageResult.class),
                             examples = {
                                     @ExampleObject(
                                             name = "검색 결과 있음",
@@ -113,7 +112,7 @@ public class SeatSearchController {
             )
     })
     @GetMapping("/gallery")
-    public ResponseEntity<SuccessResponse<SimplePageResponse<SeatViewDetailResult>>> searchSeats(
+    public ResponseEntity<SuccessResponse<SimplePageResponse<SeatViewImageResult>>> searchSeats(
 
             @AuthenticationPrincipal CustomUserDetails user,
 
@@ -128,13 +127,6 @@ public class SeatSearchController {
             @RequestParam String stadiumShortCode,
 
             @Parameter(
-                    description = "존 단축코드 (선택사항)",
-                    required = false,
-                    example = "JAM_BLUE"
-            )
-            @RequestParam(required = false) String zoneShortCode,
-
-            @Parameter(
                     description = "구역 정보 (선택사항)",
                     required = false,
                     example = "13"
@@ -142,7 +134,7 @@ public class SeatSearchController {
             @RequestParam(required = false) String section,
 
             @Parameter(
-                    description = "열 정보 (선택사항, 단독 사용 불가 - 최소 존 정보 필요)",
+                    description = "열 정보 (선택사항, 단독 사용 불가 - 구역 정보 필요)",
                     required = false,
                     example = "3"
             )
@@ -162,13 +154,13 @@ public class SeatSearchController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        Page<SeatViewDetailResult> response = seatSearchService.searchSeats(
-                user.getMember().getId(), stadiumShortCode, zoneShortCode, section, seatRow, pageable
+        Page<SeatViewImageResult> response = seatSearchService.searchSeats(
+                user.getMember().getId(), stadiumShortCode, section, seatRow, pageable
         );
 
         SuccessCode code = response.isEmpty() ? SuccessCode.SEATVIEW_EMPTY : SuccessCode.SEATVIEW_LIST_FETCHED;
 
-        SimplePageResponse<SeatViewDetailResult> simplePage = SimplePageResponse.<SeatViewDetailResult>builder()
+        SimplePageResponse<SeatViewImageResult> simplePage = SimplePageResponse.<SeatViewImageResult>builder()
                 .content(response.getContent())
                 .pageNumber(response.getNumber())
                 .pageSize(response.getSize())
