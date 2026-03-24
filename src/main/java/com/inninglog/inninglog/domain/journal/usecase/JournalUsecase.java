@@ -23,6 +23,7 @@ import com.inninglog.inninglog.domain.stadium.service.StadiumValidateService;
 import com.inninglog.inninglog.domain.team.domain.Team;
 import com.inninglog.inninglog.domain.team.service.TeamGetService;
 import com.inninglog.inninglog.global.s3.S3Uploader;
+import com.inninglog.inninglog.global.s3.ThumbnailUrlGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
@@ -51,6 +52,7 @@ public class JournalUsecase {
     private final GameReportService gameReportService;
     private final GameGetService gameGetService;
     private final S3Uploader s3Uploader;
+    private final ThumbnailUrlGenerator thumbnailUrlGenerator;
     private final LikeValidateService likeValidateService;
     private final ScrapValidateService scrapValidateService;
     private final CommentGetService commentGetService;
@@ -96,7 +98,7 @@ public class JournalUsecase {
         return journals.map(
                 journal -> JournalSumListResDto.from(
                         journal,
-                        s3Uploader.getDirectUrl(journal.getMedia_url()),
+                        thumbnailUrlGenerator.generateThumbnailUrl(journal.getMedia_url()),
                         member.getTeam().getShortCode(),
                         likedIds.contains(journal.getId()),
                         scrapedIds.contains(journal.getId())
@@ -184,7 +186,7 @@ public class JournalUsecase {
 
             return JournalFeedResDto.from(
                     journal,
-                    s3Uploader.getDirectUrl(journal.getMedia_url()),
+                    thumbnailUrlGenerator.generateThumbnailUrl(journal.getMedia_url()),
                     writedByMe,
                     likedByMe,
                     scrapedByMe
@@ -219,7 +221,7 @@ public class JournalUsecase {
 
             return JournalFeedResDto.from(
                     journal,
-                    s3Uploader.getDirectUrl(journal.getMedia_url()),
+                    thumbnailUrlGenerator.generateThumbnailUrl(journal.getMedia_url()),
                     writedByMe,
                     likedByMe,
                     scrapedByMe
@@ -244,7 +246,7 @@ public class JournalUsecase {
         Slice<JournalSumListResDto> dtoSlice = journals.map(
                 journal -> JournalSumListResDto.from(
                         journal,
-                        s3Uploader.getDirectUrl(journal.getMedia_url()),
+                        thumbnailUrlGenerator.generateThumbnailUrl(journal.getMedia_url()),
                         member.getTeam().getShortCode(),
                         likedIds.contains(journal.getId()),
                         scrapedIds.contains(journal.getId())
@@ -298,7 +300,7 @@ public class JournalUsecase {
 
             return JournalFeedResDto.from(
                     journal,
-                    s3Uploader.getDirectUrl(journal.getMedia_url()),
+                    thumbnailUrlGenerator.generateThumbnailUrl(journal.getMedia_url()),
                     writedByMe,
                     likedByMe,
                     scrapedByMe
@@ -333,7 +335,7 @@ public class JournalUsecase {
 
                     return JournalFeedResDto.from(
                             journal,
-                            s3Uploader.getDirectUrl(journal.getMedia_url()),
+                            thumbnailUrlGenerator.generateThumbnailUrl(journal.getMedia_url()),
                             writedByMe,
                             likedByMe,
                             scrapedByMe

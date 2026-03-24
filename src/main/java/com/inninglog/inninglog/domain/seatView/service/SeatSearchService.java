@@ -5,6 +5,8 @@ import com.inninglog.inninglog.domain.contentImage.repository.ContentImageReposi
 import com.inninglog.inninglog.domain.contentType.ContentType;
 import com.inninglog.inninglog.global.exception.CustomException;
 import com.inninglog.inninglog.global.exception.ErrorCode;
+import com.inninglog.inninglog.global.s3.S3UrlProperties;
+import com.inninglog.inninglog.global.s3.ThumbnailUrlGenerator;
 import com.inninglog.inninglog.domain.member.repository.MemberRepository;
 import com.inninglog.inninglog.domain.seatView.domain.SeatView;
 import com.inninglog.inninglog.domain.seatView.dto.req.SeatSearchReq;
@@ -30,6 +32,8 @@ public class SeatSearchService {
     private final SeatViewRepository seatViewRepository;
     private final ContentImageRepository contentImageRepository;
     private final MemberRepository memberRepository;
+    private final ThumbnailUrlGenerator thumbnailUrlGenerator;
+    private final S3UrlProperties s3UrlProperties;
 
     public Page<SeatViewImageResult> searchSeats(
             Long memeberId,
@@ -81,10 +85,15 @@ public class SeatSearchService {
         List<ContentImage> images = contentImageRepository.findAllByContentTypeAndTargetIdIn(
                 ContentType.SEATVIEW, seatViewIds);
 
+        String baseUrlPrefix = s3UrlProperties.getBaseUrl() + "/";
+
         return images.stream()
                 .collect(Collectors.toMap(
                         ContentImage::getTargetId,
-                        ContentImage::getOriginalUrl,
+                        img -> {
+                            String key = img.getOriginalUrl().replace(baseUrlPrefix, "");
+                            return thumbnailUrlGenerator.generateThumbnailUrl(key);
+                        },
                         (existing, replacement) -> existing // 첫 번째 이미지(썸네일) 유지
                 ));
     }
