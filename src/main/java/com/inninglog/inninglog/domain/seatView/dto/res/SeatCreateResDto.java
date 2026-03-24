@@ -17,7 +17,7 @@ public class SeatCreateResDto {
 
     public static SeatCreateResDto from(SeatView seatView) {
         return SeatCreateResDto.builder()
-                .JournalId(seatView.getJournal().getId())
+                .JournalId(seatView.getJournal() != null ? seatView.getJournal().getId() : null)
                 .SeatViewId(seatView.getId())
                 .build();
     }

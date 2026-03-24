@@ -55,15 +55,18 @@ public class SeatViewService {
                     return new CustomException(ErrorCode.USER_NOT_FOUND);
                 });
 
-        Journal journal = journalRepository.findById(dto.getJournalId())
-                .orElseThrow(() -> {
-                    log.warn("❌ [createSeatView] journalId={} 존재하지 않는 직관 일지 ID", dto.getJournalId());
-                    return new CustomException(ErrorCode.JOURNAL_NOT_FOUND);
-                });
+        Journal journal = null;
+        if (dto.getJournalId() != null) {
+            journal = journalRepository.findById(dto.getJournalId())
+                    .orElseThrow(() -> {
+                        log.warn("❌ [createSeatView] journalId={} 존재하지 않는 직관 일지 ID", dto.getJournalId());
+                        return new CustomException(ErrorCode.JOURNAL_NOT_FOUND);
+                    });
 
-        if (journal.getSeatView() != null) {
-            log.warn("⚠️ [createSeatView] journalId={} 이미 좌석 시야가 등록된 일지 ID", dto.getJournalId());
-            throw new CustomException(ErrorCode.SEATVIEW_ALREADY_EXISTS);
+            if (journal.getSeatView() != null) {
+                log.warn("⚠️ [createSeatView] journalId={} 이미 좌석 시야가 등록된 일지 ID", dto.getJournalId());
+                throw new CustomException(ErrorCode.SEATVIEW_ALREADY_EXISTS);
+            }
         }
 
         Stadium stadium = stadiumRepository.findByShortCode(dto.getStadiumShortCode())
@@ -73,7 +76,9 @@ public class SeatViewService {
                 });
 
         SeatView seatView = SeatView.from(dto, member, journal, stadium);
-        journal.setSeatView(seatView);
+        if (journal != null) {
+            journal.setSeatView(seatView);
+        }
         seatViewRepository.save(seatView);
 
         // ContentImage 테이블에 이미지 저장
