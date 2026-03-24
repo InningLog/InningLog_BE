@@ -34,7 +34,7 @@ public class HashtagSearchController {
     private final HashtagSearchService hashtagSearchService;
 
     @Operation(
-            summary = "해시태그 기반 좌석 검색 (모아보기)",
+            summary = "해시태그 기반 좌석 검색",
             description = """
                     선택한 감정 태그를 기준으로 좌석 시야 후기를 검색합니다.  
                     최대 **5개까지 태그 선택**이 가능하며, **선택한 모든 태그를 포함한 좌석만 조회**됩니다.  

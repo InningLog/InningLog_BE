@@ -7,11 +7,9 @@ import com.inninglog.inninglog.domain.contentType.ContentType;
 import com.inninglog.inninglog.domain.seatView.domain.SeatView;
 import com.inninglog.inninglog.domain.seatView.domain.SeatViewEmotionTag;
 import com.inninglog.inninglog.domain.seatView.domain.SeatViewEmotionTagMap;
-import com.inninglog.inninglog.domain.seatView.domain.Zone;
 import com.inninglog.inninglog.domain.seatView.repository.SeatViewEmotionTagMapRepository;
 import com.inninglog.inninglog.domain.seatView.repository.SeatViewEmotionTagRepository;
 import com.inninglog.inninglog.domain.seatView.repository.SeatViewRepository;
-import com.inninglog.inninglog.domain.seatView.repository.ZoneRepository;
 import com.inninglog.inninglog.global.exception.CustomException;
 import com.inninglog.inninglog.global.exception.ErrorCode;
 import com.inninglog.inninglog.domain.journal.domain.Journal;
@@ -40,7 +38,6 @@ public class SeatViewService {
     private final MemberRepository memberRepository;
     private final JournalRepository journalRepository;
     private final StadiumRepository stadiumRepository;
-    private final ZoneRepository zoneRepository;
     private final SeatViewRepository seatViewRepository;
     private final SeatViewEmotionTagRepository seatViewEmotionTagRepository;
     private final SeatViewEmotionTagMapRepository seatViewEmotionTagMapRepository;
@@ -75,18 +72,12 @@ public class SeatViewService {
                     return new CustomException(ErrorCode.STADIUM_NOT_FOUND);
                 });
 
-        Zone zone = zoneRepository.findByShortCode(dto.getZoneShortCode())
-                .orElseThrow(() -> {
-                    log.warn("❌ [createSeatView] zoneShortCode={} 존재하지 않는 존 코드", dto.getZoneShortCode());
-                    return new CustomException(ErrorCode.ZONE_NOT_FOUND);
-                });
-
-        SeatView seatView = SeatView.from(dto, member, journal, stadium, zone);
+        SeatView seatView = SeatView.from(dto, member, journal, stadium);
         journal.setSeatView(seatView);
         seatViewRepository.save(seatView);
 
         // ContentImage 테이블에 이미지 저장
-        seatViewImageCreateService.createSeatViewImage(seatView.getId(), dto.getFileName(), memberId);
+        seatViewImageCreateService.createSeatViewImages(seatView.getId(), dto.getFileNames(), memberId);
 
         // 감정 태그 매핑 저장
         for (String code : dto.getEmotionTagCodes()) {
@@ -127,9 +118,11 @@ public class SeatViewService {
                     return new CustomException(ErrorCode.SEATVIEW_NOT_FOUND);
                 });
 
-        // ContentImage에서 이미지 URL 조회
+        // ContentImage에서 이미지 URL 목록 조회
         List<ContentImage> images = imageGetService.getImageList(ContentType.SEATVIEW, seatViewId);
-        String imageUrl = images.isEmpty() ? null : images.get(0).getOriginalUrl();
+        List<String> imageUrls = images.stream()
+                .map(ContentImage::getOriginalUrl)
+                .toList();
 
         // 감정 태그 조회 (단일 좌석 기준)
         List<SeatViewEmotionTagDto> emotionTags = seatViewEmotionTagRepository
@@ -139,12 +132,10 @@ public class SeatViewService {
 
         return SeatViewDetailResult.from(
                 seatView,
-                imageUrl,
-                seatView.getZone().getName(),
-                seatView.getZone().getShortCode(),
+                imageUrls,
                 seatView.getSection(),
                 seatView.getSeatRow(),
-                seatView.getZone().getStadium().getName(),
+                seatView.getStadium().getName(),
                 emotionTags
         );
     }

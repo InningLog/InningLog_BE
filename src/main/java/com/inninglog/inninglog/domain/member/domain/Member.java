@@ -57,6 +57,10 @@ public class Member extends BaseTimeEntity {
 
     public void softDelete() {
         this.deletedAt = LocalDateTime.now();
+        this.kakaoId = null;
+        this.kakao_nickname = null;
+        this.kakao_profile_url = null;
+        this.nickname = null;
     }
 
     public boolean isDeleted() {

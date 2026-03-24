@@ -20,8 +20,8 @@ public class SeatViewDetailResult {
     @Schema(description = "좌석 시야 정보의 고유 ID", example = "102")
     private Long seatViewId;
 
-    @Schema(description = "좌석 시야 이미지 URL", example = "https://s3.ap-northeast-2.amazonaws.com/inninglog/seat/view123.jpg")
-    private String viewMediaUrl;
+    @Schema(description = "좌석 시야 이미지 URL 목록")
+    private List<String> viewMediaUrls;
 
     @Schema(description = "좌석 기본 정보")
     private SeatInfo seatInfo;
@@ -29,15 +29,14 @@ public class SeatViewDetailResult {
     @Schema(description = "감정 태그 목록")
     private List<SeatViewEmotionTagDto> emotionTags;
 
-    public static SeatViewDetailResult from(SeatView seatView, String presignedUrl,
-                                            String zoneName, String zoneShortCode,
+    public static SeatViewDetailResult from(SeatView seatView, List<String> imageUrls,
                                             String section, String seatRow,
                                             String stadiumName,
                                             List<SeatViewEmotionTagDto> emotionTags) {
         return SeatViewDetailResult.builder()
                 .seatViewId(seatView.getId())
-                .viewMediaUrl(presignedUrl)
-                .seatInfo(new SeatInfo(zoneName, zoneShortCode, section, seatRow, stadiumName))
+                .viewMediaUrls(imageUrls)
+                .seatInfo(new SeatInfo(section, seatRow, stadiumName))
                 .emotionTags(emotionTags)
                 .build();
     }
@@ -45,8 +44,6 @@ public class SeatViewDetailResult {
     @Getter
     @AllArgsConstructor
     public static class SeatInfo {
-        private String zoneName;
-        private String zoneShortCode;
         private String section;
         private String seatRow;
         private String stadiumName;

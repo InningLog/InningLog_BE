@@ -41,9 +41,9 @@ public class SeatViewController {
 
         ✅ 필수 입력 필드:
         - `journalId`: 연결된 직관 일지 ID
-        - `stadiumShortCode`, `zoneShortCode`, `section`, `seatRow`: 좌석 정보
+        - `stadiumShortCode`, `section`, `seatRow`: 좌석 정보
         - `emotionTagCodes`: 감정 태그 코드 배열 (문자열 리스트)
-        - `fileName`: 업로드한 이미지 파일명 (확장자 포함)
+        - `fileNames`: 업로드한 이미지 파일명 리스트 (최대 5장, 확장자 포함)
 
         📌 Presigned URL을 통해 업로드된 파일명만 저장하며, 실제 S3 경로는 서버에서 조립됩니다.
 
@@ -110,10 +110,8 @@ public class SeatViewController {
                                               "message": "요청이 정상적으로 처리되었습니다.",
                                               "data": {
                                                 "seatViewId": 3,
-                                                "viewMediaUrl": "https://your-s3-bucket-url/image.jpg",
+                                                "viewMediaUrls": ["https://your-s3-bucket-url/image1.jpg", "https://your-s3-bucket-url/image2.jpg"],
                                                 "seatInfo": {
-                                                  "zoneName": "블루석",
-                                                  "zoneShortCode": "JAM_BLUE",
                                                   "section": "13",
                                                   "seatRow": "3",
                                                   "stadiumName": "잠실"

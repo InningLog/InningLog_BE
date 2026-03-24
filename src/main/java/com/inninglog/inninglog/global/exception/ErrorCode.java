@@ -35,10 +35,9 @@ public enum ErrorCode {
     FILE_IS_EMPTY("FILE_IS_EMPTY", HttpStatus.BAD_REQUEST, "업로드할 파일이 없습니다."),
     JOURNAL_NOT_FOUND("JOURNAL_NOT_FOUND", HttpStatus.NOT_FOUND, "작성하지 않은 일지입니다."),
     EMOTION_TAG_NOT_FOUND("EMOTION_TAG_NOT_FOUND", HttpStatus.NOT_FOUND, "감정 태그가 없습니다."),
-    ZONE_NOT_FOUND("ZONE_NOT_FOUND", HttpStatus.NOT_FOUND, "등록되지 않은 존입니다."),
     SEATVIEW_NOT_FOUND("SEATVIEW_NOT_FOUND",HttpStatus.NOT_FOUND,"작성하지 않은 좌석 시야 후기입니다."),
     SEATVIEW_ALREADY_EXISTS("SEATVIEW_ALREADY_EXISTS", HttpStatus.BAD_REQUEST, "이미 좌석 시야 글이 작성된 직관 일지입니다."),
-    INVALID_SEAT_SEARCH("INVALID_SEAT_SEARCH", HttpStatus.BAD_REQUEST,"존 정보 없이 열만으로는 검색할 수 없습니다."),
+    INVALID_SEAT_SEARCH("INVALID_SEAT_SEARCH", HttpStatus.BAD_REQUEST,"구역 정보 없이 열만으로는 검색할 수 없습니다."),
     INVALID_HASHTAG_REQUEST("INVALID_HASHTAG_REQUEST",HttpStatus.BAD_REQUEST, "해시태그는 최소 1개, 최대 5개까지 선택할 수 있습니다."),
 
     //게시글 관련

@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class SeatViewImageCreateService {
@@ -16,25 +18,28 @@ public class SeatViewImageCreateService {
     private final S3UrlProperties s3UrlProperties;
 
     @Transactional
-    public void createSeatViewImage(Long seatViewId, String fileName, Long memberId) {
-        if (fileName == null || fileName.trim().isEmpty()) {
+    public void createSeatViewImages(Long seatViewId, List<String> fileNames, Long memberId) {
+        if (fileNames == null || fileNames.isEmpty()) {
             return;
         }
 
-        String key = "seatView/" + memberId + "/" + fileName;
-        String originalUrl = getOriginalUrl(key);
+        for (int i = 0; i < fileNames.size(); i++) {
+            String fileName = fileNames.get(i);
+            if (fileName == null || fileName.trim().isEmpty()) {
+                continue;
+            }
 
-        ContentImage contentImage = ContentImage.builder()
-                .contentType(ContentType.SEATVIEW)
-                .targetId(seatViewId)
-                .originalUrl(originalUrl)
-                .sequence(1)
-                .build();
+            String key = "seatView/" + memberId + "/" + fileName;
+            String originalUrl = s3UrlProperties.getBaseUrl() + "/" + key;
 
-        contentImageRepository.save(contentImage);
-    }
+            ContentImage contentImage = ContentImage.builder()
+                    .contentType(ContentType.SEATVIEW)
+                    .targetId(seatViewId)
+                    .originalUrl(originalUrl)
+                    .sequence(i + 1)
+                    .build();
 
-    private String getOriginalUrl(String key) {
-        return s3UrlProperties.getBaseUrl() + "/" + key;
+            contentImageRepository.save(contentImage);
+        }
     }
 }

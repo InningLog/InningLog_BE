@@ -21,9 +21,6 @@ public class SeatCreateReqDto {
     @Schema(description = "경기장 숏코드 (ex. JAMS, DAE)", example = "JAM")
     private String stadiumShortCode;
 
-    @Schema(description = "존 숏코드 (ex. JAM_BLUE )", example = "JAM_BLUE")
-    private String zoneShortCode;
-
     @Schema(description = "좌석의 구역 정보", example = "101")
     private String section;
 
@@ -33,6 +30,6 @@ public class SeatCreateReqDto {
     @Schema(description = "감정 태그 코드 리스트", example = "[    \"CHEERING_MOSTLY_STANDING\", \"SUN_NONE\"]")
     private List<String> emotionTagCodes;
 
-    @Schema(description = "업로드할 이미지 파일명 (확장자 포함)", example = "photo123.jpeg")
-    private String fileName;
+    @Schema(description = "업로드할 이미지 파일명 리스트 (최대 5장, 확장자 포함)", example = "[\"photo1.jpeg\", \"photo2.jpeg\"]")
+    private List<String> fileNames;
 }
