@@ -2,7 +2,9 @@ package com.inninglog.inninglog.domain.contentImage.controller;
 
 import com.inninglog.inninglog.domain.contentImage.dto.req.ImageListUploadReqDto;
 import com.inninglog.inninglog.domain.contentImage.dto.res.ImageListUploadResDto;
+import com.inninglog.inninglog.domain.contentImage.service.JournalImageUploadService;
 import com.inninglog.inninglog.domain.contentImage.service.PostImageUploadService;
+import com.inninglog.inninglog.domain.contentImage.service.SeatViewImageUploadService;
 import com.inninglog.inninglog.global.auth.CustomUserDetails;
 import com.inninglog.inninglog.global.response.SuccessCode;
 import com.inninglog.inninglog.global.response.SuccessResponse;
@@ -26,6 +28,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ImageUploadController {
 
     private final PostImageUploadService postImageUploadService;
+    private final JournalImageUploadService journalImageUploadService;
+    private final SeatViewImageUploadService seatViewImageUploadService;
 
     @PostMapping("/upload/post")
     @Operation(
@@ -49,6 +53,62 @@ public class ImageUploadController {
             @RequestBody @Parameter(description = "업로드할 이미지 목록") ImageListUploadReqDto reqDto
     ) {
         ImageListUploadResDto dto = postImageUploadService.getPostImagePreseignedUrlList(
+                reqDto.imageUploadReqDto(),
+                user.getMember().getId()
+        );
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, dto));
+    }
+
+    @PostMapping("/upload/journal")
+    @Operation(
+            summary = "직관일지 이미지 Presigned URL 목록 발급",
+            description = """
+                직관일지 작성 시 S3에 이미지를 업로드하기 위한 Presigned PUT URL 목록을 발급합니다.
+
+                1) 프론트는 fileName / contentType / sequence 정보를 보내면
+                2) 서버는 각 이미지에 대한 Presigned PUT URL + 저장될 S3 Key 를 생성하여 반환합니다.
+                3) 프론트는 받은 Presigned URL 로 S3에 직접 업로드한 뒤
+                4) 직관일지 생성 API 호출 시 해당 key 목록을 포함해 전송해야 합니다.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Presigned URL 생성 성공"),
+            @ApiResponse(responseCode = "400", description = "파일명 검증 실패"),
+            @ApiResponse(responseCode = "401", description = "인증 필요"),
+    })
+    public ResponseEntity<SuccessResponse<ImageListUploadResDto>> uploadJournalImage(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestBody @Parameter(description = "업로드할 이미지 목록") ImageListUploadReqDto reqDto
+    ) {
+        ImageListUploadResDto dto = journalImageUploadService.getJournalImagePresignedUrlList(
+                reqDto.imageUploadReqDto(),
+                user.getMember().getId()
+        );
+        return ResponseEntity.ok(SuccessResponse.success(SuccessCode.OK, dto));
+    }
+
+    @PostMapping("/upload/seatView")
+    @Operation(
+            summary = "좌석시야 이미지 Presigned URL 목록 발급",
+            description = """
+                좌석시야 등록 시 S3에 이미지를 업로드하기 위한 Presigned PUT URL 목록을 발급합니다.
+
+                1) 프론트는 fileName / contentType / sequence 정보를 보내면
+                2) 서버는 각 이미지에 대한 Presigned PUT URL + 저장될 S3 Key 를 생성하여 반환합니다.
+                3) 프론트는 받은 Presigned URL 로 S3에 직접 업로드한 뒤
+                4) 좌석시야 생성 API 호출 시 해당 key 목록을 포함해 전송해야 합니다.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Presigned URL 생성 성공"),
+            @ApiResponse(responseCode = "400", description = "파일명 검증 실패"),
+            @ApiResponse(responseCode = "401", description = "인증 필요"),
+    })
+    public ResponseEntity<SuccessResponse<ImageListUploadResDto>> uploadSeatViewImage(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestBody @Parameter(description = "업로드할 이미지 목록") ImageListUploadReqDto reqDto
+    ) {
+        ImageListUploadResDto dto = seatViewImageUploadService.getSeatViewImagePresignedUrlList(
                 reqDto.imageUploadReqDto(),
                 user.getMember().getId()
         );
