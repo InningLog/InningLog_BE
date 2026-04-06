@@ -40,8 +40,10 @@ public class SeatViewController {
         업로드된 파일명을 'fileName' 필드에 포함하여 요청해야 합니다.
 
         ✅ 필수 입력 필드:
-        - `journalId`: 연결된 직관 일지 ID
         - `stadiumShortCode`, `section`, `seatRow`: 좌석 정보
+
+        📎 선택 입력 필드:
+        - `journalId`: 연결할 직관 일지 ID (없으면 일지와 무관하게 독립 등록)
         - `emotionTagCodes`: 감정 태그 코드 배열 (문자열 리스트)
         - `fileNames`: 업로드한 이미지 파일명 리스트 (최대 5장, 확장자 포함)
 
