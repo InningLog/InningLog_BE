@@ -130,7 +130,7 @@ public class Journal extends BaseTimeEntity implements CommentableContent, Likea
 
         String filename = null;
         if (dto.getFileName() != null && !dto.getFileName().trim().isEmpty()) {
-            filename = "journal/" + member.getId() + "/" + dto.getFileName();
+            filename = dto.getFileName();
         }
 
         return Journal.builder()

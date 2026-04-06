@@ -30,6 +30,6 @@ public class SeatCreateReqDto {
     @Schema(description = "감정 태그 코드 리스트", example = "[    \"CHEERING_MOSTLY_STANDING\", \"SUN_NONE\"]")
     private List<String> emotionTagCodes;
 
-    @Schema(description = "업로드할 이미지 파일명 리스트 (최대 5장, 확장자 포함)", example = "[\"photo1.jpeg\", \"photo2.jpeg\"]")
+    @Schema(description = "업로드할 이미지 S3 key 리스트 (Presigned URL 발급 응답의 key 값, 최대 5장)", example = "[\"seatView/1/photo1.jpeg\", \"seatView/1/photo2.jpeg\"]")
     private List<String> fileNames;
 }
