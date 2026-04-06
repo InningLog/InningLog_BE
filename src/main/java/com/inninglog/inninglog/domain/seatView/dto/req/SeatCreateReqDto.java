@@ -15,7 +15,7 @@ import java.util.List;
 @Schema(description = "좌석 후기 등록 요청 DTO")
 public class SeatCreateReqDto {
 
-    @Schema(description = "매핑되는 직관 일지의 ID", example = "12")
+    @Schema(description = "매핑되는 직관 일지의 ID (선택, 없으면 독립 등록)", example = "12", nullable = true)
     private Long journalId;
 
     @Schema(description = "경기장 숏코드 (ex. JAMS, DAE)", example = "JAM")
