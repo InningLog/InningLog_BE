@@ -29,8 +29,7 @@ public class SeatViewImageCreateService {
                 continue;
             }
 
-            String key = "seatView/" + memberId + "/" + fileName;
-            String originalUrl = s3UrlProperties.getBaseUrl() + "/" + key;
+            String originalUrl = s3UrlProperties.getBaseUrl() + "/" + fileName;
 
             ContentImage contentImage = ContentImage.builder()
                     .contentType(ContentType.SEATVIEW)
